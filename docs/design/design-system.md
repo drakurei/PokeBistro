@@ -17,7 +17,7 @@ Tous les tokens vivent dans `src/styles/globals.css` (`@theme` de Tailwind 4) et
 --color-gold: #F2B826;
 --color-success: #1F7A4D;     /* feedback formulaire */
 --color-danger: #B42318;
---color-type-electrik / -feu / -eau / -plante / -normal / -psy / -fee / -glace
+--color-type-electrik / -feu / -eau / -plante / -normal / -combat / -psy / -spectre / -fee / -glace / -vol
 ```
 
 Règles :

@@ -1,6 +1,6 @@
 # Rapport QA
 
-Date : 25/09/2026 · Build testé : `main` (Vite 8, React 19, React Router 8).
+Date : 25/09/2026 (mise à jour après l'intégration des 16 nouveaux plats) · Build testé : `main` (Vite 8, React 19, React Router 8).
 
 ## 1. Tests automatisés
 
@@ -72,3 +72,21 @@ Piste suivante : pré-rendu statique des 34 URLs (SEO + LCP) et suppression de L
 3. Six boutons laque dans le plateau des plats signatures (trop de rouge) → CTA des cartes en encre.
 4. Stepper du panier bloqué à 1 → prop `allowRemove` (retrait à 1, comme dans le TP).
 5. Tests e2e : radio `sr-only` non cliquable (indicateur custom devant) → clic sur le label ; nom accessible des tuiles de type commençant par le compteur → `aria-label` explicite.
+
+## 7. Intégration des 16 nouveaux plats (25/09/2026)
+
+| Contrôle       | Résultat                                                                                                                                            |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Planche source | `Downloads/Gemini_Generated_Image_ocqkffocqkffocqk.jpg`, 2048 × 2048, grille 4 × 4, 16 plats dans l'ordre attendu, original conservé                |
+| Découpe        | 16 × 512 × 410 WebP (10 – 39 Ko), titres retirés (contrôle sur planche + zoom des bandes hautes), aucun raccord, aucun débord de case voisine       |
+| Catalogue      | 44 plats, ids 29 → 44, slugs uniques, catégorie Entrée, types Vol / Combat / Spectre, tags signature / frais / léger / gourmand                     |
+| Recherche      | « lucario » → 2 plats, « gyoza » → 1, « lavande » → 1 (ingrédient), « spectre » → 1 (type), sans accents                                            |
+| Filtres        | Entrée (3), Combat (2), Spectre (1), Vol (1), Nouveau (16), Signature (11), combinaisons Bento + Feu + 10–15 € → 3 (test e2e)                       |
+| Tri            | prix croissant / décroissant / nouveautés d'abord, dans l'URL (`?sort=`)                                                                            |
+| Fiche          | image, description, prix, ingrédients, type, tags, quantité, ajout, favori : identiques aux anciens plats (vérifié sur Lucario Power Burger)        |
+| Panier         | ajout d'un nouveau plat, double ajout, quantité, retrait, total, fermeture / réouverture, rechargement (suite e2e `cart.spec.js`, 30 / 30 au total) |
+| Console        | 0 erreur React / JS sur accueil, carte, fiche, panier                                                                                               |
+| Mobile 390     | bandeau de catégories défilant, tri, filtres en feuille, cartes 5:4 nettes                                                                          |
+| Git            | dossier `cart` renommé dans l'index (`Cart/` → `cart/`) : build Linux sûr                                                                           |
+
+Points d'attention documentés : les 28 anciens visuels (198 × 168) restent moins nets que les 16 nouveaux ; leur régénération est préparée dans `docs/images/`.

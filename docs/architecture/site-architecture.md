@@ -5,7 +5,7 @@
 | Route          | Page             | Rôle                                                                                                                                       |
 | -------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
 | `/`            | Accueil          | Thèse (hero), types, plats signatures, histoire (teaser), réservation.                                                                     |
-| `/menu`        | La carte         | Les 28 plats, recherche, filtres (catégorie, type, tags, prix). L'état des filtres est dans l'URL.                                         |
+| `/menu`        | La carte         | Les 44 plats regroupés par catégorie ; recherche, filtres (catégorie, types, tags, prix) et tri. L'état est dans l'URL.                    |
 | `/menu/:slug`  | Détail d'un plat | Ouvert en **dialog** au-dessus de la carte quand on vient de la grille, en **page complète** en accès direct (lien partagé, rechargement). |
 | `/histoire`    | Notre histoire   | Storytelling : origine, cuisine, types, ingrédients, chiffres.                                                                             |
 | `/contact`     | Contact          | Adresse, horaires, services, formulaire (nom, email, message).                                                                             |
@@ -57,7 +57,7 @@ src/
 ## Flux de données
 
 ```
-URL (?q=&category=&type=&tag=&price=)  --useMenuFilters-->  MenuPage --> filterProducts(products, filters) --> ProductGrid
+URL (?q=&category=&type=&tag=&price=&sort=)  --useMenuFilters-->  MenuPage --> filterProducts(products, filters) --> ProductGrid
                                                                                           |
 localStorage <--persist--  CartContext (useReducer)  <-- ProductCard / ProductDetail / CartDrawer
 localStorage <--persist--  FavoritesContext (liste d'ids)

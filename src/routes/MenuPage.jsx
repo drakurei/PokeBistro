@@ -35,6 +35,13 @@ export default function MenuPage() {
         ? `Les ${categoriesById[filters.category].plural.toLowerCase()}`
         : 'La carte'
 
+  const resultCount = (
+    <p className="font-mono text-xs whitespace-nowrap text-ink-mute" role="status" aria-live="polite">
+      {plural(visible.length, 'plat')}
+      {visible.length < products.length && ` sur ${products.length}`}
+    </p>
+  )
+
   return (
     <>
       <Seo
@@ -55,18 +62,25 @@ export default function MenuPage() {
           </p>
         </div>
 
-        {/* Toolbar: search, categories (small screens), count, sort, mobile filters */}
+        {/* Toolbar: search, sort and count; on small screens also the category strip and the filters button */}
         <div className="sticky top-(--spacing-header) z-30 border-y border-line bg-porcelain/95 backdrop-blur-md">
-          <div className="container-pb flex flex-col gap-3 py-3">
-            <div className="flex flex-wrap items-center gap-3">
-              <SearchField value={filters.q} onChange={setQuery} className="min-w-0 flex-1 basis-64" />
-              <label className="flex items-center gap-2 font-mono text-xs text-ink-mute">
-                <span className="sr-only sm:not-sr-only">Trier</span>
+          <div className="container-pb flex flex-col gap-2.5 py-2.5 lg:py-3">
+            <div className="flex flex-wrap items-center gap-2.5 lg:gap-3">
+              <SearchField
+                value={filters.q}
+                onChange={setQuery}
+                className="min-w-0 flex-1 basis-full sm:basis-64"
+              />
+              <label className="flex min-w-0 flex-1 items-center gap-2 font-mono text-xs text-ink-mute sm:flex-none">
+                <span className="sr-only">Trier</span>
                 <select
                   value={filters.sort}
                   onChange={(event) => setSort(event.target.value)}
                   aria-label="Trier les plats"
-                  className={cn(controlClass, 'h-12 w-auto rounded-full py-0 pr-9 pl-4 text-sm')}
+                  className={cn(
+                    controlClass,
+                    'h-11 w-full rounded-full py-0 pr-9 pl-4 text-sm sm:w-auto lg:h-12',
+                  )}
                 >
                   {sortOptions.map((option) => (
                     <option key={option.id} value={option.id}>
@@ -75,7 +89,12 @@ export default function MenuPage() {
                   ))}
                 </select>
               </label>
-              <Button variant="outline" size="sm" onClick={() => setSheetOpen(true)} className="lg:hidden">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSheetOpen(true)}
+                className="h-11 lg:hidden"
+              >
                 <IconFilter size={18} />
                 Filtres
                 {activeCount > 0 && (
@@ -84,10 +103,7 @@ export default function MenuPage() {
                   </span>
                 )}
               </Button>
-              <p className="font-mono text-xs text-ink-mute" role="status" aria-live="polite">
-                {plural(visible.length, 'plat')}
-                {visible.length < products.length && ` sur ${products.length}`}
-              </p>
+              <div className="hidden lg:block">{resultCount}</div>
               {activeCount > 0 && (
                 <Button variant="ghost" size="sm" onClick={reset} className="hidden lg:inline-flex">
                   Tout effacer
@@ -96,23 +112,27 @@ export default function MenuPage() {
             </div>
 
             {/* On small screens the categories are the quickest way through 44 dishes */}
-            <div className="-mx-(--spacing-gutter) flex gap-2 overflow-x-auto px-(--spacing-gutter) pb-1 lg:hidden [scrollbar-width:none]">
-              <Chip
-                active={filters.category === ''}
-                onClick={() => filters.category && setCategory(filters.category)}
-              >
-                Tout
-              </Chip>
-              {categories.map((category) => (
+            <div className="flex items-center gap-3 lg:hidden">
+              <div className="-mx-(--spacing-gutter) flex min-w-0 flex-1 gap-2 overflow-x-auto px-(--spacing-gutter) [scrollbar-width:none]">
                 <Chip
-                  key={category.id}
-                  active={filters.category === category.id}
-                  onClick={() => setCategory(category.id)}
+                  active={filters.category === ''}
+                  onClick={() => filters.category && setCategory(filters.category)}
                   className="shrink-0"
                 >
-                  {category.plural}
+                  Tout
                 </Chip>
-              ))}
+                {categories.map((category) => (
+                  <Chip
+                    key={category.id}
+                    active={filters.category === category.id}
+                    onClick={() => setCategory(category.id)}
+                    className="shrink-0"
+                  >
+                    {category.plural}
+                  </Chip>
+                ))}
+                <span className="shrink-0 self-center pl-1">{resultCount}</span>
+              </div>
             </div>
           </div>
         </div>

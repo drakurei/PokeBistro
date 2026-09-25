@@ -6,7 +6,7 @@ Site vitrine et carte en ligne d'un restaurant fictif inspiré de l'univers Pok�
 
 ## Présentation
 
-PokéBistro sert des bentos, des burgers, des bowls, des desserts et des boissons qui portent chacun le nom d'un Pokémon : Pikachu Bento, Tauros Steakhouse Burger, Carapuce Blue Bowl, Rondoudou Dessert… Le site présente le restaurant, laisse explorer les 28 plats par type Pokémon, par catégorie, par envie ou par prix, compose un panier et demande une table.
+PokéBistro sert des entrées, des bentos, des burgers, des bowls, des desserts et des boissons qui portent chacun le nom d'un Pokémon : Pikachu Bento, Lucario Power Burger, Marill Aqua Bowl, Mentali Velvet Cake… Le site présente le restaurant, laisse explorer les **44 plats** par type Pokémon (onze types), par catégorie, par envie ou par prix, compose un panier et demande une table.
 
 Le projet part d'un TP React (`tp-react-resto`) validé en cours, conservé tel quel dans son dépôt. Cette version en garde la logique utile (reducer du panier, filtres, données) et reconstruit tout le reste : identité, pages, composants, motion, accessibilité, SEO, tests. L'audit de départ et chaque décision (garder, refactorer, redessiner, reconstruire) sont dans [`docs/audit/tp-audit.md`](docs/audit/tp-audit.md).
 
@@ -21,8 +21,8 @@ La Poké Ball est traitée comme un objet de design : rouge laqué, blanc porcel
 - **Écran de chargement** de marque (anneau de la Poké Ball qui se trace, ceinture, wordmark), une fois par session, non bloquant, avec timeout et version reduced-motion.
 - **Hero** « Poké Ball ouverte » : moitié laque, moitié porcelaine, ceinture au centre, **Poké Ball 3D** (Three.js) qui flotte et suit la souris, trois plats signatures en médaillons.
 - **Header** transparent sur le hero puis porcelaine avec la ceinture ; navigation multipage ; menu mobile plein écran.
-- **Types Pokémon** : huit tuiles qui teintent la section au survol et ouvrent la carte filtrée.
-- **La carte** : 28 plats, recherche (nom, Pokémon, catégorie, type, tags, mots-clés, ingrédients, sans accents), filtres combinables (catégorie, types multiples, envies multiples, prix), **état dans l'URL** (partageable, bouton retour), rail de filtres desktop et feuille de filtres mobile, compteur annoncé, état vide.
+- **Types Pokémon** : onze tuiles qui teintent la section au survol et ouvrent la carte filtrée, plus une porte vers toute la carte.
+- **La carte** : 44 plats **regroupés par catégorie** comme un vrai menu (entrées, bentos, burgers, bowls, desserts, boissons, menus), recherche (nom, Pokémon, catégorie, type, tags, mots-clés, ingrédients, sans accents), filtres combinables (catégorie, types multiples, envies multiples, prix), **tri** (ordre de la carte, prix, nouveautés), **état dans l'URL** (partageable, bouton retour), rail de filtres desktop, bandeau de catégories et feuille de filtres sur mobile, compteur annoncé, état vide.
 - **Fiche plat** : dialog au-dessus de la carte (URL `/menu/:slug`) ou page complète en accès direct, ingrédients, encart type, quantité, ajout, favori, plats du même type.
 - **Panier** : tiroir latéral, lignes avec stepper, suppression, total, état vide, « Vider » avec confirmation, « Commander » qui explique la démonstration, **persistance locale validée**.
 - **Favoris** persistants.
@@ -94,11 +94,16 @@ Une seule expérience : la Poké Ball du hero, construite en Three.js (sphère e
 
 ## Images
 
-Les 28 visuels viennent de la planche générée pour le TP (198 × 168 px), convertis en WebP (1,4 Mo → 157 Ko) et affichés avec un masque radial qui fond leur fond crème dans la surface. Le remplacement par des visuels haute définition est préparé : plan dans [`docs/images/image-plan.md`](docs/images/image-plan.md), prompts Gemini par plat (bloc de style commun + bloc produit) dans [`docs/images/gemini-prompts.md`](docs/images/gemini-prompts.md). Il suffira de déposer `<slug>.webp` dans `src/assets/products/`.
+Deux séries cohabitent, même direction artistique (fond crème, plat isolé, plongée 3/4) :
+
+- **16 plats (seconde planche Gemini, 25/09/2026)** : planche 4 × 4 de 2048 × 2048 découpée par script (Python + Pillow + NumPy) en 16 images **512 × 410** (5:4, le bloc image des cartes). La bande de titre de chaque case est détectée (lignes de texte noir) et retirée ; le reste de la case est conservé tel quel, sans remplissage ni redimensionnement, donc fond, ombre et échelle sont identiques pour les 16. Planche de contrôle : `docs/images/new-products-preview.webp`. 400 Ko au total.
+- **28 plats (première planche, TP)** : 198 × 168 px, WebP, corrects mais en basse définition dans les cartes. Leur régénération en haute définition est préparée (prompts par plat dans [`docs/images/gemini-prompts.md`](docs/images/gemini-prompts.md), plan dans [`docs/images/image-plan.md`](docs/images/image-plan.md)) et ne bloque pas la livraison : il suffira de déposer `<slug>.webp` dans `src/assets/products/`.
+
+Toutes les images sont affichées avec un masque radial qui fond les angles dans la surface (le haut et le bas restent visibles pour les flammes, vagues et éclairs), en `loading="lazy"` avec dimensions déclarées.
 
 ## Performance
 
-Bundle initial : 118 Ko gzip (React, Router, accueil, carte, UI) + 53 Ko (motion) + 12,5 Ko de CSS. Three.js (133 Ko gzip) et les pages secondaires sont chargés à la demande. Aucune requête tierce, fonts en `swap`, images lazy avec dimensions déclarées, animations sur `transform` et `opacity`. Détails et pistes dans [`docs/qa/qa-report.md`](docs/qa/qa-report.md).
+Bundle initial : 122 Ko gzip (React, Router, accueil, carte à 44 plats, UI) + 53 Ko (motion) + 12,5 Ko de CSS. Three.js (133 Ko gzip) et les pages secondaires sont chargés à la demande. Aucune requête tierce, fonts en `swap`, images lazy avec dimensions déclarées, animations sur `transform` et `opacity`. Détails et pistes dans [`docs/qa/qa-report.md`](docs/qa/qa-report.md).
 
 ## Accessibilité
 
@@ -185,7 +190,18 @@ Le site n'est jamais enfermé dans GitHub Pages : la base est une variable d'env
 **Problème.** À 390 px, la balle centrée sur la ceinture chevauchait l'accroche et la fin du titre.
 **Solution.** Balle plus petite sous 768 px, titre limité en largeur, marge haute du bloc bas augmentée pour passer sous la balle.
 
-### 7. Attributs SVG en double dans le générateur de maquettes
+### 7. Le dossier `cart` suivi par Git en `Cart/`
+
+**Problème.** `git status` affichait `src/components/Cart/CartLine.jsx` alors que le code importe `./components/cart/…`. Sur Windows tout fonctionnait ; sur Linux (Vercel, Netlify, CI) le build aurait échoué avec un module introuvable.
+**Cause.** Le dossier `Cart/` du TP existait encore quand les nouveaux fichiers ont été créés : le système de fichiers, insensible à la casse, a gardé l'ancien nom et Git l'a enregistré.
+**Solution.** Renommer en deux temps (`git mv Cart cart_tmp`, puis `git mv cart_tmp cart`) pour que l'index reflète la bonne casse, et vérifier avec `git ls-files`.
+
+### 8. Découper la seconde planche sans raccord visible
+
+**Problème.** La première méthode (boîte englobante du plat + canvas carré rempli de la couleur de fond) laissait un rectangle visible : le fond des cases n'est pas uniforme (léger dégradé), et la détection « encre » prenait tout le fond des bols pour du plat.
+**Solution.** Garder la case entière moins la bande de titre (512 × 410, un ratio 5:4 naturel), sans remplissage ni redimensionnement, et détecter le texte par ses lignes noires plutôt que par distance au fond. Zéro raccord, échelle identique pour les 16 plats, contrôle visuel sur une planche générée et sur un zoom des bandes hautes.
+
+### 9. Attributs SVG en double dans le générateur de maquettes
 
 **Problème.** Les maquettes générées ne s'affichaient pas (`Attribute font-weight redefined`).
 **Cause.** La constante de police display embarquait déjà `font-weight`, réinjecté par l'appel.
@@ -202,11 +218,13 @@ Le site n'est jamais enfermé dans GitHub Pages : la base est une variable d'env
 - **Lenis limité au desktop** et coupé en reduced motion ; le tactile reste natif.
 - **Pas de backend factice** : une couche `api/` qui imite `fetch` (promesse, délai, échec possible), remplaçable en une ligne.
 - **Fonts auto-hébergées** : aucune requête vers Google Fonts, sous-ensembles latin uniquement.
+- **Carte regroupée par catégorie** quand aucun filtre n'est actif : avec 44 plats, on lit la carte comme un menu ; un filtre, une recherche ou un tri la remettent à plat.
+- **Un badge maximum par carte** (Nouveau, sinon Signature) et plus de ligne de tags : les plats restent les stars, les détails sont dans la fiche.
 - **Aucun fichier d'assistant** dans le dépôt (`.claude`, `.kilo`, etc. ignorés).
 
 ## Améliorations futures
 
-- Visuels haute définition générés à partir des prompts Gemini, puis image de hero dédiée.
+- Régénérer les 28 visuels de la première série en haute définition (prompts prêts), puis une image de hero dédiée.
 - Pré-rendu statique des 34 URLs au build (SEO et LCP).
 - Vraie API pour le contact et la réservation (la couche `api/` est prête), puis commande en ligne.
 - Mode sombre (les tokens le permettent : porcelaine ↔ encre).

@@ -31,7 +31,7 @@ Le site est construit sur cette correspondance. Il ne cite pas Pokémon par des 
 | Ligne          | `#E6E0D3` | Bordures, séparateurs discrets.                                                                                                           |
 | Or             | `#F2B826` | Accent rare : badge « signature », favoris, Pikachu. Encre dessus.                                                                        |
 
-Couleurs de **types** (palette fonctionnelle, jamais décorative) : Électrik `#F2B826`, Feu `#E8542B`, Eau `#2F7BE0`, Plante `#4FB34F`, Normal `#9E9683`, Psy `#E9508A`, Fée `#F2A1B8`, Glace `#7FD3E0`. Chaque type a une version « teinte » (14 % sur porcelaine) pour les fonds.
+Couleurs de **types** (palette fonctionnelle, jamais décorative) : Électrik `#F2B826`, Feu `#E8542B`, Eau `#2F7BE0`, Plante `#4FB34F`, Normal `#9E9683`, Combat `#B85C38`, Psy `#E9508A`, Spectre `#6D5B9C`, Fée `#F2A1B8`, Glace `#7FD3E0`, Vol `#A3A8E8`. Chaque type a une version « teinte » (14 % sur porcelaine) pour les fonds.
 
 Ce qu'on évite : le trio bleu/jaune/rouge primaire du TP, les blobs flous, les dégradés « tech », et le trio crème + serif + terracotta des sites générés automatiquement.
 
