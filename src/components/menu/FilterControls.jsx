@@ -3,6 +3,8 @@ import { categories, tags, priceRanges } from '../../data/filters'
 import { types } from '../../data/types'
 import cn from '../../utils/cn'
 import Chip from '../ui/Chip'
+import { combos } from '../../data/combos'
+import { FORMULES } from '../../hooks/useMenuFilters'
 
 function Group({ title, children }) {
   return (
@@ -26,6 +28,13 @@ export default function FilterControls({
     <div className="flex flex-col gap-8">
       <Group title="Catégorie">
         <div className="flex flex-wrap gap-2">
+          <Chip
+            active={filters.category === FORMULES}
+            onClick={() => setCategory(FORMULES)}
+            count={combos.length}
+          >
+            Formules
+          </Chip>
           {categories.map((category) => (
             <Chip
               key={category.id}

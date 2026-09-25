@@ -9,6 +9,8 @@ import { emptyFilters } from '../utils/filterProducts'
 // Unknown values are dropped silently.
 
 const MAX_QUERY = 60
+// Virtual category: the formules are not products but they have their own place in the carte
+export const FORMULES = 'formules'
 
 function parseList(value, dictionary) {
   if (!value) return []
@@ -21,7 +23,10 @@ export default function useMenuFilters() {
   const filters = useMemo(
     () => ({
       q: (params.get('q') ?? '').slice(0, MAX_QUERY),
-      category: categoriesById[params.get('category')] ? params.get('category') : '',
+      category:
+        categoriesById[params.get('category')] || params.get('category') === FORMULES
+          ? params.get('category')
+          : '',
       types: parseList(params.get('type'), typesById),
       tags: parseList(params.get('tag'), tagsById),
       price: priceRangesById[params.get('price')] ? params.get('price') : 'all',

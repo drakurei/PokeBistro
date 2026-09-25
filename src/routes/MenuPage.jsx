@@ -7,8 +7,10 @@ import SearchField from '../components/menu/SearchField'
 import FilterControls from '../components/menu/FilterControls'
 import FilterSheet from '../components/menu/FilterSheet'
 import ProductGrid from '../components/menu/ProductGrid'
-import useMenuFilters from '../hooks/useMenuFilters'
+import ComboCard from '../components/menu/ComboCard'
+import useMenuFilters, { FORMULES } from '../hooks/useMenuFilters'
 import products from '../data/products'
+import { combos } from '../data/combos'
 import filterProducts, { countActiveFilters, groupByCategory, sortProducts } from '../utils/filterProducts'
 import { types, typesById } from '../data/types'
 import { categories, categoriesById, sortOptions } from '../data/filters'
@@ -16,20 +18,48 @@ import { plural } from '../utils/text'
 import { controlClass } from '../components/ui/formStyles'
 import cn from '../utils/cn'
 
+// The formules, as a section of the carte
+function CombosSection({ headingLevel = 'h2' }) {
+  const Heading = headingLevel
+  return (
+    <section aria-labelledby="group-formules">
+      <div className="mb-5 flex items-baseline justify-between gap-4 border-b border-ink pb-3">
+        <Heading id="group-formules" className="font-display text-display-sm">
+          Formules
+          <span className="ml-3 font-mono text-sm font-normal text-ink-mute">{combos.length}</span>
+        </Heading>
+        <p className="hidden text-sm text-ink-mute sm:block">Un repas complet, moins cher qu’à la carte</p>
+      </div>
+      <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {combos.map((combo) => (
+          <li key={combo.id}>
+            <ComboCard combo={combo} />
+          </li>
+        ))}
+      </ul>
+    </section>
+  )
+}
+
 export default function MenuPage() {
   const { filters, setQuery, setCategory, toggleType, toggleTag, setPrice, setSort, reset } = useMenuFilters()
   const [sheetOpen, setSheetOpen] = useState(false)
 
-  const visible = useMemo(() => sortProducts(filterProducts(products, filters), filters.sort), [filters])
+  const formulesOnly = filters.category === FORMULES
+  // Formules have their own place: when they are selected, products are listed without a category filter
+  const visible = useMemo(() => {
+    const productFilters = formulesOnly ? { ...filters, category: '' } : filters
+    return sortProducts(filterProducts(products, productFilters), filters.sort)
+  }, [filters, formulesOnly])
   const activeCount = countActiveFilters(filters)
   const controls = { filters, setCategory, toggleType, toggleTag, setPrice }
 
-  // The full carte reads like a real menu: grouped by category. Any filter or sort flattens it.
+  // The full carte reads like a real menu: formules, then every category. Any filter or sort flattens it.
   const grouped = activeCount === 0 && filters.sort === '' ? groupByCategory(visible) : null
 
-  // A short title reflecting the current selection ("Les plats Feu", "Les burgers")
-  const heading =
-    filters.types.length === 1 && !filters.category
+  const heading = formulesOnly
+    ? 'Les formules'
+    : filters.types.length === 1 && !filters.category
       ? `Les plats ${typesById[filters.types[0]].label}`
       : filters.category
         ? `Les ${categoriesById[filters.category].plural.toLowerCase()}`
@@ -37,8 +67,8 @@ export default function MenuPage() {
 
   const resultCount = (
     <p className="font-mono text-xs whitespace-nowrap text-ink-mute" role="status" aria-live="polite">
-      {plural(visible.length, 'plat')}
-      {visible.length < products.length && ` sur ${products.length}`}
+      {formulesOnly ? plural(combos.length, 'formule') : plural(visible.length, 'plat')}
+      {!formulesOnly && visible.length < products.length && ` sur ${products.length}`}
     </p>
   )
 
@@ -47,13 +77,13 @@ export default function MenuPage() {
       <Seo
         title="La carte"
         path="/menu"
-        description={`Les ${products.length} plats de PokéBistro : entrées, bentos, burgers, bowls, desserts et boissons inspirés des Pokémon. Filtrez par type, par envie ou par prix.`}
+        description={`Les ${products.length} plats et ${combos.length} formules de PokéBistro : entrées, bentos, burgers, bowls, desserts et boissons inspirés des Pokémon. Filtrez par type, par envie ou par prix.`}
       />
 
       <section className="pt-(--spacing-header)">
-        <div className="container-pb pt-12 pb-8 md:pt-16">
+        <div className="container-wide pt-12 pb-8 md:pt-16">
           <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">
-            {products.length} plats · {types.length} types
+            {products.length} plats · {combos.length} formules · {types.length} types
           </p>
           <h1 className="mt-4 font-display text-display-lg text-balance">{heading}</h1>
           <p className="mt-4 max-w-xl text-lg text-ink-soft">
@@ -64,7 +94,7 @@ export default function MenuPage() {
 
         {/* Toolbar: search, sort and count; on small screens also the category strip and the filters button */}
         <div className="sticky top-(--spacing-header) z-30 border-y border-line bg-porcelain/95 backdrop-blur-md">
-          <div className="container-pb flex flex-col gap-2.5 py-2.5 lg:py-3">
+          <div className="container-wide flex flex-col gap-2.5 py-2.5 lg:py-3">
             <div className="flex flex-wrap items-center gap-2.5 lg:gap-3">
               <SearchField
                 value={filters.q}
@@ -111,7 +141,7 @@ export default function MenuPage() {
               )}
             </div>
 
-            {/* On small screens the categories are the quickest way through 44 dishes */}
+            {/* On small screens the categories are the quickest way through the carte */}
             <div className="flex items-center gap-3 lg:hidden">
               <div className="-mx-(--spacing-gutter) flex min-w-0 flex-1 gap-2 overflow-x-auto px-(--spacing-gutter) [scrollbar-width:none]">
                 <Chip
@@ -120,6 +150,9 @@ export default function MenuPage() {
                   className="shrink-0"
                 >
                   Tout
+                </Chip>
+                <Chip active={formulesOnly} onClick={() => setCategory(FORMULES)} className="shrink-0">
+                  Formules
                 </Chip>
                 {categories.map((category) => (
                   <Chip
@@ -137,15 +170,18 @@ export default function MenuPage() {
           </div>
         </div>
 
-        <div className="container-pb grid gap-10 py-10 lg:grid-cols-[280px_1fr] lg:gap-12">
+        <div className="container-wide grid gap-10 py-10 lg:grid-cols-[264px_1fr] lg:gap-12">
           <aside aria-label="Filtres" className="hidden lg:block">
             <div className="sticky top-[calc(var(--spacing-header)+5.5rem)]">
               <FilterControls idPrefix="rail" {...controls} />
             </div>
           </aside>
           <div>
-            {grouped ? (
+            {formulesOnly ? (
+              <CombosSection />
+            ) : grouped ? (
               <div className="flex flex-col gap-14">
+                <CombosSection />
                 {grouped.map((group) => (
                   <section key={group.category.id} aria-labelledby={`group-${group.category.id}`}>
                     <div className="mb-5 flex items-baseline justify-between gap-4 border-b border-ink pb-3">
@@ -171,7 +207,7 @@ export default function MenuPage() {
       <FilterSheet
         open={sheetOpen}
         onClose={() => setSheetOpen(false)}
-        resultCount={visible.length}
+        resultCount={formulesOnly ? combos.length : visible.length}
         activeCount={activeCount}
         onReset={reset}
         {...controls}

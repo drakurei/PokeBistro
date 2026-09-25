@@ -1,12 +1,13 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState } from 'react'
 import cartReducer, { initialState, MAX_QUANTITY } from '../reducers/cartReducer'
-import { productsById } from '../data/products'
+import { isValidCartId, resolveCartItem } from '../utils/cartItems'
 import { readJSON, writeJSON, isPositiveInt } from '../utils/storage'
 
 const STORAGE_KEY = 'cart'
 const CartContext = createContext(null)
 
-// A stored cart is accepted only if every line is { id, quantity } with a product that still exists.
+// A stored cart is accepted only if every line is { id, quantity } with an id that still resolves
+// (a product id, or a formule id whose composition is valid)
 function isValidCart(value) {
   return (
     value &&
@@ -16,10 +17,10 @@ function isValidCart(value) {
     value.items.every(
       (item) =>
         item &&
-        isPositiveInt(item.id) &&
+        (isPositiveInt(item.id) || (typeof item.id === 'string' && item.id.length <= 200)) &&
         isPositiveInt(item.quantity) &&
         item.quantity <= MAX_QUANTITY &&
-        productsById[item.id] !== undefined,
+        isValidCartId(item.id),
     )
   )
 }
@@ -27,7 +28,7 @@ function isValidCart(value) {
 function initCart() {
   const stored = readJSON(STORAGE_KEY, isValidCart)
   if (!stored) return initialState
-  // Deduplicate defensively: one line per product
+  // Deduplicate defensively: one line per id
   const seen = new Set()
   const items = stored.items.filter((item) => (seen.has(item.id) ? false : seen.add(item.id)))
   return { items }
@@ -43,12 +44,15 @@ export function CartProvider({ children }) {
     writeJSON(STORAGE_KEY, state)
   }, [state])
 
-  // Lines enriched with the catalogue data (name, price, image…)
+  // Lines enriched with the catalogue data (name, price, image, composition for formules)
   const items = useMemo(
     () =>
       state.items
-        .map((item) => ({ ...productsById[item.id], quantity: item.quantity }))
-        .filter((item) => item.id !== undefined),
+        .map((item) => {
+          const resolved = resolveCartItem(item.id)
+          return resolved ? { ...resolved, id: item.id, quantity: item.quantity } : null
+        })
+        .filter(Boolean),
     [state.items],
   )
 

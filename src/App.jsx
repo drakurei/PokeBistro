@@ -11,11 +11,13 @@ import RouteEffects from './components/layout/RouteEffects'
 import LoadingScreen from './components/loading/LoadingScreen'
 import CartDrawer from './components/cart/CartDrawer'
 import ProductDialog from './components/menu/ProductDialog'
+import ComboDialog from './components/menu/ComboDialog'
 import HomePage from './routes/HomePage'
 import MenuPage from './routes/MenuPage'
 
 // Home and menu are the core of the site and ship in the main bundle; the other pages load on demand.
 const ProductPage = lazy(() => import('./routes/ProductPage'))
+const ComboPage = lazy(() => import('./routes/ComboPage'))
 const StoryPage = lazy(() => import('./routes/StoryPage'))
 const ContactPage = lazy(() => import('./routes/ContactPage'))
 const ReservationPage = lazy(() => import('./routes/ReservationPage'))
@@ -43,6 +45,7 @@ function App() {
                 <Routes location={background || location}>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/menu" element={<MenuPage />} />
+                  <Route path="/menu/formule/:slug" element={<ComboPage />} />
                   <Route path="/menu/:slug" element={<ProductPage />} />
                   <Route path="/histoire" element={<StoryPage />} />
                   <Route path="/contact" element={<ContactPage />} />
@@ -52,6 +55,7 @@ function App() {
               </Suspense>
               {background && (
                 <Routes>
+                  <Route path="/menu/formule/:slug" element={<ComboDialog />} />
                   <Route path="/menu/:slug" element={<ProductDialog />} />
                 </Routes>
               )}

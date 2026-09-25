@@ -24,6 +24,7 @@ export default function CartLine({ item }) {
           <p className="shrink-0 font-mono text-sm font-medium">{formatPrice(item.price * item.quantity)}</p>
         </div>
         <p className="font-mono text-xs text-ink-mute">{formatPrice(item.price)} l’unité</p>
+        {item.kind === 'combo' && <p className="text-xs text-ink-soft">{item.composition.join(' · ')}</p>}
         <div className="mt-1 flex items-center justify-between gap-3">
           <Stepper
             value={item.quantity}
