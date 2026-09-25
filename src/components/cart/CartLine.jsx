@@ -13,8 +13,8 @@ export default function CartLine({ item }) {
         <img
           src={item.image}
           alt=""
-          width="198"
-          height="168"
+          width="512"
+          height="410"
           className="dish-image h-full w-full object-cover"
         />
       </div>
