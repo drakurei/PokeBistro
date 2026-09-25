@@ -13,60 +13,19 @@
     <link rel="icon" type="image/svg+xml" href="/PokeBistro/favicon.svg" />
     <link rel="apple-touch-icon" href="/PokeBistro/apple-touch-icon.png" />
     <link rel="manifest" href="/PokeBistro/site.webmanifest" />
-    <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "Restaurant",
-        "name": "PokéBistro",
-        "description": "Bistro contemporain inspiré de l’univers Pokémon : bentos, burgers, bowls, desserts et boissons portant le nom d’un Pokémon.",
-        "url": "https://drakurei.github.io/PokeBistro/",
-        "image": "https://drakurei.github.io/PokeBistro/og-image.png",
-        "telephone": "+33123456789",
-        "email": "bonjour@pokebistro.fr",
-        "servesCuisine": ["Japonaise", "Fusion", "Burgers"],
-        "priceRange": "€€",
-        "acceptsReservations": "True",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "12 route Victoire",
-          "postalCode": "91000",
-          "addressLocality": "Évry-Courcouronnes",
-          "addressCountry": "FR"
-        },
-        "openingHoursSpecification": [
-          {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            "opens": "11:30",
-            "closes": "14:30"
-          },
-          {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
-            "opens": "18:30",
-            "closes": "22:30"
-          },
-          {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Saturday", "Sunday"],
-            "opens": "12:00",
-            "closes": "15:00"
-          },
-          {
-            "@type": "OpeningHoursSpecification",
-            "dayOfWeek": ["Saturday", "Sunday"],
-            "opens": "18:30",
-            "closes": "23:00"
-          }
-        ],
-        "hasMenu": "https://drakurei.github.io/PokeBistro/menu"
-      }
+    <script>
+      try {
+        if (sessionStorage.getItem('pokebistro:loaded') === '1')
+          document.documentElement.dataset.loader = 'done'
+      } catch (e) {}
     </script>
-    <script type="module" crossorigin src="/PokeBistro/assets/index-BXKnGvQy.js"></script>
+    <script type="module" crossorigin src="/PokeBistro/assets/index-CF4fityc.js"></script>
     <link rel="modulepreload" crossorigin href="/PokeBistro/assets/cn-CLdESmj-.js">
     <link rel="modulepreload" crossorigin href="/PokeBistro/assets/motion-BOsHh4SR.js">
-    <link rel="modulepreload" crossorigin href="/PokeBistro/assets/Seo-B2NONFZc.js">
-    <link rel="stylesheet" crossorigin href="/PokeBistro/assets/index-D214G9et.css">
+    <link rel="modulepreload" crossorigin href="/PokeBistro/assets/Button-NM6yNVqU.js">
+    <link rel="modulepreload" crossorigin href="/PokeBistro/assets/products-CaERr5ze.js">
+    <link rel="modulepreload" crossorigin href="/PokeBistro/assets/DishImage-CvS2oogv.js">
+    <link rel="stylesheet" crossorigin href="/PokeBistro/assets/index-CpMSz4FY.css">
   </head>
   <body>
     <div id="root"></div>
