@@ -1,0 +1,10 @@
+{
+  "name": "PokéBistro",
+  "short_name": "PokéBistro",
+  "description": "Le bistro qui sert l’univers Pokémon dans l’assiette.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fcfbf8",
+  "theme_color": "#c9211b",
+  "icons": [{ "src": "/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }]
+}
