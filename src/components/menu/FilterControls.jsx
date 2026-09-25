@@ -1,10 +1,12 @@
 import products from '../../data/products'
-import { categories, tags, priceRanges } from '../../data/filters'
+import { categories, diets, tags, priceRanges } from '../../data/filters'
 import { types } from '../../data/types'
-import cn from '../../utils/cn'
-import Chip from '../ui/Chip'
 import { combos } from '../../data/combos'
 import { FORMULES } from '../../hooks/useMenuFilters'
+import { matchesDiet } from '../../utils/filterProducts'
+import cn from '../../utils/cn'
+import Chip from '../ui/Chip'
+import TypeIcon from '../ui/TypeIcon'
 
 function Group({ title, children }) {
   return (
@@ -21,6 +23,7 @@ export default function FilterControls({
   setCategory,
   toggleType,
   toggleTag,
+  setDiet,
   setPrice,
   idPrefix = 'f',
 }) {
@@ -28,13 +31,6 @@ export default function FilterControls({
     <div className="flex flex-col gap-8">
       <Group title="Catégorie">
         <div className="flex flex-wrap gap-2">
-          <Chip
-            active={filters.category === FORMULES}
-            onClick={() => setCategory(FORMULES)}
-            count={combos.length}
-          >
-            Formules
-          </Chip>
           {categories.map((category) => (
             <Chip
               key={category.id}
@@ -45,6 +41,13 @@ export default function FilterControls({
               {category.label}
             </Chip>
           ))}
+          <Chip
+            active={filters.category === FORMULES}
+            onClick={() => setCategory(FORMULES)}
+            count={combos.length}
+          >
+            Formules
+          </Chip>
         </div>
       </Group>
 
@@ -53,9 +56,15 @@ export default function FilterControls({
           {types.map((type) => (
             <Chip
               key={type.id}
-              color={type.color}
               active={filters.types.includes(type.id)}
               onClick={() => toggleType(type.id)}
+              icon={
+                <TypeIcon
+                  typeId={type.id}
+                  size={16}
+                  style={{ color: filters.types.includes(type.id) ? undefined : type.color }}
+                />
+              }
             >
               {type.label}
             </Chip>
@@ -68,6 +77,21 @@ export default function FilterControls({
           {tags.map((tag) => (
             <Chip key={tag.id} active={filters.tags.includes(tag.id)} onClick={() => toggleTag(tag.id)}>
               {tag.label}
+            </Chip>
+          ))}
+        </div>
+      </Group>
+
+      <Group title="Régime">
+        <div className="flex flex-wrap gap-2">
+          {diets.map((diet) => (
+            <Chip
+              key={diet.id}
+              active={filters.diet === diet.id}
+              onClick={() => setDiet(diet.id)}
+              count={products.filter((product) => matchesDiet(product, diet.id)).length}
+            >
+              {diet.label}
             </Chip>
           ))}
         </div>

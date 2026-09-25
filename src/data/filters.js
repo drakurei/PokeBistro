@@ -6,22 +6,54 @@ export const categories = [
   { id: 'bento', label: 'Bento', plural: 'Bentos', description: 'Le plat complet, compartimenté' },
   { id: 'burger', label: 'Burger', plural: 'Burgers', description: 'Pain maison, frites maison' },
   { id: 'bowl', label: 'Bowl', plural: 'Bowls', description: 'Frais, coloré, à composer' },
+  {
+    id: 'assiette',
+    label: 'Grande assiette',
+    plural: 'Grandes assiettes',
+    description: 'Les plats du chef, dressés à l’assiette',
+  },
   { id: 'dessert', label: 'Dessert', plural: 'Desserts', description: 'Sucré, en forme de Pokémon' },
   { id: 'boisson', label: 'Boisson', plural: 'Boissons', description: 'Sodas, thés, shots' },
-  { id: 'menu', label: 'Menu', plural: 'Menus', description: 'La formule des grands appétits' },
 ]
 
+// Editorial tags only: nothing here claims sales data
 export const tags = [
-  { id: 'populaire', label: 'Populaire' },
-  { id: 'nouveau', label: 'Nouveau' },
   { id: 'signature', label: 'Signature' },
+  { id: 'chef', label: 'Choix du chef' },
+  { id: 'nouveau', label: 'Nouveau' },
   { id: 'epice', label: 'Épicé' },
   { id: 'vegetarien', label: 'Végétarien' },
   { id: 'frais', label: 'Frais' },
   { id: 'leger', label: 'Léger' },
   { id: 'gourmand', label: 'Gourmand' },
-  { id: 'dessert', label: 'Dessert' },
 ]
+
+// Dietary filters, derived from product.diet and product.allergens
+export const diets = [
+  { id: 'vegetarien', label: 'Végétarien' },
+  { id: 'vegan', label: 'Végan' },
+  { id: 'sans-gluten', label: 'Sans gluten' },
+]
+
+// The 14 allergens of EU regulation 1169/2011 (ids used in product.allergens)
+export const allergens = [
+  { id: 'gluten', label: 'Gluten' },
+  { id: 'crustaces', label: 'Crustacés' },
+  { id: 'oeufs', label: 'Œufs' },
+  { id: 'poissons', label: 'Poissons' },
+  { id: 'arachides', label: 'Arachides' },
+  { id: 'soja', label: 'Soja' },
+  { id: 'lait', label: 'Lait' },
+  { id: 'fruits-a-coque', label: 'Fruits à coque' },
+  { id: 'celeri', label: 'Céleri' },
+  { id: 'moutarde', label: 'Moutarde' },
+  { id: 'sesame', label: 'Sésame' },
+  { id: 'sulfites', label: 'Sulfites' },
+  { id: 'lupin', label: 'Lupin' },
+  { id: 'mollusques', label: 'Mollusques' },
+]
+
+export const spicyLabels = ['', 'Légèrement relevé', 'Relevé', 'Très relevé']
 
 // A product matches a range when min <= price < max
 export const priceRanges = [
@@ -42,5 +74,7 @@ export const sortOptions = [
 
 export const categoriesById = Object.fromEntries(categories.map((item) => [item.id, item]))
 export const tagsById = Object.fromEntries(tags.map((item) => [item.id, item]))
+export const dietsById = Object.fromEntries(diets.map((item) => [item.id, item]))
+export const allergensById = Object.fromEntries(allergens.map((item) => [item.id, item]))
 export const priceRangesById = Object.fromEntries(priceRanges.map((item) => [item.id, item]))
 export const sortOptionsById = Object.fromEntries(sortOptions.map((item) => [item.id, item]))

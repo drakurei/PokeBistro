@@ -1,9 +1,11 @@
 // The Pokémon types served at PokéBistro.
 // A type is both a filter and a mood: each one has a colour, a short promise and a flavour line.
 // `onColor` tells which text colour keeps a readable contrast on the type colour.
+// `icon` names the original glyph drawn in components/ui/TypeIcon (no official mark is used).
 export const types = [
   {
     id: 'electrik',
+    icon: 'bolt',
     label: 'Électrik',
     color: '#f2b826',
     onColor: 'ink',
@@ -12,6 +14,7 @@ export const types = [
   },
   {
     id: 'feu',
+    icon: 'flame',
     label: 'Feu',
     color: '#e8542b',
     onColor: 'porcelain',
@@ -20,6 +23,7 @@ export const types = [
   },
   {
     id: 'eau',
+    icon: 'drop',
     label: 'Eau',
     color: '#2f7be0',
     onColor: 'porcelain',
@@ -28,6 +32,7 @@ export const types = [
   },
   {
     id: 'plante',
+    icon: 'leaf',
     label: 'Plante',
     color: '#4fb34f',
     onColor: 'ink',
@@ -36,6 +41,7 @@ export const types = [
   },
   {
     id: 'normal',
+    icon: 'plate',
     label: 'Normal',
     color: '#9e9683',
     onColor: 'ink',
@@ -44,6 +50,7 @@ export const types = [
   },
   {
     id: 'combat',
+    icon: 'fist',
     label: 'Combat',
     color: '#b85c38',
     onColor: 'porcelain',
@@ -52,6 +59,7 @@ export const types = [
   },
   {
     id: 'psy',
+    icon: 'spiral',
     label: 'Psy',
     color: '#e9508a',
     onColor: 'porcelain',
@@ -60,6 +68,7 @@ export const types = [
   },
   {
     id: 'spectre',
+    icon: 'ghost',
     label: 'Spectre',
     color: '#6d5b9c',
     onColor: 'porcelain',
@@ -68,6 +77,7 @@ export const types = [
   },
   {
     id: 'fee',
+    icon: 'star',
     label: 'Fée',
     color: '#f2a1b8',
     onColor: 'ink',
@@ -76,6 +86,7 @@ export const types = [
   },
   {
     id: 'glace',
+    icon: 'snowflake',
     label: 'Glace',
     color: '#7fd3e0',
     onColor: 'ink',
@@ -84,6 +95,7 @@ export const types = [
   },
   {
     id: 'vol',
+    icon: 'feather',
     label: 'Vol',
     color: '#a3a8e8',
     onColor: 'ink',

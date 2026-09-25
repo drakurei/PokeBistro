@@ -1,7 +1,9 @@
 import { getType } from '../../data/types'
 import cn from '../../utils/cn'
+import TypeIcon from './TypeIcon'
 
-// "● FEU" — the small type label shown on cards and in the product detail
+// Glyph + name of a type ("⚡ ÉLECTRIK"): the glyph carries the type colour, the name stays readable
+// without it.
 export default function TypeBadge({ typeId, size = 'sm', className }) {
   const type = getType(typeId)
   if (!type) return null
@@ -14,7 +16,7 @@ export default function TypeBadge({ typeId, size = 'sm', className }) {
         className,
       )}
     >
-      <span aria-hidden="true" className="size-2 rounded-full" style={{ backgroundColor: type.color }} />
+      <TypeIcon typeId={typeId} size={size === 'sm' ? 14 : 16} style={{ color: type.color }} />
       <span>
         <span className="sr-only">Type </span>
         {type.label}

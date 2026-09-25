@@ -1,21 +1,24 @@
 import { useRef, useState } from 'react'
-import { gsap, useGSAP, FULL } from '../../lib/motion'
 import { Link } from 'react-router'
+import { gsap, useGSAP, FULL } from '../../lib/motion'
 import { useCart } from '../../contexts/CartContext'
 import { useFavorites } from '../../contexts/FavoritesContext'
 import { useToast } from '../../contexts/ToastContext'
-import { categoriesById, tagsById } from '../../data/filters'
+import { allergensById, categoriesById, dietsById, spicyLabels, tagsById } from '../../data/filters'
+import { combosContaining } from '../../data/combos'
 import { getType } from '../../data/types'
 import formatPrice from '../../utils/formatPrice'
 import cn from '../../utils/cn'
 import Button from '../ui/Button'
+import DishImage from '../ui/DishImage'
 import Stepper from '../ui/Stepper'
 import TypeBadge from '../ui/TypeBadge'
-import { IconCart, IconHeart } from '../ui/Icons'
+import TypeIcon from '../ui/TypeIcon'
+import { IconArrowRight, IconCart, IconHeart, IconInfo } from '../ui/Icons'
 
 // Full detail of a dish: shared by the dialog (over the menu) and the standalone page
 export default function ProductDetail({ product, titleId = 'product-title', onNavigate }) {
-  const { add, getQuantity } = useCart()
+  const { addProduct, getProductQuantity } = useCart()
   const { isFavorite, toggle } = useFavorites()
   const toast = useToast()
   const [quantity, setQuantity] = useState(1)
@@ -25,11 +28,7 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
     () => {
       const mm = gsap.matchMedia()
       mm.add(FULL, () => {
-        gsap.fromTo(
-          '.detail-visual',
-          { scale: 0.9, opacity: 0 },
-          { scale: 1, opacity: 1, duration: 0.6, ease: 'power3.out' },
-        )
+        gsap.fromTo('.detail-visual', { scale: 0.94 }, { scale: 1, duration: 0.6, ease: 'power3.out' })
         gsap.fromTo(
           '.detail-content > *',
           { y: 14, opacity: 0 },
@@ -41,11 +40,14 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
   )
 
   const type = getType(product.type)
-  const inCart = getQuantity(product.id)
+  const inCart = getProductQuantity(product.id)
   const favorite = isFavorite(product.id)
+  const formulas = combosContaining(product.slug)
+  const diets = (product.diet ?? []).map((id) => dietsById[id]?.label).filter(Boolean)
+  const allergens = (product.allergens ?? []).map((id) => allergensById[id]?.label).filter(Boolean)
 
   const handleAdd = () => {
-    add(product.id, quantity)
+    addProduct(product.id, quantity)
     toast.show({
       title: quantity > 1 ? `${quantity} × ajoutés au panier` : 'Ajouté au panier',
       description: product.name,
@@ -57,23 +59,24 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
     <div ref={root} className="grid md:grid-cols-2">
       {/* Visual on a tinted washi surface */}
       <div
-        className="relative flex aspect-square items-center justify-center overflow-hidden bg-washi md:aspect-auto md:min-h-[520px]"
+        className="relative flex aspect-square items-center justify-center overflow-hidden bg-washi md:aspect-auto md:min-h-[560px]"
         style={{
           background: `radial-gradient(ellipse at 50% 50%, var(--color-washi) 38%, color-mix(in oklab, ${type?.color ?? '#fff'} 24%, var(--color-washi)) 100%)`,
         }}
       >
         <div aria-hidden="true" className="absolute inset-x-0 top-1/2 h-0.5 bg-ink/10" />
-        <img
-          src={product.image}
+        <DishImage
+          product={product}
+          priority
+          sizes="(min-width: 768px) 480px, 90vw"
           alt={product.name}
-          width="512"
-          height="410"
-          className="dish-image detail-visual relative w-[88%] max-w-[420px] object-contain"
+          className="detail-visual relative w-[88%] max-w-[440px] object-contain drop-shadow-[0_24px_30px_rgb(23_21_26_/_0.18)]"
+          style={{ viewTransitionName: `dish-${product.slug}` }}
         />
       </div>
 
       <div className="detail-content flex flex-col gap-6 p-6 md:p-10">
-        <div className="flex items-center gap-3 font-mono text-xs tracking-[0.12em] text-ink-mute uppercase">
+        <div className="flex flex-wrap items-center gap-3 font-mono text-xs tracking-[0.12em] text-ink-mute uppercase">
           <Link
             to={`/menu?category=${product.category}`}
             onClick={onNavigate}
@@ -83,6 +86,12 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
           </Link>
           <span aria-hidden="true">·</span>
           <TypeBadge typeId={product.type} size="md" />
+          {product.spicy > 0 && (
+            <>
+              <span aria-hidden="true">·</span>
+              <span className="text-lacquer">{spicyLabels[product.spicy]}</span>
+            </>
+          )}
         </div>
 
         <div className="pr-10">
@@ -108,10 +117,64 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
           </ul>
         </div>
 
+        {(diets.length > 0 || allergens.length > 0) && (
+          <div className="rounded-(--radius-sm) border border-line p-4 text-sm">
+            {diets.length > 0 && (
+              <p>
+                <span className="font-bold">Régime :</span> {diets.join(', ')}
+              </p>
+            )}
+            <p className={cn(diets.length > 0 && 'mt-1')}>
+              <span className="font-bold">Allergènes :</span>{' '}
+              {allergens.length > 0 ? allergens.join(', ') : 'aucun des 14 allergènes réglementaires'}
+            </p>
+            <p className="mt-2 flex items-start gap-1.5 font-mono text-[11px] text-ink-mute">
+              <IconInfo size={14} className="mt-0.5 shrink-0" />
+              Informations de démonstration (restaurant fictif), pas un avis sanitaire.
+            </p>
+          </div>
+        )}
+
         {type && (
-          <p className="rounded-(--radius-sm) bg-washi px-4 py-3 text-sm text-ink-soft">
-            <span className="font-bold text-ink">Type {type.label}.</span> {type.flavour}
+          <p className="flex items-start gap-3 rounded-(--radius-sm) bg-washi px-4 py-3 text-sm text-ink-soft">
+            <TypeIcon
+              typeId={product.type}
+              size={20}
+              className="mt-0.5 shrink-0"
+              style={{ color: type.color }}
+            />
+            <span>
+              <span className="font-bold text-ink">Type {type.label}.</span> {type.flavour}
+            </span>
           </p>
+        )}
+
+        {formulas.length > 0 && (
+          <div>
+            <h3 className="font-mono text-xs tracking-[0.14em] text-ink-mute uppercase">
+              Existe aussi en formule
+            </h3>
+            <ul className="mt-3 flex flex-col gap-2">
+              {formulas.map((combo) => (
+                <li key={combo.id}>
+                  <Link
+                    to={`/menu/formule/${combo.id}`}
+                    onClick={onNavigate}
+                    className="flex items-center justify-between gap-3 rounded-(--radius-sm) bg-ink px-4 py-3 text-sm text-porcelain no-underline hover:bg-ink-soft"
+                  >
+                    <span>
+                      <span className="font-bold">{combo.name}</span>
+                      <span className="block text-xs text-porcelain/70">{combo.description}</span>
+                    </span>
+                    <span className="flex shrink-0 items-center gap-2 font-mono">
+                      {formatPrice(combo.price)}
+                      <IconArrowRight size={16} />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
 
         {product.tags.length > 0 && (
@@ -137,7 +200,7 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
             aria-pressed={favorite}
             aria-label={favorite ? 'Retirer des favoris' : 'Ajouter aux favoris'}
             className={cn(
-              'flex size-14 items-center justify-center rounded-full border-2 transition-colors duration-(--duration-fast)',
+              'flex size-14 items-center justify-center rounded-full border-2 transition-[color,border-color,transform] duration-(--duration-fast) active:scale-90',
               favorite
                 ? 'border-lacquer text-lacquer'
                 : 'border-line text-ink-mute hover:border-ink hover:text-ink',

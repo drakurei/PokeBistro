@@ -19,8 +19,10 @@ const columns = [
       { label: 'Bentos', to: '/menu?category=bento' },
       { label: 'Burgers', to: '/menu?category=burger' },
       { label: 'Bowls', to: '/menu?category=bowl' },
+      { label: 'Grandes assiettes', to: '/menu?category=assiette' },
       { label: 'Desserts', to: '/menu?category=dessert' },
       { label: 'Boissons', to: '/menu?category=boisson' },
+      { label: 'Formules', to: '/menu?category=formules' },
     ],
   },
 ]

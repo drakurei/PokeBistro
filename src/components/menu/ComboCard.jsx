@@ -3,17 +3,19 @@ import { useCart } from '../../contexts/CartContext'
 import { useToast } from '../../contexts/ToastContext'
 import { getType } from '../../data/types'
 import formatPrice from '../../utils/formatPrice'
-import { comboLineId, comboProducts, defaultChoices, regularPrice } from '../../utils/cartItems'
+import { comboProducts, defaultChoices, regularPrice } from '../../utils/cartItems'
 import Button from '../ui/Button'
+import DishImage from '../ui/DishImage'
+import TypeIcon from '../ui/TypeIcon'
 import { IconArrowRight, IconPlus } from '../ui/Icons'
 
-const badgeLabels = { populaire: 'Populaire', signature: 'Signature', nouveau: 'Nouveau' }
+const badgeLabels = { signature: 'Signature', chef: 'Choix du chef', nouveau: 'Nouveau' }
 
 // A formule on the ink tray: composition, set price, what it saves, and the way in.
-// Fixed formules can be added in one tap; the configurable one opens its composer.
+// Fixed formules can be added in one tap; configurable ones open their composer.
 export default function ComboCard({ combo }) {
   const location = useLocation()
-  const { add } = useCart()
+  const { addFormula } = useCart()
   const toast = useToast()
 
   const items = comboProducts(combo, defaultChoices(combo))
@@ -24,8 +26,8 @@ export default function ComboCard({ combo }) {
   const detailState = { background: location.state?.background ?? location }
 
   const handleAdd = () => {
-    add(comboLineId(combo))
-    toast.show({ title: 'Ajouté au panier', description: combo.name })
+    addFormula(combo.id)
+    toast.show({ title: 'Ajoutée au panier', description: combo.name })
   }
 
   return (
@@ -33,34 +35,29 @@ export default function ComboCard({ combo }) {
       <div className="flex items-start justify-between gap-3">
         <p className="font-mono text-xs tracking-[0.14em] text-gold uppercase">{combo.eyebrow}</p>
         {combo.badge && (
-          <span className="rounded-full bg-porcelain/12 px-2 py-0.5 font-mono text-[10px] tracking-[0.12em] uppercase">
+          <span className="shrink-0 rounded-full bg-porcelain/12 px-2 py-0.5 font-mono text-[10px] tracking-[0.12em] uppercase">
             {badgeLabels[combo.badge]}
           </span>
         )}
       </div>
 
-      <div className="flex items-start gap-4">
-        <ul className="flex -space-x-3" aria-hidden="true">
-          {items.slice(0, 4).map((product) => (
-            <li key={product.id} className="size-14 overflow-hidden rounded-full bg-washi ring-2 ring-ink">
-              <img
-                src={product.image}
-                alt=""
-                width="512"
-                height="410"
-                loading="lazy"
-                className="dish-image h-full w-full object-cover"
-              />
-            </li>
-          ))}
-        </ul>
-      </div>
+      <ul className="flex -space-x-3" aria-hidden="true">
+        {items.slice(0, 5).map((product, index) => (
+          <li
+            key={`${product.id}-${index}`}
+            className="size-14 overflow-hidden rounded-full bg-washi ring-2 ring-ink"
+          >
+            <DishImage product={product} sizes="56px" className="h-full w-full object-cover" />
+          </li>
+        ))}
+      </ul>
 
       <div>
         <h3 className="font-display text-display-sm">
           <Link
             to={detailLink}
             state={detailState}
+            viewTransition
             className="no-underline after:absolute after:inset-0 after:content-['']"
           >
             {combo.name}
@@ -78,6 +75,12 @@ export default function ComboCard({ combo }) {
               ))
             : items.map((product) => <li key={product.id}>{product.name}</li>)}
         </ul>
+        {combo.availability && (
+          <p className="mt-3 font-mono text-[11px] tracking-[0.1em] text-gold uppercase">
+            {combo.availability.label}
+          </p>
+        )}
+        {combo.note && <p className="mt-2 text-xs text-porcelain/60">{combo.note}</p>}
       </div>
 
       <div className="mt-auto flex items-end justify-between gap-4 border-t border-porcelain/15 pt-4">
@@ -93,14 +96,15 @@ export default function ComboCard({ combo }) {
             </p>
           )}
           {type && (
-            <p className="mt-2 font-mono text-[11px] tracking-[0.12em] text-porcelain/50 uppercase">
+            <p className="mt-2 flex items-center gap-1.5 font-mono text-[11px] tracking-[0.12em] text-porcelain/60 uppercase">
+              <TypeIcon typeId={combo.type} size={13} style={{ color: type.color }} />
               Type {type.label}
             </p>
           )}
         </div>
         <div className="relative z-10">
           {combo.slots ? (
-            <Button to={detailLink} state={detailState} variant="light" size="sm">
+            <Button to={detailLink} state={detailState} viewTransition variant="light" size="sm">
               Composer
               <IconArrowRight size={16} />
             </Button>

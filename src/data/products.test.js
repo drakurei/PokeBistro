@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
-import products, { productsBySlug } from './products'
-import { categoriesById, tagsById } from './filters'
+import products, { productsBySlug, signatureProducts } from './products'
+import { allergensById, categoriesById, dietsById, tagsById } from './filters'
 import { typesById } from './types'
 
 // The catalogue is data, but it is also a contract for the rest of the site
@@ -18,12 +18,22 @@ describe('catalogue', () => {
     }
   })
 
-  it('only references known categories, types and tags', () => {
+  it('only references known categories, types, tags, diets and allergens', () => {
     for (const product of products) {
       expect(categoriesById[product.category], `${product.slug} category`).toBeDefined()
       expect(typesById[product.type], `${product.slug} type`).toBeDefined()
       for (const tag of product.tags) expect(tagsById[tag], `${product.slug} tag ${tag}`).toBeDefined()
+      for (const diet of product.diet) expect(dietsById[diet], `${product.slug} diet ${diet}`).toBeDefined()
+      for (const allergen of product.allergens) expect(allergensById[allergen], `${product.slug} allergen`).toBeDefined()
+      expect([0, 1, 2, 3]).toContain(product.spicy)
     }
+  })
+
+  it('keeps editorial badges rare and honest', () => {
+    expect(signatureProducts).toHaveLength(6)
+    expect(products.filter((p) => p.tags.includes('nouveau')).length).toBeLessThanOrEqual(8)
+    expect(products.filter((p) => p.tags.includes('chef')).length).toBeLessThanOrEqual(5)
+    expect(products.some((p) => p.tags.includes('populaire') || p.tags.includes('bestseller'))).toBe(false)
   })
 
   it('has complete, credible content', () => {
@@ -36,5 +46,15 @@ describe('catalogue', () => {
       expect(product.pokemon).toBeTruthy()
     }
     expect(productsBySlug['pikachu-bento'].tags).toContain('signature')
+    // Sweet bowls are desserts, the big plates have their own category
+    expect(productsBySlug['mew-berry-bowl'].category).toBe('dessert')
+    expect(productsBySlug['mewtwo-deluxe-menu'].category).toBe('assiette')
+    expect(productsBySlug['fresh-ice-blue-bowl'].pokemon).toBe('Givrali')
+    // Vegan implies vegetarian, and vegan dishes carry no milk or egg allergen
+    for (const product of products.filter((p) => p.diet.includes('vegan'))) {
+      expect(product.diet).toContain('vegetarien')
+      expect(product.allergens).not.toContain('lait')
+      expect(product.allergens).not.toContain('oeufs')
+    }
   })
 })

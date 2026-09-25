@@ -1,8 +1,8 @@
 import cn from '../../utils/cn'
 
-// Toggle chip used by every filter (categories, types, tags) and by the tags on a product.
-// `color` adds a dot (Pokémon type), `count` a small counter. Active state is announced with aria-pressed.
-export default function Chip({ active = false, color, count, children, className, ...props }) {
+// Toggle chip used by every filter (categories, types, tags, diets) and by the tags on a product.
+// `icon` (a small element) or `color` (a dot) sits before the label; `count` adds a small counter.
+export default function Chip({ active = false, color, icon, count, children, className, ...props }) {
   return (
     <button
       type="button"
@@ -17,7 +17,8 @@ export default function Chip({ active = false, color, count, children, className
       )}
       {...props}
     >
-      {color && (
+      {icon}
+      {!icon && color && (
         <span
           aria-hidden="true"
           className={cn('size-2.5 shrink-0 rounded-full', active && 'ring-2 ring-porcelain/60')}

@@ -22,7 +22,11 @@ import cn from '../utils/cn'
 function CombosSection({ headingLevel = 'h2' }) {
   const Heading = headingLevel
   return (
-    <section aria-labelledby="group-formules">
+    <section
+      aria-labelledby="group-formules"
+      id="formules"
+      className="scroll-mt-[calc(var(--spacing-header)+6rem)]"
+    >
       <div className="mb-5 flex items-baseline justify-between gap-4 border-b border-ink pb-3">
         <Heading id="group-formules" className="font-display text-display-sm">
           Formules
@@ -42,7 +46,8 @@ function CombosSection({ headingLevel = 'h2' }) {
 }
 
 export default function MenuPage() {
-  const { filters, setQuery, setCategory, toggleType, toggleTag, setPrice, setSort, reset } = useMenuFilters()
+  const { filters, setQuery, setCategory, toggleType, toggleTag, setDiet, setPrice, setSort, reset } =
+    useMenuFilters()
   const [sheetOpen, setSheetOpen] = useState(false)
 
   const formulesOnly = filters.category === FORMULES
@@ -52,9 +57,9 @@ export default function MenuPage() {
     return sortProducts(filterProducts(products, productFilters), filters.sort)
   }, [filters, formulesOnly])
   const activeCount = countActiveFilters(filters)
-  const controls = { filters, setCategory, toggleType, toggleTag, setPrice }
+  const controls = { filters, setCategory, toggleType, toggleTag, setDiet, setPrice }
 
-  // The full carte reads like a real menu: formules, then every category. Any filter or sort flattens it.
+  // The full carte reads like a real menu: every category in order, then the formules. Any filter or sort flattens it.
   const grouped = activeCount === 0 && filters.sort === '' ? groupByCategory(visible) : null
 
   const heading = formulesOnly
@@ -181,9 +186,13 @@ export default function MenuPage() {
               <CombosSection />
             ) : grouped ? (
               <div className="flex flex-col gap-14">
-                <CombosSection />
                 {grouped.map((group) => (
-                  <section key={group.category.id} aria-labelledby={`group-${group.category.id}`}>
+                  <section
+                    key={group.category.id}
+                    id={group.category.id}
+                    aria-labelledby={`group-${group.category.id}`}
+                    className="scroll-mt-[calc(var(--spacing-header)+6rem)]"
+                  >
                     <div className="mb-5 flex items-baseline justify-between gap-4 border-b border-ink pb-3">
                       <h2 id={`group-${group.category.id}`} className="font-display text-display-sm">
                         {group.category.plural}
@@ -196,6 +205,7 @@ export default function MenuPage() {
                     <ProductGrid products={group.items} onReset={reset} hasFilters={false} />
                   </section>
                 ))}
+                <CombosSection />
               </div>
             ) : (
               <ProductGrid products={visible} onReset={reset} hasFilters={activeCount > 0} />

@@ -2,7 +2,7 @@ import { priceRangesById, categoriesById, tagsById, categories } from '../data/f
 import { typesById } from '../data/types'
 import { normalize } from './text'
 
-export const emptyFilters = { q: '', category: '', types: [], tags: [], price: 'all', sort: '' }
+export const emptyFilters = { q: '', category: '', types: [], tags: [], diet: '', price: 'all', sort: '' }
 
 // Builds the text a product can be found by: name, Pokémon, category, type, tags, keywords, ingredients.
 function searchableText(product) {
@@ -19,9 +19,15 @@ function searchableText(product) {
   )
 }
 
+export function matchesDiet(product, diet) {
+  if (!diet) return true
+  if (diet === 'sans-gluten') return !(product.allergens ?? []).includes('gluten')
+  return (product.diet ?? []).includes(diet)
+}
+
 // Returns the products matching ALL active filters.
 // - q: every word must be found (order-free): "bento épicé" matches "Goupix Fire Box"
-// - category / price: single choice
+// - category / price / diet: single choice
 // - types: any of the selected types
 // - tags: all of the selected tags
 export default function filterProducts(products, filters = emptyFilters) {
@@ -38,6 +44,7 @@ export default function filterProducts(products, filters = emptyFilters) {
     if (filters.category && product.category !== filters.category) return false
     if (types.size > 0 && !types.has(product.type)) return false
     if (tags.length > 0 && !tags.every((tag) => product.tags.includes(tag))) return false
+    if (!matchesDiet(product, filters.diet)) return false
     return product.price >= range.min && product.price < range.max
   })
 }
@@ -67,6 +74,7 @@ export function countActiveFilters(filters) {
     filters.category !== '',
     filters.types.length > 0,
     filters.tags.length > 0,
+    Boolean(filters.diet),
     filters.price !== 'all',
   ].filter(Boolean).length
 }
