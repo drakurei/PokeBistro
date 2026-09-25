@@ -21,9 +21,9 @@ export const chapters = [
   {
     id: 'types',
     eyebrow: 'Les types',
-    title: 'Huit types pour dire ce qu’on a envie de manger.',
+    title: 'Onze types pour dire ce qu’on a envie de manger.',
     paragraphs: [
-      'Les types Pokémon sont devenus notre langue commune avec les clients. « Un truc Feu » veut dire relevé, grillé, fumé. « Plutôt Eau » veut dire frais, iodé, léger. On n’a jamais eu besoin d’expliquer davantage.',
+      'Les types Pokémon sont devenus notre langue commune avec les clients. « Un truc Feu » veut dire relevé, grillé, fumé. « Plutôt Eau » veut dire frais, iodé, léger. « Combat » veut dire qu’on a faim. On n’a jamais eu besoin d’expliquer davantage.',
     ],
   },
 ]

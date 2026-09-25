@@ -1,5 +1,12 @@
 # Prompts Gemini — visuels PokéBistro
 
+## État des visuels
+
+| Série                                         | Plats   | Statut                                                                                                                      |
+| --------------------------------------------- | ------- | --------------------------------------------------------------------------------------------------------------------------- |
+| Première série (28 plats, ci-dessous)         | 1 → 28  | visuels **basse définition** en place (198 × 168) : à régénérer avec ces prompts, en 1:1 ou en planche 4 × 4 de 2048 × 2048 |
+| Deuxième série (16 plats, en fin de document) | 29 → 44 | **terminée** : planche Gemini du 25/09/2026 découpée en 512 × 410, aucune action                                            |
+
 Tous les prompts partagent le même **bloc de style** (à coller en tête de chaque génération) puis un **bloc produit**. Générer en 1:1, la plus haute définition proposée, puis recadrer en 1200 × 1200 si nécessaire.
 
 ## Bloc de style (commun à toutes les images)
@@ -16,7 +23,7 @@ the plate or box described. Consistent series look.
 
 Contraintes de série : même crème, même angle, même lumière, même échelle. Le Pokémon est **dans** la nourriture (riz moulé, décor en sucre, forme du pain, motif de l'assiette), jamais posé à côté comme une figurine ou un jouet.
 
-## Bloc produit — un prompt par plat
+## Bloc produit — première série (à régénérer)
 
 ### Bentos
 
@@ -301,3 +308,26 @@ Same series. Subject: a row of six finished bento boxes (yellow, orange, green, 
 lined up on a pass counter, seen from a 3/4 high angle, shallow depth of field on the first two,
 warm daylight, cream wall. 16:10 landscape. No text.
 ```
+
+## Deuxième série (terminée) — prompts utilisés, pour référence et régénération éventuelle
+
+Générée en une planche 4 × 4 (2048 × 2048) avec le bloc de style commun, un titre par case (retiré au découpage). À régénérer une case seule : reprendre le bloc de style + le bloc ci-dessous.
+
+| #   | Plat                       | Sujet                                                                                                                                                                       |
+| --- | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 29  | **Roucool Crispy**         | Crispy chicken pieces fanned on a white plate with young salad leaves, shredded carrot, lemon-sesame dressing, one crisp bread "feather" evoking Pidgey. Type Vol.          |
+| 30  | **Ouisticram Gyoza**       | Six pan-fried golden gyoza on a white plate, two dipping bowls (chili soy, chili crisp), two small flame-shaped crisps evoking Chimchar. Type Feu.                          |
+| 31  | **Caninos Karaage**        | Glossy teriyaki karaage chicken pieces on a white plate, one skewer of grilled zucchini and pepper, sesame, spring onion, evoking Growlithe. Type Feu.                      |
+| 32  | **Lucario Bento**          | Black lacquered bento: sliced grilled beef, black-sesame rice with a small blue Lucario face in tinted rice, edamame, wasabi, roasted carrot and sweet potato. Type Combat. |
+| 33  | **Ectoplasma Black Bento** | Black and red lacquered bento: glazed chicken, black venere rice with a purple Gengar face in rice paste, pickled red cabbage, sautéed shiitake, pink ginger. Type Spectre. |
+| 34  | **Arcanin Grill Bento**    | White plate: teriyaki-glazed grilled chicken, sesame rice, roasted zucchini and peppers, one flame-shaped rice cracker standing in the rice, evoking Arcanine. Type Feu.    |
+| 35  | **Noadkoko Garden Bowl**   | Cream bowl: avocado and mango cubes, cucumber, edamame, coriander sprig on warm rice, evoking Exeggutor. Type Plante, vegetarian.                                           |
+| 36  | **Marill Aqua Bowl**       | White bowl with a blue rim: fresh salmon cubes, cucumber slices, avocado, blueberries, sushi rice, wakame, one small blue sugar wave, evoking Marill. Type Eau.             |
+| 37  | **Feunard Sunset Bowl**    | White bowl: grilled chicken slices, roasted sweet potato and pumpkin wedges, pickled carrot, honey-sriracha sauce, sesame, sunset colours evoking Ninetales. Type Feu.      |
+| 38  | **Lucario Power Burger**   | Black charcoal bun, thick beef patty, blue cheese sauce, confit onions, lettuce, small blue sugar flame on top, evoking Lucario. Type Combat.                               |
+| 39  | **Arcanin Flame Burger**   | Golden brioche bun, beef patty, melted cheddar, crispy caramelised onions, smoky hot sauce, small flame-shaped sugar on top, evoking Arcanine. Type Feu.                    |
+| 40  | **Poussifeu Mochi**        | White plate: soft mango and peach mochi (one cut open), whipped cream, tiny sugar flames, evoking Torchic. Type Feu, dessert.                                               |
+| 41  | **Sorbébé Ice Parfait**    | Tall frosted glass: vanilla and blueberry ice parfait layers, vanilla scoop, fresh blueberries, blue sugar splash, evoking Vanillite. Type Glace, dessert.                  |
+| 42  | **Mentali Velvet Cake**    | Purple-and-pink velvet layer cake on a lavender plate, smooth lilac icing, dried lavender sprigs, evoking Espeon. Type Psy, dessert.                                        |
+| 43  | **Amphinobi Blue Tea**     | Tall glass of blue butterfly-pea iced tea, lime slice, fresh mint, ice cubes, a small blue ribbon, evoking Greninja. Type Eau, drink.                                       |
+| 44  | **Pikachu Spark Soda**     | Tall glass of sparkling yellow lemonade, ice, lemon halves and wedges, one sugar lightning bolt on the rim, evoking Pikachu. Type Électrik, drink.                          |

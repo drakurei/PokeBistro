@@ -1,36 +1,41 @@
 # Plan images
 
-## État actuel
+## État au 25/09/2026
 
-Les 28 visuels produits viennent d'une planche unique générée pour le TP (grille 7 × 4), découpée en 28 fichiers de **198 × 168 px**. Ils sont convertis en WebP (1 412 Ko → 157 Ko au total) et rangés dans `src/assets/products/<slug>.webp`.
+Le catalogue compte **44 plats** et deux générations de visuels, toutes deux découpées à partir d'une planche Gemini, rangées dans `src/assets/products/<slug>.webp` et chargées par `import.meta.glob` (aucun code à toucher pour remplacer un fichier).
 
-Ils ont deux qualités : une direction artistique homogène (fond crème `#F8EFDE`, plat isolé, éclairage doux, style illustration réaliste) et un Pokémon reconnaissable dans chaque assiette. Ils ont une limite : la définition. Le site les affiche donc dans des zones bornées (cartes ≤ 400 px, fiche ≤ 420 px, médaillons 96 – 144 px) avec un **masque radial** (`.dish-image`) qui fond les bords crème dans la surface derrière, ce qui donne l'impression d'un plat détouré.
+| Série                 | Plats | Source                    | Format final              | Poids                        | Qualité                                                             | Statut                              |
+| --------------------- | ----- | ------------------------- | ------------------------- | ---------------------------- | ------------------------------------------------------------------- | ----------------------------------- |
+| Première planche (TP) | 28    | grille 7 × 4, 1408 × 768  | 198 × 168, WebP           | 157 Ko au total              | correcte mais **basse définition** (upscalée ×2 dans les cartes)    | **à régénérer** avec les prompts HD |
+| Deuxième planche      | 16    | grille 4 × 4, 2048 × 2048 | 512 × 410 (5:4), WebP q86 | 400 Ko au total (10 – 39 Ko) | **bonne** : nette dans les cartes (~ 400 px) et la fiche (≤ 420 px) | **terminée**                        |
 
-## Cible
+Les deux séries partagent la même direction artistique (fond crème uni, plat isolé vu en plongée 3/4, lumière douce), donc elles cohabitent sans rupture de style ; seule la définition diffère.
 
-Remplacer les 28 visuels par des images haute définition générées avec Gemini à partir de `gemini-prompts.md`, en gardant la même direction artistique pour que les anciennes et les nouvelles images puissent cohabiter le temps de la transition.
+## Découpage de la deuxième planche
 
-| Usage                                    | Fichier                                             | Format cible                           | Notes                                                                                                    |
-| ---------------------------------------- | --------------------------------------------------- | -------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| Carte produit, fiche, panier, médaillons | `src/assets/products/<slug>.webp`                   | **1200 × 1200**, WebP q80 (~ 60–90 Ko) | Fond crème uni `#F8EFDE`, plat centré, marge ≥ 12 %. Une seule source, redimensionnée par le navigateur. |
-| Hero (optionnel, phase 2)                | `src/assets/hero/hero-plate.webp`                   | 1600 × 1600                            | Un plat signature vu de dessus, à poser derrière la Poké Ball ou à sa place sur mobile.                  |
-| Histoire                                 | `src/assets/sections/kitchen-01.webp` …             | 1600 × 1000                            | Cuisine, mains, bento en préparation. Même lumière, même crème.                                          |
-| Open Graph                               | `public/og-image.png`                               | 1200 × 630 PNG                         | Généré depuis le site (typographie + Poké Ball).                                                         |
-| Icônes                                   | `public/favicon.svg`, `public/apple-touch-icon.png` | SVG + 180 × 180                        | Faits.                                                                                                   |
+Script Python + Pillow + NumPy, exécuté hors du dépôt (original conservé intact dans `Downloads`) :
 
-## Règles de cohérence
+1. la planche est divisée en 16 cases de 512 × 512 ;
+2. dans chaque case, la bande de titre est détectée par les lignes contenant du texte noir dans le cinquième supérieur (« ROUCOOL CRISPY », « (Inspired by Pidgey) ») ;
+3. la découpe commence sous le texte et garde **410 lignes** : la case entière moins le titre, soit un cadre 5:4 identique au bloc image des cartes ;
+4. aucun canvas synthétique, aucun redimensionnement : le fond, l'ombre et l'échelle d'origine sont conservés, donc les 16 plats sont à la même échelle ;
+5. export WebP qualité 86 ; planche de contrôle dans [`new-products-preview.webp`](new-products-preview.webp).
 
-1. **Même fond** : crème `#F8EFDE`, uni, sans ombre portée dure, une ombre douce sous l'assiette.
-2. **Même angle** : 3/4 plongeant (environ 35°) pour les assiettes et bentos ; face légèrement plongeante pour les burgers et boissons.
-3. **Même lumière** : lumière principale douce venant du haut gauche, rebond chaud à droite, aucun reflet spéculaire dur.
-4. **Même échelle** : le plat occupe 70 – 76 % de la largeur ; un seul plat par image ; pas de couverts, pas de main.
-5. **Le Pokémon est dans la nourriture** (riz moulé, décor en sucre, forme du pain), jamais posé à côté comme une figurine.
-6. **Pas de texte, pas de logo, pas de filigrane** dans l'image.
+Les cases dont le fond présente un léger dégradé (bols, boissons) ont été gardées entières précisément pour éviter tout raccord visible.
 
-## Intégration
+## Affichage
 
-- Nommer le fichier exactement comme le `slug` du produit (`pikachu-bento.webp`).
-- Convertir en WebP (Pillow, Squoosh ou `cwebp -q 80`), vérifier le poids (< 100 Ko).
-- Remplacer le fichier dans `src/assets/products/` : aucun code à toucher (`import.meta.glob`).
-- Mettre à jour `width`/`height` des `<img>` (198 × 168 → 1200 × 1200) dans `ProductCard`, `ProductDetail`, `CartLine`, `Hero`, `StoryPage` pour garder un ratio réservé correct.
-- Le masque radial `.dish-image` peut alors être adouci (bords moins fondus) puisque le fond sera uniforme.
+- Cartes : bloc image 5:4, `object-cover`, masque radial `.dish-image` (fondu des angles uniquement ; le haut et le bas restent visibles pour les flammes, vagues et éclairs).
+- Fiche : `object-contain`, largeur max 420 px sur un fond washi teinté par le type.
+- Médaillons (hero, histoire) : 112 – 144 px, `rounded-full`.
+- Attributs `width="512" height="410"` déclarés partout : aucun décalage de mise en page ; les 28 anciennes images (198 × 168, ratio 1,18) s'y adaptent avec un recadrage de 3 %.
+
+## Ce qui reste à faire (n'empêche pas la livraison)
+
+| Plat                              | Fichier                                                  | Action                                                                                               | Prompt                                          |
+| --------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Les 28 plats de la première série | `src/assets/products/<slug>.webp` (198 × 168)            | **Régénérer** en 1200 × 1200 ou en planche 4 × 4 haute définition, puis découper avec le même script | `gemini-prompts.md`, section « Première série » |
+| Hero                              | `src/assets/hero/hero-plate.webp`                        | Créer (optionnel)                                                                                    | section « Hero et sections »                    |
+| Histoire                          | `src/assets/sections/kitchen-01.webp`, `kitchen-02.webp` | Créer (optionnel)                                                                                    | section « Hero et sections »                    |
+
+Marche à suivre pour une planche 4 × 4 : générer en 2048 × 2048 avec le bloc de style commun, adapter la liste `SLUGS` du script de découpe, lancer, contrôler la planche produite, remplacer les fichiers. Rien d'autre à changer.

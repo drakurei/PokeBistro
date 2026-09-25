@@ -39,11 +39,3 @@ export const restaurant = {
     { label: 'TikTok', href: 'https://tiktok.com', handle: '@pokebistro' },
   ],
 }
-
-// Quick facts used on the home page and the story page
-export const facts = [
-  { value: 28, label: 'plats à la carte', suffix: '' },
-  { value: 8, label: 'types Pokémon', suffix: '' },
-  { value: 2, label: 'services par jour', suffix: '' },
-  { value: 100, label: 'fait maison', suffix: ' %' },
-]

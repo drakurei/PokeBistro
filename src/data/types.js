@@ -1,4 +1,4 @@
-// The eight Pokémon types served at PokéBistro.
+// The Pokémon types served at PokéBistro.
 // A type is both a filter and a mood: each one has a colour, a short promise and a flavour line.
 // `onColor` tells which text colour keeps a readable contrast on the type colour.
 export const types = [
@@ -8,7 +8,7 @@ export const types = [
     color: '#f2b826',
     onColor: 'ink',
     promise: 'Vif, doré, plein d’énergie',
-    flavour: 'Maïs grillé, omelette roulée, agrumes et gingembre : des plats qui réveillent.',
+    flavour: 'Maïs grillé, omelette roulée, citron et gingembre : des plats qui réveillent.',
   },
   {
     id: 'feu',
@@ -24,7 +24,7 @@ export const types = [
     color: '#2f7be0',
     onColor: 'porcelain',
     promise: 'Frais, iodé, léger',
-    flavour: 'Saumon grillé, riz vinaigré, edamame, concombre. La mer dans un bol bleu.',
+    flavour: 'Saumon, riz vinaigré, edamame, concombre, thé glacé bleu. La mer dans un bol.',
   },
   {
     id: 'plante',
@@ -32,7 +32,7 @@ export const types = [
     color: '#4fb34f',
     onColor: 'ink',
     promise: 'Végétal, croquant, vert',
-    flavour: 'Avocat, brocolis, tofu mariné, thé vert. 100 % végétal, 0 % ennuyeux.',
+    flavour: 'Avocat, mangue, brocolis, tofu mariné, thé vert. 100 % végétal, 0 % ennuyeux.',
   },
   {
     id: 'normal',
@@ -43,12 +43,28 @@ export const types = [
     flavour: 'Steak de bœuf, frites maison, rôti, pommes de terre. Les classiques, bien faits.',
   },
   {
+    id: 'combat',
+    label: 'Combat',
+    color: '#b85c38',
+    onColor: 'porcelain',
+    promise: 'Costaud, protéiné, sérieux',
+    flavour: 'Bœuf grillé, steaks épais, riz au sésame noir : pour les appétits d’entraînement.',
+  },
+  {
     id: 'psy',
     label: 'Psy',
     color: '#e9508a',
     onColor: 'porcelain',
     promise: 'Fruité, mystérieux',
-    flavour: 'Fruits rouges, yaourt onctueux, sauces violettes aux baies. Doux et un peu étrange.',
+    flavour: 'Fruits rouges, lavande, sauces violettes aux baies. Doux et un peu étrange.',
+  },
+  {
+    id: 'spectre',
+    label: 'Spectre',
+    color: '#6d5b9c',
+    onColor: 'porcelain',
+    promise: 'Sombre, laqué, farceur',
+    flavour: 'Riz noir, poulet laqué, chou rouge mariné : des assiettes qui jouent avec l’obscurité.',
   },
   {
     id: 'fee',
@@ -64,7 +80,15 @@ export const types = [
     color: '#7fd3e0',
     onColor: 'ink',
     promise: 'Glacé, net, bleu pâle',
-    flavour: 'Bowls froids, glaces vanille-myrtille, meringue. Une banquise dans l’assiette.',
+    flavour: 'Bowls froids, parfaits givrés, glace vanille-myrtille. Une banquise dans l’assiette.',
+  },
+  {
+    id: 'vol',
+    label: 'Vol',
+    color: '#a3a8e8',
+    onColor: 'ink',
+    promise: 'Léger, aérien, croustillant',
+    flavour: 'Poulet croustillant, jeunes pousses, chips légères : ce qui se mange sans peser.',
   },
 ]
 

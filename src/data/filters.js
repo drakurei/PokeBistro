@@ -1,20 +1,25 @@
 // Lists used by the menu filters. Ids are URL-safe (they end up in ?category=…&tag=…),
-// labels are what people read.
+// labels are what people read. Categories are in menu order.
 
 export const categories = [
-  { id: 'bento', label: 'Bento', description: 'Le plat complet, compartimenté' },
-  { id: 'burger', label: 'Burger', description: 'Pain maison, frites maison' },
-  { id: 'bowl', label: 'Bowl', description: 'Frais, coloré, à composer' },
-  { id: 'dessert', label: 'Dessert', description: 'Sucré, en forme de Pokémon' },
-  { id: 'boisson', label: 'Boisson', description: 'Sodas, thés, shots' },
-  { id: 'menu', label: 'Menu', description: 'La formule des grands appétits' },
+  { id: 'entree', label: 'Entrée', plural: 'Entrées', description: 'Pour commencer, ou pour partager' },
+  { id: 'bento', label: 'Bento', plural: 'Bentos', description: 'Le plat complet, compartimenté' },
+  { id: 'burger', label: 'Burger', plural: 'Burgers', description: 'Pain maison, frites maison' },
+  { id: 'bowl', label: 'Bowl', plural: 'Bowls', description: 'Frais, coloré, à composer' },
+  { id: 'dessert', label: 'Dessert', plural: 'Desserts', description: 'Sucré, en forme de Pokémon' },
+  { id: 'boisson', label: 'Boisson', plural: 'Boissons', description: 'Sodas, thés, shots' },
+  { id: 'menu', label: 'Menu', plural: 'Menus', description: 'La formule des grands appétits' },
 ]
 
 export const tags = [
   { id: 'populaire', label: 'Populaire' },
   { id: 'nouveau', label: 'Nouveau' },
+  { id: 'signature', label: 'Signature' },
   { id: 'epice', label: 'Épicé' },
   { id: 'vegetarien', label: 'Végétarien' },
+  { id: 'frais', label: 'Frais' },
+  { id: 'leger', label: 'Léger' },
+  { id: 'gourmand', label: 'Gourmand' },
   { id: 'dessert', label: 'Dessert' },
 ]
 
@@ -27,6 +32,15 @@ export const priceRanges = [
   { id: 'gt20', label: 'Plus de 20 €', min: 20, max: Infinity },
 ]
 
+// Sort orders offered on the menu ('' = the order of the carte)
+export const sortOptions = [
+  { id: '', label: 'Ordre de la carte' },
+  { id: 'price-asc', label: 'Prix croissant' },
+  { id: 'price-desc', label: 'Prix décroissant' },
+  { id: 'new', label: 'Nouveautés d’abord' },
+]
+
 export const categoriesById = Object.fromEntries(categories.map((item) => [item.id, item]))
 export const tagsById = Object.fromEntries(tags.map((item) => [item.id, item]))
 export const priceRangesById = Object.fromEntries(priceRanges.map((item) => [item.id, item]))
+export const sortOptionsById = Object.fromEntries(sortOptions.map((item) => [item.id, item]))
