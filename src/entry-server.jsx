@@ -6,6 +6,7 @@ export { allRoutes, getPageMeta, headTags, sitemapEntries } from './seo/pageMeta
 
 // Used only at build time by scripts/prerender.mjs: renders one route to static HTML.
 // The same <App> and the same basename as main.jsx, so the markup hydrates without a difference.
+// The location carries the base path ("/PokeBistro/menu" on GitHub Pages), as the browser would.
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '')
 
 export async function render(url) {
@@ -15,7 +16,7 @@ export async function render(url) {
   // swaps it in with an inline script. A static page wants everything inline: raise the threshold.
   const { prelude } = await prerenderToNodeStream(
     <StrictMode>
-      <StaticRouter location={url} basename={basename}>
+      <StaticRouter location={`${basename}${url}`} basename={basename}>
         <App />
       </StaticRouter>
     </StrictMode>,
