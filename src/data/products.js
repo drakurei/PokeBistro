@@ -493,13 +493,7 @@ const products = [
     pokemon: 'Dracaufeu',
     description:
       'Poulet grillé au piment, riz épicé, légumes rôtis et sauce feu de Dracaufeu, dressés sur ardoise.',
-    ingredients: [
-      'poulet grillé au piment',
-      'riz épicé',
-      'légumes rôtis',
-      'sauce feu de Dracaufeu',
-      'boisson au choix',
-    ],
+    ingredients: ['poulet grillé au piment', 'riz épicé', 'légumes rôtis', 'sauce feu de Dracaufeu'],
     price: 21.9,
     category: 'menu',
     type: 'feu',
@@ -514,13 +508,7 @@ const products = [
     pokemon: 'Mewtwo',
     description:
       'Filet de saumon laqué, riz au sésame, légumes croquants et sauce violette aux baies : le menu prestige.',
-    ingredients: [
-      'filet de saumon laqué',
-      'riz au sésame',
-      'légumes croquants',
-      'sauce violette aux baies',
-      'dessert au choix',
-    ],
+    ingredients: ['filet de saumon laqué', 'riz au sésame', 'légumes croquants', 'sauce violette aux baies'],
     price: 24.9,
     category: 'menu',
     type: 'psy',
@@ -535,15 +523,7 @@ const products = [
     pokemon: 'Léviator',
     description:
       'Saumon grillé, riz, brocolis, concombre et algues, servis sur une assiette aux vagues de Léviator.',
-    ingredients: [
-      'saumon grillé',
-      'riz',
-      'brocolis',
-      'concombre',
-      'algues',
-      'sauce soja',
-      'boisson au choix',
-    ],
+    ingredients: ['saumon grillé', 'riz', 'brocolis', 'concombre', 'algues', 'sauce soja'],
     price: 22.5,
     category: 'menu',
     type: 'eau',
