@@ -24,11 +24,13 @@ La Poké Ball est traitée comme un objet de design : rouge laqué, blanc porcel
 - **Types Pokémon** : onze tuiles qui teintent la section au survol et ouvrent la carte filtrée, plus une porte vers toute la carte.
 - **La carte** : 44 plats **regroupés par catégorie** comme un vrai menu (entrées, bentos, burgers, bowls, desserts, boissons, menus), recherche (nom, Pokémon, catégorie, type, tags, mots-clés, ingrédients, sans accents), filtres combinables (catégorie, types multiples, envies multiples, prix), **tri** (ordre de la carte, prix, nouveautés), **état dans l'URL** (partageable, bouton retour), rail de filtres desktop, bandeau de catégories et feuille de filtres sur mobile, compteur annoncé, état vide.
 - **Fiche plat** : dialog au-dessus de la carte (URL `/menu/:slug`) ou page complète en accès direct, ingrédients, encart type, quantité, ajout, favori, plats du même type.
-- **Panier** : tiroir latéral, lignes avec stepper, suppression, total, état vide, « Vider » avec confirmation, « Commander » qui explique la démonstration, **persistance locale validée**.
+- **Formules** : cinq menus composés (Pikachu, Feu, Aqua, Signature, et la Formule Dresseur à composer : entrée + plat + boisson + dessert à prix fixe), toujours moins chers qu'à la carte (vérifié par un test), badges, économie affichée, ajout au panier avec leur composition.
+- **Panier** : tiroir latéral, lignes avec stepper (plats et formules, composition affichée), suppression, total, état vide, « Vider » avec confirmation, « Commander » qui explique la démonstration, **persistance locale validée** (ids de plats et de formules revalidés au chargement).
 - **Favoris** persistants.
-- **Histoire** : trois chapitres, principes, les huit types, chiffres.
+- **Histoire** : trois chapitres, principes, les onze types, l'équipe, le geste du chef, la philosophie, chiffres.
+- **Avis clients** : section de témoignages **clairement identifiée comme contenu de démonstration** (bandeau « Avis de démonstration — contenu fictif, version portfolio », mention « démo » sur chaque date). Aucune note Google, aucun profil réel. Les données passent par `getReviews()` dans `src/data/reviews.js`, prévu pour être remplacé par un vrai flux (fiche Google Business via un proxy serveur) sans toucher au composant.
 - **Contact** : informations, services, carte stylisée hors ligne, formulaire à quatre états.
-- **Réservation** : date, créneau, convives, nom, email ; validation à la perte de focus, récapitulatif en succès. Simulation côté client, structure prête pour une vraie API.
+- **Réservation** : date, créneau, convives, nom, email, demande spéciale ; validation à la perte de focus, récapitulatif en succès. Simulation côté client (dit explicitement), structure prête pour une vraie API.
 - **404**, skip link, focus géré à chaque changement de page, `prefers-reduced-motion` respecté partout.
 
 ## Stack technique
@@ -52,12 +54,12 @@ Bootstrap, présent dans le TP, a été retiré : deux frameworks CSS doublaient
 ```
 src/
 ├── main.jsx, App.jsx        entrée, providers, layout, routes (pages secondaires en lazy)
-├── routes/                  HomePage, MenuPage, ProductPage, StoryPage, ContactPage, ReservationPage, NotFoundPage
+├── routes/                  HomePage, MenuPage, ProductPage, ComboPage, StoryPage, ContactPage, ReservationPage, NotFoundPage
 ├── components/
 │   ├── layout/              Header, MobileMenu, Footer, Belt, Logo, Seo, SkipLink, RouteEffects
 │   ├── ui/                  Button, Chip, TypeBadge, Stepper, Field, Dialog, Icons
-│   ├── home/                Hero, HeroBall, TypesSection, SignatureDishes, StoryTeaser, ReservationCta
-│   ├── menu/                SearchField, FilterControls, FilterSheet, ProductGrid, ProductCard, ProductDetail, ProductDialog, EmptyResults
+│   ├── home/                Hero, HeroBall, TypesSection, SignatureDishes, StoryTeaser, ReviewsSection, ReservationCta
+│   ├── menu/                SearchField, FilterControls, FilterSheet, ProductGrid, ProductCard, ProductDetail, ProductDialog, ComboCard, ComboDetail, ComboDialog, EmptyResults
 │   ├── cart/                CartButton, CartDrawer, CartLine
 │   ├── forms/               useForm, ContactForm, ReservationForm
 │   ├── loading/             LoadingScreen (+ état de session)
@@ -65,8 +67,8 @@ src/
 ├── contexts/                CartContext (useReducer + localStorage), FavoritesContext, ToastContext
 ├── hooks/                   useMenuFilters (URL), useMediaQuery, useScrolled
 ├── reducers/                cartReducer (+ tests)
-├── data/                    products, types, filters, restaurant, story, navigation
-├── utils/                   filterProducts, storage, validation, formatPrice, text, cn (+ tests)
+├── data/                    products (44), combos (formules), reviews (démo), types, filters, facts, restaurant, story, navigation
+├── utils/                   filterProducts, cartItems (ids produit / formule), storage, validation, formatPrice, text, cn (+ tests)
 ├── api/                     couche « fetch » simulée (contact, réservation)
 ├── lib/                     motion (GSAP), SmoothScroll (Lenis)
 ├── three/                   pokeball (scène), PokeballCanvas
@@ -74,7 +76,7 @@ src/
 └── assets/                  products (WebP), branding
 ```
 
-Flux : l'URL porte les filtres de la carte ; le panier ne stocke que `{ id, quantité }` et relit prix et noms dans le catalogue ; tout ce qui vient du `localStorage` est validé. Détails dans [`docs/architecture/site-architecture.md`](docs/architecture/site-architecture.md).
+Flux : l'URL porte les filtres de la carte ; le panier ne stocke que `{ id, quantité }` (id numérique pour un plat, chaîne `combo:…` pour une formule et sa composition) et relit prix, noms et composition dans le catalogue ; tout ce qui vient du `localStorage` est validé. Détails dans [`docs/architecture/site-architecture.md`](docs/architecture/site-architecture.md).
 
 ## Design system
 
@@ -103,7 +105,7 @@ Toutes les images sont affichées avec un masque radial qui fond les angles dans
 
 ## Performance
 
-Bundle initial : 122 Ko gzip (React, Router, accueil, carte à 44 plats, UI) + 53 Ko (motion) + 12,5 Ko de CSS. Three.js (133 Ko gzip) et les pages secondaires sont chargés à la demande. Aucune requête tierce, fonts en `swap`, images lazy avec dimensions déclarées, animations sur `transform` et `opacity`. Détails et pistes dans [`docs/qa/qa-report.md`](docs/qa/qa-report.md).
+Bundle initial : 110 Ko gzip (React, Router, accueil, carte à 44 plats, UI) + 53 Ko (motion) + 12,5 Ko de CSS. Three.js (133 Ko gzip) et les pages secondaires sont chargés à la demande. Aucune requête tierce, fonts en `swap`, images lazy avec dimensions déclarées, animations sur `transform` et `opacity`. Détails et pistes dans [`docs/qa/qa-report.md`](docs/qa/qa-report.md).
 
 ## Accessibilité
 
@@ -201,7 +203,14 @@ Le site n'est jamais enfermé dans GitHub Pages : la base est une variable d'env
 **Problème.** La première méthode (boîte englobante du plat + canvas carré rempli de la couleur de fond) laissait un rectangle visible : le fond des cases n'est pas uniforme (léger dégradé), et la détection « encre » prenait tout le fond des bols pour du plat.
 **Solution.** Garder la case entière moins la bande de titre (512 × 410, un ratio 5:4 naturel), sans remplissage ni redimensionnement, et détecter le texte par ses lignes noires plutôt que par distance au fond. Zéro raccord, échelle identique pour les 16 plats, contrôle visuel sur une planche générée et sur un zoom des bandes hautes.
 
-### 9. Attributs SVG en double dans le générateur de maquettes
+### 9. Quatre plats sans image
+
+**Problème.** Quatre cartes (Salamèche Bento, Salamèche Bento Maxi, Mew Berry Bowl, Mew Berry Bowl Chantilly) affichaient une zone image vide.
+**Cause.** Le catalogue charge les images par slug (`import.meta.glob`), mais ces quatre fichiers avaient gardé le nom de la planche du TP (`salameche-bento-01.webp`, `mew-berry-bowl-02.webp`…) : `image('salameche-bento')` renvoyait `undefined` sans erreur.
+**Solution.** Renommer les fichiers pour qu'ils suivent les slugs, et ajouter un test unitaire qui vérifie que les 44 produits résolvent bien un fichier `.webp`, plus un test Playwright qui charge la carte et contrôle que chaque image a une largeur naturelle non nulle.
+**Appris.** Une convention « fichier = slug » ne vaut que si un test la garde.
+
+### 10. Attributs SVG en double dans le générateur de maquettes
 
 **Problème.** Les maquettes générées ne s'affichaient pas (`Attribute font-weight redefined`).
 **Cause.** La constante de police display embarquait déjà `font-weight`, réinjecté par l'appel.
@@ -220,6 +229,8 @@ Le site n'est jamais enfermé dans GitHub Pages : la base est une variable d'env
 - **Fonts auto-hébergées** : aucune requête vers Google Fonts, sous-ensembles latin uniquement.
 - **Carte regroupée par catégorie** quand aucun filtre n'est actif : avec 44 plats, on lit la carte comme un menu ; un filtre, une recherche ou un tri la remettent à plat.
 - **Un badge maximum par carte** (Nouveau, sinon Signature) et plus de ligne de tags : les plats restent les stars, les détails sont dans la fiche.
+- **Formules = compositions, pas des produits** : elles vivent dans `data/combos.js`, référencent les plats par slug et entrent dans le panier avec un identifiant qui encode leur composition. Le catalogue reste à 44 plats et le prix d'une formule est toujours inférieur à la somme de ses plats (test).
+- **Avis clients fictifs, assumés** : pas de faux avis Google ; une section « démo » avec une seule fonction à remplacer le jour où une vraie fiche existe.
 - **Aucun fichier d'assistant** dans le dépôt (`.claude`, `.kilo`, etc. ignorés).
 
 ## Améliorations futures

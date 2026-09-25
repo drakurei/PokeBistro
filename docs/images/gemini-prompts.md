@@ -283,6 +283,34 @@ wave crest made of thin blue-tinted rice paper evoking Gyarados. Colours: blue, 
 Mood: sea, generous, "Eau" type.
 ```
 
+## Visuels du restaurant (à générer, même direction artistique)
+
+Bloc de style commun aux scènes (à coller avant chaque prompt) :
+
+```
+Editorial photography of a contemporary Japanese-inspired bistro in France, warm cream walls (#F8EFDE),
+black lacquered wood, red lacquer accents, porcelain plates, soft daylight from large windows, film-like
+colour, shallow depth of field, no people looking at the camera, no logos, no text, no watermark,
+consistent series look with the dish photography (warm cream, soft shadows).
+```
+
+| #   | Visuel            | Fichier cible                            | Format      | Prompt (sujet)                                                                                                                                                                                 |
+| --- | ----------------- | ---------------------------------------- | ----------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| H1  | Hero food         | `src/assets/hero/hero-plate.webp`        | 1600 × 1600 | Top-down (90°) view of the Dracaufeu Spicy Menu on a black slate board, centred, plate fills 80 % of the square, a wisp of steam, plain cream around. Used behind the 3D Poké Ball on desktop. |
+| H2  | Hero mobile       | `src/assets/hero/hero-plate-mobile.webp` | 1200 × 1500 | Same dish, 3/4 angle, portrait framing, plate in the lower two thirds, cream above for the title.                                                                                              |
+| K1  | Cuisine           | `src/assets/sections/kitchen-01.webp`    | 1600 × 1000 | Close-up of two hands placing a tamagoyaki slice into a yellow lacquered bento box on a light wooden pass, blurred kitchen behind, warm daylight.                                              |
+| K2  | Cuisine           | `src/assets/sections/kitchen-02.webp`    | 1600 × 1000 | Six finished bento boxes (yellow, orange, green, blue, pink, black) lined up on the pass, 3/4 high angle, shallow depth of field on the first two.                                             |
+| C1  | Chef              | `src/assets/sections/chef.webp`          | 1200 × 1500 | A chef in a black apron seen from the side, plating a bowl with tweezers, face turned toward the plate, bento boxes stacked behind, no visible face detail.                                    |
+| R1  | Salle             | `src/assets/sections/room.webp`          | 1600 × 1000 | The dining room at 11:30, empty, cream walls, black lacquered tables, red lacquer chairs, a long belt-like black line painted at mid-height on the wall, daylight.                             |
+| R2  | Comptoir          | `src/assets/sections/counter.webp`       | 1600 × 1000 | The take-away counter: black lacquered counter, a row of porcelain bowls, a small red-and-white sphere as a lamp, kraft boxes stacked, morning light.                                          |
+| T1  | Table             | `src/assets/sections/table.webp`         | 1600 × 1000 | A table for two from above: two bentos, a blue iced tea, a yellow soda, chopsticks on a black rest, cream tablecloth, hands out of frame.                                                      |
+| E1  | Ambiance soir     | `src/assets/sections/evening.webp`       | 1600 × 1000 | The same room at night: warm pendant lights, red lacquer glowing, window reflections, tables set, a soft yellow glow like Pikachu's cheeks on the wall.                                        |
+| D1  | Dessert signature | `src/assets/sections/dessert.webp`       | 1200 × 1200 | The Mentali Velvet Cake being sliced, one slice lifted on a black knife, lavender crumbs, cream background.                                                                                    |
+| B1  | Réservation       | `src/assets/sections/reservation.webp`   | 1600 × 1000 | A reserved table: a small black card with a red dot standing on a cream plate, two glasses, evening light, blurred room behind.                                                                |
+| S1  | Storytelling      | `src/assets/sections/origin.webp`        | 1600 × 1000 | A tiny kitchen, 2019 feel: one bento box being decorated with two red rice cheeks, a handwritten menu pinned on the wall (no readable text), warm lamp.                                        |
+
+Contraintes : mêmes tons crème / laque / encre que les plats, aucun personnage reconnaissable, aucun texte lisible, pas de logo Pokémon officiel. Chaque visuel arrive en WebP (q 80), largeur ≤ 1600 px, avec ses dimensions déclarées dans le composant qui l'affiche.
+
 ## Hero et sections (phase 2)
 
 **Hero plate** (`hero/hero-plate`)

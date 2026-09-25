@@ -32,10 +32,10 @@ Les cases dont le fond présente un léger dégradé (bols, boissons) ont été 
 
 ## Ce qui reste à faire (n'empêche pas la livraison)
 
-| Plat                              | Fichier                                                  | Action                                                                                               | Prompt                                          |
-| --------------------------------- | -------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| Les 28 plats de la première série | `src/assets/products/<slug>.webp` (198 × 168)            | **Régénérer** en 1200 × 1200 ou en planche 4 × 4 haute définition, puis découper avec le même script | `gemini-prompts.md`, section « Première série » |
-| Hero                              | `src/assets/hero/hero-plate.webp`                        | Créer (optionnel)                                                                                    | section « Hero et sections »                    |
-| Histoire                          | `src/assets/sections/kitchen-01.webp`, `kitchen-02.webp` | Créer (optionnel)                                                                                    | section « Hero et sections »                    |
+| Plat                                                                                 | Fichier                                       | Action                                                                                               | Prompt                                          |
+| ------------------------------------------------------------------------------------ | --------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| Les 28 plats de la première série                                                    | `src/assets/products/<slug>.webp` (198 × 168) | **Régénérer** en 1200 × 1200 ou en planche 4 × 4 haute définition, puis découper avec le même script | `gemini-prompts.md`, section « Première série » |
+| Hero (H1, H2)                                                                        | `src/assets/hero/`                            | Créer                                                                                                | `gemini-prompts.md`, « Visuels du restaurant »  |
+| Cuisine, chef, salle, comptoir, table, soir, dessert, réservation, origine (K1 → S1) | `src/assets/sections/`                        | Créer, puis intégrer dans Histoire, Contact et Réservation                                           | idem                                            |
 
 Marche à suivre pour une planche 4 × 4 : générer en 2048 × 2048 avec le bloc de style commun, adapter la liste `SLUGS` du script de découpe, lancer, contrôler la planche produite, remplacer les fichiers. Rien d'autre à changer.
