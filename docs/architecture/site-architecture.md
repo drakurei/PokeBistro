@@ -2,71 +2,66 @@
 
 ## Plan du site
 
-| Route          | Page             | Rôle                                                                                                                                       |
-| -------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `/`            | Accueil          | Thèse (hero), types, plats signatures, histoire (teaser), réservation.                                                                     |
-| `/menu`        | La carte         | Les 44 plats regroupés par catégorie ; recherche, filtres (catégorie, types, tags, prix) et tri. L'état est dans l'URL.                    |
-| `/menu/:slug`  | Détail d'un plat | Ouvert en **dialog** au-dessus de la carte quand on vient de la grille, en **page complète** en accès direct (lien partagé, rechargement). |
-| `/histoire`    | Notre histoire   | Storytelling : origine, cuisine, types, ingrédients, chiffres.                                                                             |
-| `/contact`     | Contact          | Adresse, horaires, services, formulaire (nom, email, message).                                                                             |
-| `/reservation` | Réserver         | Formulaire (date, heure, couverts, nom, email) simulé côté client.                                                                         |
-| `*`            | 404              | Retour à l'accueil / à la carte.                                                                                                           |
+| Route               | Page             | Rôle                                                                                                                                                                                                          |
+| ------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/`                 | Accueil          | Hero « food-first », marquee, types (glyphes), plats signatures, histoire (teaser), avis (démo), réservation.                                                                                                 |
+| `/menu`             | La carte         | Sommaire, 7 catégories dans l'ordre d'un repas puis les formules ; la section Desserts est sous-groupée (`DessertGroups`) ; recherche, filtres (catégorie, type, envie, régime, prix), tri ; état dans l'URL. |
+| `/menu/:slug`       | Fiche d'un plat  | Dialog au-dessus de la carte depuis la grille, page complète (`<h1>`) en accès direct. Régime, allergènes, formules, suggestions.                                                                             |
+| `/menu/formule/:id` | Fiche de formule | Idem, avec le composeur visuel pour les formules à choix.                                                                                                                                                     |
+| `/commande`         | Commander        | Simulation en quatre étapes + confirmation. `noindex`.                                                                                                                                                        |
+| `/favoris`          | Vos favoris      | Les plats gardés dans ce navigateur. `noindex`.                                                                                                                                                               |
+| `/histoire`         | Notre histoire   | Storytelling : origine, cuisine, types, ingrédients, chiffres.                                                                                                                                                |
+| `/contact`          | Contact          | Adresse, horaires, services, formulaire.                                                                                                                                                                      |
+| `/reservation`      | Réserver         | Formulaire → récapitulatif → confirmation, créneaux simulés, .ics.                                                                                                                                            |
+| `*`                 | 404              | Coquille de l'application sur GitHub Pages.                                                                                                                                                                   |
 
-Le panier est un **tiroir** disponible sur toutes les pages, pas une route.
-
-## Stack
-
-- **React 19 + Vite 8** (JS, JSX). React 19 hisse `<title>` / `<meta>` dans `<head>` : le SEO par page ne nécessite aucune bibliothèque.
-- **Découpage** : accueil et carte dans le bundle initial ; fiche, histoire, contact, réservation et 404 chargés à la demande (`React.lazy`), Three.js dans son propre chunk.
-- **React Router 8** (mode déclaratif) : routes ci-dessus, `useSearchParams` pour les filtres, `location.state.background` pour le détail en dialog.
-- **Tailwind CSS 4** : tokens `@theme`, utilitaires, quelques classes composant dans `globals.css`. Bootstrap retiré (raisons dans `docs/audit/tp-audit.md`).
-- **GSAP 3 + @gsap/react** : reveals, hero, marquee, transitions. **ScrollTrigger** pour les sections. **Lenis** (desktop, hors reduced-motion) pour le défilement.
-- **Three.js** : Poké Ball 3D du hero, chargée en chunk séparé (`React.lazy`) uniquement sur desktop, WebGL disponible, reduced-motion désactivé.
-- **Fontsource** : 3 familles auto-hébergées.
-- **Vitest** (logique pure) + **Playwright** (parcours).
-
-## Arborescence `src/`
+## Arborescence
 
 ```
 src/
-├── main.jsx                 fonts, styles, Router, App
-├── App.jsx                  providers, layout, routes
-├── routes/                  une page = un fichier
-│   ├── HomePage.jsx, MenuPage.jsx, ProductPage.jsx, StoryPage.jsx,
-│   ├── ContactPage.jsx, ReservationPage.jsx, NotFoundPage.jsx
-├── components/
-│   ├── layout/              Header, MobileMenu, Footer, Belt, Seo, SkipLink, PageTransition
-│   ├── ui/                  Button, IconButton, Chip, TypeBadge, Stepper, Field, Dialog, Drawer, Toast, Icons
-│   ├── home/                Hero, HeroBall (lazy 3D), PokeballMark (fallback SVG), TypesSection, SignatureDishes, StoryTeaser, ReservationCta
-│   ├── menu/                MenuToolbar, FilterRail, FilterSheet, SearchField, ProductGrid, ProductCard, ProductDetail, EmptyResults
-│   ├── cart/                CartDrawer, CartLine, CartButton
-│   ├── forms/               ContactForm, ReservationForm
-│   └── loading/             LoadingScreen
-├── contexts/                CartContext (useReducer + localStorage), FavoritesContext, ToastContext
-├── hooks/                   useMenuFilters (URL), useMediaQuery, useReducedMotion, useLockBodyScroll, useFocusTrap, useScrolled
-├── reducers/                cartReducer
-├── data/                    products, types, filters, restaurant, story
-├── utils/                   filterProducts, formatPrice, storage (parse + validation), validation (formulaires), cn
-├── api/                     contact.js, reservation.js — simulation Promise + délai, même signature qu'un vrai fetch
-├── lib/                     motion.js (registration GSAP, tokens), SmoothScroll.jsx (Lenis)
-├── three/                   pokeball.js (scène) + PokeballCanvas.jsx
-├── styles/                  globals.css
-└── assets/                  products/ (webp), branding/ (logo, pokeball), hero/, sections/, icons/, 3d/
+  api/            fausse couche réseau (Promise + délai, hook d'échec "erreur@")
+  components/
+    cart/         CartDrawer, CartLine, CartButton, MobileCartBar
+    forms/        ContactForm, ReservationForm, useForm
+    home/         Hero, HeroBall, TypesSection, SignatureDishes, StoryTeaser, ReviewsSection, ReservationCta
+    layout/       Header, Footer, MobileMenu, FavoritesButton, Seo, ErrorBoundary, LazyFailed, Belt, Logo…
+    loading/      LoadingScreen + loadingState
+    menu/         ProductCard, ProductDetail, ProductGrid, MenuToolbar, MenuSections, CombosSection,
+                  ComboCard, ComboDetail, ChoiceGrid, FilterControls, FilterSheet, dialogs
+    motion/       Reveal
+    order/        StepIndicator, ChoiceCard, SlotPicker
+    ui/           Button, Chip, Dialog, DishImage, Field, Icons, Stepper, TypeBadge, TypeIcon
+  contexts/       CartContext, FavoritesContext, ToastContext
+  data/           products (44), combos (8), filters, types (+ glyphe), restaurant, reviews, story, content, facts
+  hooks/          useMenuFilters (URL), useMediaQuery, useScrolled
+  reducers/       cartReducer (lignes objets)
+  routes/         une page par route
+  seo/            pageMeta (titres, descriptions, canonical, JSON-LD, routes, sitemap)
+  three/          Poké Ball (chunk séparé)
+  utils/          cartItems, filterProducts, schedule, suggestions, ics, storage, validation, text…
+  entry-server.jsx  rendu statique (utilisé par scripts/prerender.mjs)
+scripts/          prerender, clean, size-budget, csp-hash
+e2e/              Playwright (navigation, menu, carte, panier, commande, favoris, formulaires, a11y, seo, motion)
 ```
 
-## Flux de données
+## Données
 
-```
-URL (?q=&category=&type=&tag=&price=&sort=)  --useMenuFilters-->  MenuPage --> filterProducts(products, filters) --> ProductGrid
-                                                                                          |
-localStorage <--persist--  CartContext (useReducer)  <-- ProductCard / ProductDetail / CartDrawer
-localStorage <--persist--  FavoritesContext (liste d'ids)
-```
+- **Produit** : `id, slug, name, pokemon, description, ingredients, price, category, subcategory (desserts : choux / patisserie / glace / fruits), type, tags, diet, allergens (14 UE), spicy (0-3), availability, image, imageSet, keywords`. Les régimes et allergènes sont des données de démonstration, annoncées comme telles dans la fiche.
+- **Formule** : fixe (`items`) ou à choix (`slots` avec catégories, prix minimum, choix par défaut), `price`, `badge`, `availability` (Déjeuner), `note`.
+- **Types** : couleur, texte de contraste, promesse, saveur, `icon` (nom du glyphe original).
+- **Contenu éditorial** : `data/content.js` (accueil), `data/story.js` (histoire), `data/restaurant.js` (coordonnées, horaires structurés, fermetures, places, politique d'annulation), `data/editorial.js` (création du chef, desserts mis en avant : un slug à changer, le site suit).
 
-- Le stockage local ne contient que `{ id, quantity }` (panier) et `[id]` (favoris). Les prix et noms sont **toujours** relus depuis `data/products.js` : une valeur modifiée dans le navigateur ne peut pas altérer un prix.
-- Tout ce qui est lu depuis `localStorage` passe par `utils/storage.js` (try/catch + validation de forme + limites).
+## Panier
 
-## Déploiement
+Lignes objets : `{ kind: 'product', productId }` ou `{ kind: 'formula', formulaId, choices }`, clé stable (`p:12`, `f:formule-dresseur:plat=…`), quantité ≤ 20. `cartItems.js` résout une ligne en article (nom, prix, image, composition), valide ce qui vient du stockage et calcule les **formules atteignables** (les plats d'une formule fixe sont tous dans le panier → proposition d'économie, jamais appliquée seule). Persistance après le montage (le HTML pré-rendu est vide), `localStorage` préfixé, plafonné, validé.
 
-- `vite build` → `dist/` avec `base = '/'` (Vercel, Netlify : `vercel.json` / `netlify.toml` réécrivent tout vers `index.html`).
-- `npm run build:pages` → `vite build --mode pages` lit `.env.pages` (`VITE_BASE=/PokeBistro/`) et copie `index.html` en `404.html` pour le fallback SPA de GitHub Pages ; `npm run deploy` publie `dist/` sur `gh-pages`.
+## Rendu et chargement
+
+- **Pré-rendu** : `entry-server.jsx` rend `<App>` dans un `StaticRouter` pour chaque route de `pageMeta.allRoutes` ; les pages paresseuses sont **préchargées** avant le rendu et `progressiveChunkSize` est relevé pour que Fizz n'externalise aucun Suspense. `main.jsx` hydrate si la racine a déjà du contenu, sinon rend (dev, 404).
+- **Chunks** : `index` (app), `motion` (GSAP + Lenis), `three` (différé, desktop), un chunk par page secondaire, données du catalogue dans un chunk partagé.
+- **Robustesse** : `ErrorBoundary` autour des routes (clé = chemin), `lazyPage` remplace un chunk introuvable par un panneau « recharger », `HeroBall` isole la 3D.
+- **Loader** : dans le HTML, masqué avant la première peinture par un script inline quand la session l'a vu.
+
+## Qualité
+
+`npm run check` = lint (oxlint) → tests unitaires (Vitest) → build + pré-rendu → budget (`scripts/size-budget.mjs`). Les tests de bout en bout (Playwright, desktop + mobile, reduced motion + une suite plein mouvement, axe) tournent contre le build prévisualisé. Le tout est exécuté par GitHub Actions (`.github/workflows/ci.yml`) sur `main`, `develop` et les pull requests.

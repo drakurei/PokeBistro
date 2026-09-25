@@ -359,3 +359,57 @@ Générée en une planche 4 × 4 (2048 × 2048) avec le bloc de style commun, un
 | 42  | **Mentali Velvet Cake**    | Purple-and-pink velvet layer cake on a lavender plate, smooth lilac icing, dried lavender sprigs, evoking Espeon. Type Psy, dessert.                                        |
 | 43  | **Amphinobi Blue Tea**     | Tall glass of blue butterfly-pea iced tea, lime slice, fresh mint, ice cubes, a small blue ribbon, evoking Greninja. Type Eau, drink.                                       |
 | 44  | **Pikachu Spark Soda**     | Tall glass of sparkling yellow lemonade, ice, lemon halves and wedges, one sugar lightning bolt on the rim, evoking Pikachu. Type Électrik, drink.                          |
+
+## Visuels des pages secondaires (à générer, non lancés par le site)
+
+Même bloc de style que les plats, sans Pokémon visible. Format 3:2 ou 16:9, 2048 px de large.
+
+### Salle du bistro (Histoire, Contact)
+
+> Interior of a small contemporary Japanese bistro in France, warm cream walls, black lacquered counter with a thin horizontal black band, porcelain plates stacked, red lacquer accents, soft daylight from a large window, no people, no text, no logos, photographic, 35 mm, shallow depth of field.
+
+### Terrasse (Réservation)
+
+> Ten small bistro tables on a quiet French street terrace, cream parasols, black metal chairs, red lacquer menu stands, late afternoon light, no people, no text, photographic.
+
+### Plateau de formule (fiche formule, Open Graph)
+
+> Top-down flat lay of a bento box, a tall glass of blue sparkling soda and a small round pudding on a black lacquered tray, cream background, soft shadow, no text, no logos, photographic, 1:1.
+
+### Image Open Graph (1200 × 630)
+
+> Same style as the dishes: a salmon poke bowl with cucumber, avocado and blueberries on a cream background, a thin black horizontal band behind it, large empty space on the left for a headline, 1200 by 630 pixels.
+
+## Troisième série (terminée) — la collection de profiteroles
+
+Générée le 25/09/2026 en une planche 6 × 4 (2816 × 1536), titres en bas de case, découpée par `scripts/cut-dessert-sheet.py`. Bloc de style commun, puis un bloc par dessert. Le Pokémon est toujours construit avec de la pâte à choux, du glaçage, de la crème, des fruits, du chocolat, du sucre travaillé : jamais de figurine, jamais de jouet.
+
+**Bloc de style (desserts)**
+
+```
+Professional pastry photography, a small stack of cream puffs (profiteroles / choux) assembled and
+decorated to evoke a Pokémon using only edible elements: glaze, whipped cream, chocolate, fruit,
+sugar tuiles, meringue, marzipan. Plain warm cream background, soft studio light from the upper
+left, short natural shadow, 3/4 high angle, centred, no plate, no text, no logo, no toy, no
+figurine. Same scale and lighting for every subject.
+```
+
+| Case    | Plat                           | Sujet                                                                                                 |
+| ------- | ------------------------------ | ----------------------------------------------------------------------------------------------------- |
+| (1,1)   | Pikachu Spark Profiteroles     | Three yellow-glazed choux stacked, vanilla cream, raspberry cheeks, dark chocolate lightning bolt.    |
+| (1,2)   | Évoli Praliné Profiteroles     | Milk-chocolate glazed choux, hazelnut praline, whipped-cream collar, marzipan ears evoking Eevee.     |
+| (1,3)   | Rondoudou Cloud Profiteroles   | Pink strawberry-glazed choux, vanilla chantilly clouds, sugar ears, fresh strawberries.               |
+| (1,5)   | Salamèche Flame Profiteroles   | Dark chocolate and orange glazed choux, salted caramel cream, orange sugar tuiles as flames.          |
+| (1,6)   | Carapuce Aqua Profiteroles     | Tower of blueberry-glazed choux, yuzu mousseline, blue sugar shards, turtle head in glaze.            |
+| (2,2)   | Bulbizarre Garden Profiteroles | Pistachio-matcha choux, matcha cream, marzipan bulb, fresh mint, raspberries and blueberries.         |
+| (2,4)   | Goupix Fire Profiteroles       | Apricot-glazed choux, orange-blossom crème brûlée, caramel tuiles as six tails, fox face in glaze.    |
+| (2,5)   | Psykokwak Lemon Profiteroles   | Lemon-glazed choux, lemon curd cream, white chocolate beak, candied lemon slice.                      |
+| (3,1)   | Togepi Egg Profiteroles        | Small white-chocolate glazed choux with coloured sugar triangles, vanilla cream, meringue eggshell.   |
+| (3,2)   | Ectoplasma Dark Profiteroles   | Black cocoa choux, purple blackberry glaze, blackcurrant cream, cocoa crumble, chocolate smile.       |
+| (3,3)   | Mew Rose Profiteroles          | Pink and white choux, rose-lychee cream, raspberries and raspberry coulis.                            |
+| (3,4)   | Lucario Aura Profiteroles      | Chocolate choux, midnight-blue glaze, praline-cocoa cream, blue sugar shards as an aura.              |
+| (3–4,6) | Pikachu Croquembouche          | Tall croquembouche of thirty vanilla-lemon choux, spun caramel, raspberries, marzipan Pikachu on top. |
+| (4,2)   | Marill Bubble Profiteroles     | Blueberry-glazed blue choux, vanilla cream, blown-sugar bubbles, Marill face in icing.                |
+| (4,3)   | Mentali Violette Profiteroles  | Lavender-glazed purple choux, blackberry-violet cream, crystallised violets, sugar leaves.            |
+
+Cases non retenues (doublons ou identité ambiguë) : (1,4), (2,1), (2,3), (2,6), (3,5), (4,1), (4,4), (4,5).

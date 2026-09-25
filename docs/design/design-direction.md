@@ -10,65 +10,61 @@ Le site est construit sur cette correspondance. Il ne cite pas Pokémon par des 
 
 ## Ce que le site doit faire ressentir
 
-| Ressenti                              | Comment                                                                                                              |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
-| « C'est un vrai restaurant »          | La nourriture d'abord : plats grands, détourés, prix, ingrédients, réservation.                                      |
-| « C'est premium »                     | Beaucoup d'air, typographie large et peu de familles, une seule couleur forte, mouvement lent et précis.             |
-| « C'est Pokémon, sans être enfantin » | La Poké Ball comme objet 3D et comme motif géométrique ; les types comme palette fonctionnelle ; les noms des plats. |
-| « C'est japonais contemporain »       | Matières (laque, porcelaine, encre), grille bento, étiquettes mono type « fiche », rythme calme.                     |
+1. **On a faim avant d'avoir compris le concept.** Le premier écran montre un plat, pas un logo. Le titre est une phrase (« Le bistro qui sert l'univers Pokémon dans l'assiette. »), pas une marque en 9 rem.
+2. **C'est un vrai restaurant.** Prix, horaires, allergènes, formules, réservation avec créneaux, commande en quatre étapes : tout ce qu'un client attend, avec la mention honnête de ce qui est simulé.
+3. **C'est joueur, pas puéril.** L'humour est dans les noms, les descriptions, les types ; jamais dans des couleurs criardes ou des mascottes.
 
-## Palette : laque, porcelaine, encre, or
+## Le hero (v3, « food-first »)
 
-| Nom            | Hex       | Rôle                                                                                                                                      |
-| -------------- | --------- | ----------------------------------------------------------------------------------------------------------------------------------------- |
-| Porcelaine     | `#FCFBF8` | Fond de page. Blanc chaud, pas crème « papier ».                                                                                          |
-| Washi          | `#F7EEDC` | Surface des cartes et fond des visuels (c'est la couleur de fond des images produits, pour qu'elles semblent détourées).                  |
-| Laque          | `#C9211B` | La couleur forte. Utilisée en **surfaces** (moitié haute du hero, bandeau réservation) plus qu'en accent. Blanc dessus : contraste 5,2:1. |
-| Laque profonde | `#9E1913` | Survol / actif.                                                                                                                           |
-| Encre          | `#17151A` | Texte, ceinture, sections sombres (« plateau »).                                                                                          |
-| Encre douce    | `#3C3944` | Texte secondaire.                                                                                                                         |
-| Encre muette   | `#6B6772` | Texte tertiaire (contraste 5,5:1 sur porcelaine).                                                                                         |
-| Ligne          | `#E6E0D3` | Bordures, séparateurs discrets.                                                                                                           |
-| Or             | `#F2B826` | Accent rare : badge « signature », favoris, Pikachu. Encre dessus.                                                                        |
+- **Structure** : la Poké Ball ouverte. Haut laque (`#C9211B`), ceinture encre de 3 px, bas porcelaine. La **Poké Ball 3D** est le bouton de la ceinture, à petite échelle (72 → 150 px) : un sceau, plus un décor.
+- **Sujet** : un plat haute définition (Marill Aqua Bowl, `data/content.js › hero.dishSlug`) qui déborde de la laque et se pose sur la ceinture. Il est peint immédiatement (`fetchpriority="high"`, préchargé, jamais en `opacity: 0`).
+- **Titre** : `clamp(1.85rem, 5.6vw, 4.25rem)`, `max-width: 14ch`, trois lignes maximum à 390 px. Visible dès la première peinture : l'intro GSAP n'anime que la ceinture, le plat, la balle, le chapeau et les boutons.
+- **Sous la ceinture** : le chapeau, deux boutons (carte, réservation) et la **légende du plat** (nom, type, prix) qui mène à sa fiche. Les quatre médaillons de la v2 ont disparu : ils gênaient à 768 px et diluaient le sujet.
+- **Hauteurs plafonnées** : `min-height: min(50svh, 560px)` pour la laque, aucune section n'excède un écran.
 
-Couleurs de **types** (palette fonctionnelle, jamais décorative) : Électrik `#F2B826`, Feu `#E8542B`, Eau `#2F7BE0`, Plante `#4FB34F`, Normal `#9E9683`, Combat `#B85C38`, Psy `#E9508A`, Spectre `#6D5B9C`, Fée `#F2A1B8`, Glace `#7FD3E0`, Vol `#A3A8E8`. Chaque type a une version « teinte » (14 % sur porcelaine) pour les fonds.
+## Palette
 
-Ce qu'on évite : le trio bleu/jaune/rouge primaire du TP, les blobs flous, les dégradés « tech », et le trio crème + serif + terracotta des sites générés automatiquement.
+| Token               | Valeur     | Rôle                                                     |
+| ------------------- | ---------- | -------------------------------------------------------- |
+| `--color-lacquer`   | `#C9211B`  | Laque : hero, CTA principal, accents, prix barrés jamais |
+| `--color-porcelain` | `#FCFBF8`  | Fond général                                             |
+| `--color-washi`     | `#F7EEDC`  | Surfaces secondaires (cartes de plats, encarts)          |
+| `--color-ink`       | `#17151A`  | Texte, ceinture, plateaux des formules, panier, footer   |
+| `--color-gold`      | `#F2B826`  | Badge « Nouveau », économies, étoiles, favoris           |
+| `--color-type-*`    | 11 teintes | Une par type Pokémon, portée par le glyphe, jamais seule |
+
+Règle de contraste : `ink-mute` (`#6B6772`) sur porcelaine = 5,1:1, `porcelain/60` sur ink = 6,3:1. Une information n'est jamais portée par la couleur seule (badge = texte, type = glyphe + nom, créneau complet = barré + « (complet) »).
 
 ## Typographie
 
-| Rôle       | Famille                                   | Usage                                                                                                                 |
-| ---------- | ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------- |
-| Display    | **Unbounded** (variable 500–800)          | Titres larges, chiffres, marque. Large, géométrique, un peu « arcade ». Réservé aux moments forts (max 5–6 par page). |
-| Texte      | **Zen Kaku Gothic New** (400 / 500 / 700) | Corps, navigation, cartes. Calme, dessin japonais contemporain, très lisible.                                         |
-| Utilitaire | **DM Mono** (400 / 500)                   | Prix, étiquettes, eyebrows, métadonnées (« TYPE · FEU », « 12,90 € »). Donne le côté fiche / Pokédex.                 |
+- **Unbounded** (display) pour les titres : large, géométrique, un peu « enseigne ». Toujours en `text-balance`, jamais plus de trois lignes.
+- **Zen Kaku Gothic New** (texte) : un gothique japonais lisible, qui donne le ton bistro sans cliché.
+- **DM Mono** (utilitaire) : prix, compteurs, chapeaux, badges, étapes. Chiffres tabulaires partout.
+- Un seul chapeau (« eyebrow » mono, lacquer) par section. Le chapeau dit la catégorie, le titre dit l'idée.
 
-Auto-hébergées (Fontsource, sous-ensemble latin), `font-display: swap`. Aucune requête vers Google Fonts.
+## Les glyphes de types
 
-## Signature : la ceinture
+Onze pictogrammes **originaux** (`components/ui/TypeIcon.jsx`), dessinés dans la grammaire des icônes du site (grille 24, trait 1,75, bouts ronds) : éclair, flamme, goutte, feuille, assiette, poing, spirale, fantôme de drap, étoile à quatre branches, flocon, plume. Aucun logo ni sprite officiel n'est copié. Le glyphe porte la couleur du type, le nom reste écrit à côté ; il apparaît sur les badges des cartes, les filtres, les tuiles « Choisissez votre type », la fiche, le composeur de formule et la page Histoire.
 
-L'élément que le visiteur retient : **la ceinture de la Poké Ball**, une ligne d'encre de 2 px avec un bouton (anneau blanc, cercle d'encre) au centre. Elle traverse le hero au niveau de la Poké Ball 3D, ferme le header quand il devient opaque, sépare les grandes sections et ouvre le pied de page. Tout le reste reste calme.
+## Cartes de plats
 
-Deuxième motif, discret : la **grille bento** — les cartes de la carte sont posées sur un « plateau » d'encre, comme des compartiments.
+Image (masque radial qui fond le crème de la planche dans le washi), badge de type, nom, prix, description coupée **au mot** (~90 caractères), au plus **un** badge éditorial (Nouveau > Signature > Choix du chef), bouton « Ajouter » qui devient un compteur. Le cœur reste cliquable mais hors de l'ordre de tabulation : la même action existe dans la fiche.
 
-## Composition du hero
+## La signature dessert : les profiteroles Pokémon
 
-```
-+--------------------------------------------------------------+
-| [logo]  Accueil  La carte  Histoire  Contact  [Réserver] [P] |  header transparent
-|                                                              |
-|  BISTRO · ÉVRY · DEPUIS 2019 (mono)                          |  surface LAQUE
-|  POKÉ                                     .--------.         |  (moitié haute)
-|  BISTRO  (Unbounded, très large, blanc)   |  ball  |  3D     |
-| ==========================================|   3D   |=========|  <- ceinture au milieu
-|  Des bentos, des burgers et des bowls     '--------'         |  surface PORCELAINE
-|  qui portent le nom d'un Pokémon.         o  o  o  plats     |  (moitié basse)
-|  [Voir la carte]  [Réserver une table]                       |
-+--------------------------------------------------------------+
-```
+Le dessert est devenu la seconde signature du restaurant, après la Poké Ball ouverte du hero. Le principe est celui de la carte : on reconnaît le Pokémon avant de lire le nom, et on a envie de le manger avant de le reconnaître. Ici le matériau est unique, la **pâte à choux**, et tout ce qui fait le Pokémon est comestible (glaçage, crème, chocolat, fruits, sucre tiré, meringue, pâte d'amande). Pas de figurine, pas de moule, pas de gâteau d'anniversaire.
 
-Le hero **est** une Poké Ball ouverte : moitié haute laque, moitié basse porcelaine, ceinture au centre, bouton = Poké Ball 3D.
+- **Sur l'accueil**, une section washi (le crème des photos, donc la photo se fond dans la page) : « Une touche sucrée pour votre prochaine évolution. », le **croquembouche de Pikachu** en grand (455 × 558, vertical, la seule image haute du site), la « Création du chef » en carte de texte, puis quatre profiteroles en cartes. Un seul bouton : « Tous les desserts ».
+- **Sur la carte**, la section Desserts se lit comme une vitrine de pâtisserie : Choux & profiteroles (15), Gâteaux & douceurs, Desserts glacés, Fruits & bowls. Les sous-titres sont des `h3`, ancrés (`#dessert-choux`).
+- **Dans la fiche**, le fil d'Ariane ajoute le sous-groupe, et « À déguster avec » propose un thé ou une boisson du type et un dessert d'une autre famille.
+- **Badges** : le croquembouche est Signature (la septième, la seule sucrée) et Choix du chef ; quatre choux portent Nouveau ; les autres n'ont rien. La collection se vend par ses visuels, pas par ses étiquettes.
 
-## Risque assumé
+## Matière
 
-Utiliser la laque comme **surface pleine** (une moitié de viewport rouge) plutôt que comme accent. C'est ce qui rend le site reconnaissable en une seconde, et c'est la seule zone où la couleur forte s'exprime : ailleurs, elle ne sert qu'aux actions principales.
+Les surfaces restent mates et planes ; la seule « matière » est la laque du hero et du CTA (ombre colorée courte) et l'ombre portée du plat sur la ceinture. Pas de grain, pas de verre dépoli : la Poké Ball 3D suffit comme objet.
+
+## Ce qu'on ne fait pas
+
+- Pas de sprites, pas de logos, pas de police « Pokémon ».
+- Pas de « Populaire », « Best-seller », « 4,9/5 Google » sans donnée réelle.
+- Pas de titre en quatre lignes, pas de section plus haute qu'un écran, pas de texte sous 12 px.

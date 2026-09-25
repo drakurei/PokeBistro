@@ -2,43 +2,49 @@
 
 ## Principe
 
-Le mouvement de PokéBistro est **lent, précis, physique** : une Poké Ball qui flotte, une ceinture qui se trace, des plats qui se posent. Rien ne rebondit, rien ne clignote. Une seule chose bouge à la fois dans le champ de vision.
+Le mouvement de PokéBistro est **lent, précis, physique** : une Poké Ball qui flotte, une ceinture qui se trace, un plat qui se pose. Rien ne rebondit, rien ne clignote. Une seule chose bouge à la fois dans le champ de vision, et **rien de ce qui compte ne commence invisible**.
 
 ## Tokens
 
-| Token           | Valeur                              | Usage                               |
-| --------------- | ----------------------------------- | ----------------------------------- |
-| `--ease-out`    | `cubic-bezier(.22, 1, .36, 1)`      | entrées, ouvertures                 |
-| `--ease-in-out` | `cubic-bezier(.65, 0, .35, 1)`      | déplacements, marquee               |
-| `--dur-fast`    | 150 ms                              | survol, focus, chips                |
-| `--dur-base`    | 250 ms                              | boutons, cartes, toast              |
-| `--dur-slow`    | 450 ms                              | dialog, tiroir, transitions de page |
-| `--dur-hero`    | 900 ms                              | séquence du hero, loading           |
-| stagger         | 40 ms (grille), 60 ms (menu mobile) | listes                              |
+| Token             | Valeur                           | Usage                                |
+| ----------------- | -------------------------------- | ------------------------------------ |
+| `--ease-out`      | `cubic-bezier(.22, 1, .36, 1)`   | entrées, ouvertures                  |
+| `--ease-in-out`   | `cubic-bezier(.65, 0, .35, 1)`   | déplacements, marquee                |
+| `--ease-spring`   | `cubic-bezier(.34, 1.3, .64, 1)` | badge du panier                      |
+| `--duration-fast` | 150 ms                           | hover, focus, chips                  |
+| `--duration-base` | 250 ms                           | boutons, cartes                      |
+| `--duration-slow` | 450 ms                           | dialogs, tiroir, transitions de page |
+| `--duration-hero` | 900 ms                           | intro du hero, loader                |
 
 ## Séquences
 
-**Loading (une fois par session, max 1,4 s)** : anneau de la Poké Ball qui se trace (stroke-dashoffset, 700 ms) → bouton central qui apparaît (150 ms) → wordmark en fondu (250 ms) → le voile se lève vers le haut (450 ms, `--ease-out`). Un timeout de 2 s force la sortie. Reduced motion : simple fondu de 200 ms.
+### Loader (une fois par session)
 
-**Hero (au montage, après le loading)** : ceinture qui se trace du centre vers les bords (600 ms) → titre mot à mot (translateY 40 px → 0, 700 ms, stagger 80 ms) → sous-titre + CTA (400 ms) → plats flottants (scale .8 → 1, stagger 60 ms). La Poké Ball 3D tourne lentement (1 tour / 40 s) et suit la souris (parallaxe ± 8°, amortie).
+Contour de la Poké Ball qui se trace (0,4 s), ceinture (0,2 s), bouton (0,15 s), mot (0,2 s), levée du voile (0,4 s) : **~0,9 s** au total, garde-fou à 1,8 s. Le voile est dans le HTML pré-rendu ; un script inline le masque avant la première peinture quand la session l'a déjà vu, et `prefers-reduced-motion` le supprime en CSS. Le titre du hero est peint dessous dès le départ (LCP).
 
-**Scroll** : chaque section a un reveal unique (opacité 0 → 1, translateY 24 px → 0, 600 ms) déclenché à 80 % du viewport, une seule fois. Les chiffres de l'histoire comptent de 0 à N (1 s). Le marquee de la ceinture défile à vitesse constante et se met en pause au survol.
+### Hero
 
-**Cartes** : survol = surface `washi-deep` + image scale 1.04 (250 ms) + apparition du CTA (opacité). Pas de translation (stabilité). « Ajouté » = le bouton passe en encre avec une coche 1,2 s ; le badge du panier scale 1 → 1.25 → 1 (300 ms).
+Timeline GSAP démarrée à la fin du loader : ceinture (scaleX), plat (y 28 → 0, scale .94 → 1), Poké Ball (scale .5 → 1, `back.out`), chapeau, boutons, légende. Le `<h1>` n'est **pas** animé.
 
-**Dialog / tiroir** : voile (opacité 0 → .55, 250 ms) + panneau (translateX 100 % → 0 ou scale .96 → 1, 450 ms `--ease-out`). Fermeture = 60 % de la durée.
+### Carte
 
-**Menu mobile** : panneau plein écran (opacité + translateY, 400 ms), liens en stagger 60 ms.
+- Les cartes montent de 18 px en cascade (40 ms) quand la grille apparaît ou quand un **filtre** change (`animationKey`), jamais en tapant dans la recherche ni en triant.
+- `content-visibility: auto` sur les sections a été essayé puis retiré : en une colonne, la hauteur réelle (jusqu'à 6 000 px) est trop loin de l'estimation et le défilement sautait.
 
-**Transitions de page** : entrée 400 ms (opacité + translateY 12 px). Le focus est placé sur le `<main>` à chaque changement de route, le scroll remis en haut (sauf pour le détail en dialog).
+### Dialogs et tiroir
+
+Natifs, animés en CSS (`@starting-style` + `allow-discrete`) : fiche en fondu + scale .96, tiroir du panier en translation depuis la droite, feuille de filtres depuis le bas. La fermeture attend `transitionend` (garde-fou 600 ms) avant de reculer dans l'historique.
+
+### Transitions de page
+
+`::view-transition-old/new(root)` en 220 ms quand le navigateur sait faire ; désactivées en reduced motion. Les cartes ouvrent une dialog par-dessus la carte : la continuité, c'est le même plat qui reste visible, pas un morphing.
+
+### Marquee, Poké Ball, compteurs
+
+- Marquee 48 s linéaire, **en pause hors écran** (IntersectionObserver) et au survol.
+- Poké Ball 3D : rotation lente (un tour / 40 s), flottement, parallaxe pointeur ; SVG flottant partout ailleurs. Chargée après le loader, quand le navigateur est libre.
+- Compteurs de la section Histoire : de 0 à la valeur en 1,2 s, une seule fois, à l'entrée dans l'écran.
 
 ## Reduced motion
 
-`prefers-reduced-motion: reduce` (via `gsap.matchMedia` et `@media` CSS) : toutes les translations deviennent des fondus ≤ 150 ms, le marquee est statique, la Poké Ball 3D n'est pas chargée, Lenis n'est pas monté, le loading est un fondu.
-
-## Implémentation
-
-- `@gsap/react` `useGSAP` avec `scope` par composant ; cleanup automatique.
-- ScrollTrigger enregistré une fois dans `lib/motion.js`, `ScrollTrigger.refresh()` après changement de route.
-- Lenis (`lenis/react`) monté dans `lib/SmoothScroll.jsx`, synchronisé avec `gsap.ticker`, désactivé en reduced-motion ; le défilement tactile reste natif.
-- Micro-interactions (survol, focus, chips) en CSS pur (`transition`), jamais en JS.
+`prefers-reduced-motion: reduce` : pas de loader, pas d'intro (les `matchMedia` GSAP n'installent rien), pas de smooth scroll, animations CSS à 0,01 ms, transitions de dialog à 150 ms sans translation, transitions de page désactivées, marquee figé. Tout est testé en reduced motion par défaut ; une suite dédiée vérifie le plein mouvement.

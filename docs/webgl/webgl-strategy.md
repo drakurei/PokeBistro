@@ -2,29 +2,29 @@
 
 ## Décision
 
-Une seule expérience 3D : **la Poké Ball du hero**. Elle est le « bouton » de la ceinture qui traverse le hero, donc un élément de composition, pas une démonstration. Aucune autre 3D sur le site (les plats attendent les visuels Gemini haute définition ; un plat 3D n'apporterait rien de plus qu'une belle image).
+Une seule expérience 3D : **la Poké Ball du hero**, devenue un **sceau** (72 → 150 px) qui sert de bouton à la ceinture. Le plat en photo est le sujet ; la balle signe l'objet. Aucune autre 3D sur le site.
 
 ## Construction (Three.js, sans framework)
 
-- Sphère (`SphereGeometry` 64 × 64) coupée en deux matériaux via `phiStart/phiLength` : hémisphère haut `MeshPhysicalMaterial` laque (`#C9211B`, clearcoat 1, roughness .25), hémisphère bas porcelaine (`#F4F1EA`, roughness .4).
-- Ceinture : `TorusGeometry` encre, légèrement plus large que la sphère.
-- Bouton : cylindre encre + disque porcelaine + anneau encre fin.
-- Lumière : `HemisphereLight` chaud/froid + `DirectionalLight` clé + `DirectionalLight` contre-jour. Pas d'environment map (poids) : le clearcoat suffit.
-- Animation : rotation Y lente (1 tour / 40 s), flottement vertical sin (± 6 px, 4 s), parallaxe souris amortie (`lerp` 0.06) sur X/Y ± 8°.
-- Rendu : `WebGLRenderer` `antialias`, `alpha`, `pixelRatio` plafonné à 1.5, `setAnimationLoop` mis en pause quand le hero sort du viewport (`IntersectionObserver`) ou que l'onglet est caché.
+- Sphère coupée en deux matériaux via `phiStart/phiLength` : hémisphère haut `MeshPhysicalMaterial` laque (`#C9211B`, clearcoat 1, roughness .28), hémisphère bas porcelaine (`#F4F1EA`, roughness .42, clearcoat .5).
+- Ceinture : `TorusGeometry` encre. Bouton : cylindre encre + anneau + disque porcelaine + point.
+- Lumière : `HemisphereLight` chaud/froid + trois `DirectionalLight` (clé, contre-jour doré, remplissage bleuté).
+- Rendu : `pixelRatio ≤ 1.5`, tone mapping ACES, boucle arrêtée hors écran et onglet caché, tout est disposé au démontage (géométries, matériaux, renderer, écouteurs, observers).
 
-## Garde-fous
+## Quand elle se charge
 
-| Condition                                                          | Comportement                                                                                            |
-| ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- |
-| `prefers-reduced-motion: reduce`                                   | Chunk non chargé, fallback SVG statique.                                                                |
-| Largeur < 1024 px ou pointeur grossier                             | Fallback SVG (animation CSS légère : rotation 60 s).                                                    |
-| `navigator.connection.saveData`                                    | Fallback SVG.                                                                                           |
-| WebGL indisponible (`canvas.getContext('webgl2' ou 'webgl')` null) | Fallback SVG.                                                                                           |
-| Erreur au chargement du chunk                                      | `ErrorBoundary` → fallback SVG.                                                                         |
-| Redimensionnement                                                  | `ResizeObserver` sur le conteneur → `renderer.setSize`, caméra mise à jour.                             |
-| Démontage                                                          | `renderer.dispose()`, géométries et matériaux `dispose()`, listeners retirés, `setAnimationLoop(null)`. |
+`HeroBall` décide au montage : **desktop avec pointeur fin, motion autorisée, pas de Data Saver, WebGL disponible**. Même alors, le chunk `three` (≈ 129 kB gzip) n'est demandé qu'**après le loader et quand le navigateur est libre** (`requestIdleCallback`, délai max 2 s). Le SVG flottant est affiché d'abord et reste si le chunk échoue (ErrorBoundary locale) ou si la création du contexte WebGL échoue.
 
-## Poids
+## Ce qu'on a choisi de ne pas ajouter
 
-`three` est isolé dans un chunk `three` (`manualChunks`) chargé après le loading via `React.lazy` : ~ 150 Ko gzip, uniquement sur desktop. Le bundle initial ne le contient pas.
+- **Environment map / ombres** : la balle fait 150 px ; un PMREM et une ombre portée coûteraient plus (init GPU, textures) qu'ils n'apporteraient à cette taille. Le clearcoat et le contre-jour suffisent. À réévaluer si la balle redevient grande.
+- **Interaction au clic** : le hero doit vendre le plat ; la balle ne réagit qu'au pointeur (parallaxe).
+
+## Coût
+
+| Chemin                 | JS téléchargé             | Quand                    |
+| ---------------------- | ------------------------- | ------------------------ |
+| Mobile, reduced motion | 0 (SVG)                   | jamais                   |
+| Desktop qualifié       | ≈ 129 kB gzip (`three-*`) | après le loader, en idle |
+
+Budget vérifié à chaque build (`npm run size`).

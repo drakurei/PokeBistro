@@ -1,258 +1,106 @@
 # PokéBistro
 
-Site vitrine et carte en ligne d'un restaurant fictif inspiré de l'univers Pokémon. Version professionnelle, pensée comme un projet de portfolio : direction artistique propre, motion design, Poké Ball 3D, carte filtrable, panier persistant, réservation, accessibilité et SEO.
+Site vitrine, carte en ligne et parcours de commande d'un restaurant fictif inspiré de l'univers Pokémon. Projet de portfolio de niveau studio : direction artistique propre, motion design mesuré, Poké Ball 3D, carte filtrable, formules composables, panier persistant, commande et réservation simulées, HTML pré-rendu pour chaque page, accessibilité auditée, budget de performance en CI.
 
 **Démo** : https://drakurei.github.io/PokeBistro/ · **Code** : https://github.com/drakurei/PokeBistro
 
 ## Présentation
 
-PokéBistro sert des entrées, des bentos, des burgers, des bowls, des desserts et des boissons qui portent chacun le nom d'un Pokémon : Pikachu Bento, Lucario Power Burger, Marill Aqua Bowl, Mentali Velvet Cake… Le site présente le restaurant, laisse explorer les **44 plats** par type Pokémon (onze types), par catégorie, par envie ou par prix, compose un panier et demande une table.
+PokéBistro sert des entrées, des bentos, des burgers, des bowls, des grandes assiettes, des desserts et des boissons qui portent chacun le nom d'un Pokémon : Pikachu Bento, Lucario Power Burger, Marill Aqua Bowl, Mentali Velvet Cake… Le site présente le restaurant, laisse explorer les **59 plats** (dont une collection de **15 profiteroles Pokémon**) et **8 formules** par type Pokémon (onze types, onze glyphes originaux), par catégorie, par envie, par régime ou par prix, compose un panier, simule une commande sur place ou à emporter et demande une table.
 
-Le projet part d'un TP React (`tp-react-resto`) validé en cours, conservé tel quel dans son dépôt. Cette version en garde la logique utile (reducer du panier, filtres, données) et reconstruit tout le reste : identité, pages, composants, motion, accessibilité, SEO, tests. L'audit de départ et chaque décision (garder, refactorer, redessiner, reconstruire) sont dans [`docs/audit/tp-audit.md`](docs/audit/tp-audit.md).
+Le projet part d'un TP React validé en cours, conservé tel quel dans son dépôt. Cette version en garde la logique utile et reconstruit tout le reste. L'audit de départ est dans [`docs/audit/tp-audit.md`](docs/audit/tp-audit.md) ; l'audit senior qui a guidé la dernière itération et son bilan sont dans [`docs/audit/senior-audit-implementation.md`](docs/audit/senior-audit-implementation.md).
 
-## Vision
+## Ce que le site fait
 
-> Un bistro contemporain qui sert l'univers Pokémon dans l'assiette.
+- **Accueil** : hero « food-first » (un plat HD sur la ceinture, la Poké Ball 3D en sceau, un titre qui se lit), types, six signatures, **la collection dessert** (croquembouche de Pikachu en grand, création du chef, quatre profiteroles), histoire, avis de démonstration clairement identifiés, réservation.
+- **La carte** : sommaire, sept catégories dans l'ordre d'un repas puis les formules ; la section Desserts se lit comme une vitrine (choux & profiteroles, gâteaux, glacés, fruits) ; recherche sans accents, filtres combinables (catégorie, type, envie, régime végétarien / vegan / sans gluten, prix), tri ; tout vit dans l'URL, donc partageable.
+- **Fiche de plat** : en dialog au-dessus de la carte, en page complète en accès direct ; ingrédients, régime, 14 allergènes réglementaires (données de démonstration, dites comme telles), niveau d'épice, « Existe aussi en formule », « À déguster avec » (un chou du type après un plat, un thé après un bowl, une boisson après un dessert).
+- **Formules** : cinq fixes, trois à composer dans un composeur visuel (cartes-radio par emplacement), prix fixe, économie affichée ; la Formule Déjeuner porte ses conditions.
+- **Panier** : plats et formules, quantités, annulation d'une suppression, proposition de passer en formule quand ses plats sont tous là, « Ajouter un dessert ? » / « Et une boisson ? » selon ce qui manque, barre mobile, persistance locale validée.
+- **Commande** (`/commande`) : simulation en quatre étapes (mode, créneau réel selon les horaires, coordonnées, récapitulatif) puis confirmation avec numéro. Retour possible à chaque étape, clavier complet.
+- **Réservation** : créneaux complets simulés, jours de fermeture, intérieur / terrasse, téléphone, récapitulatif, politique d'annulation, fichier `.ics`.
+- **Favoris** (`/favoris`) : gardés dans le navigateur, compteur dans le header, état vide utile.
+- **Pré-rendu** : les 74 adresses existent en HTML statique avec leur titre, description, balises sociales et JSON-LD (`Restaurant`, `Menu`, `MenuItem`, `BreadcrumbList`) ; sitemap généré au build.
 
-La Poké Ball est traitée comme un objet de design : rouge laqué, blanc porcelaine, ceinture noire, un bouton. Ce sont les matières d'une belle table japonaise (laque, porcelaine, encre), et c'est ce que le site emprunte, plutôt que les couleurs primaires et les sprites. Les Pokémon apparaissent là où ils sont déjà : dans les plats, et dans les **types**, qui deviennent la façon de choisir ce qu'on mange. Détails dans [`docs/design/design-direction.md`](docs/design/design-direction.md).
+## Stack
 
-## Fonctionnalités
+| Domaine     | Choix                                                                                                              |
+| ----------- | ------------------------------------------------------------------------------------------------------------------ |
+| UI          | React 19, React Router 8 (déclaratif, état des filtres dans l'URL, routes modales), Tailwind CSS 4 (`@theme`)      |
+| Motion      | GSAP 3 + `@gsap/react`, ScrollTrigger, Lenis (desktop, wheel), View Transitions API, `<dialog>` natif              |
+| 3D          | Three.js, chunk séparé, chargé après le loader et en idle sur desktop qualifié, SVG sinon                          |
+| Images      | Planches Gemini découpées (Pillow) ; AVIF + WebP, `srcset`/`sizes`, vignettes 256 px, préchargement du hero        |
+| Polices     | Fontsource : Unbounded (display), Zen Kaku Gothic New (texte), DM Mono (utilitaire), sous-ensembles latin          |
+| Build       | Vite 8 ; pré-rendu statique par `react-dom/static` (`scripts/prerender.mjs`) ; budget de taille sans dépendance    |
+| Qualité     | oxlint, Prettier, Vitest, Playwright (desktop + mobile, reduced motion, plein mouvement, axe-core), GitHub Actions |
+| Hébergement | GitHub Pages (`base=/PokeBistro/`, 404 = coquille), configs Vercel et Netlify avec en-têtes de sécurité            |
 
-- **Écran de chargement** de marque (anneau de la Poké Ball qui se trace, ceinture, wordmark), une fois par session, non bloquant, avec timeout et version reduced-motion.
-- **Hero** « Poké Ball ouverte » : moitié laque, moitié porcelaine, ceinture au centre, **Poké Ball 3D** (Three.js) qui flotte et suit la souris, trois plats signatures en médaillons.
-- **Header** transparent sur le hero puis porcelaine avec la ceinture ; navigation multipage ; menu mobile plein écran.
-- **Types Pokémon** : onze tuiles qui teintent la section au survol et ouvrent la carte filtrée, plus une porte vers toute la carte.
-- **La carte** : 44 plats **regroupés par catégorie** comme un vrai menu (entrées, bentos, burgers, bowls, desserts, boissons, menus), recherche (nom, Pokémon, catégorie, type, tags, mots-clés, ingrédients, sans accents), filtres combinables (catégorie, types multiples, envies multiples, prix), **tri** (ordre de la carte, prix, nouveautés), **état dans l'URL** (partageable, bouton retour), rail de filtres desktop, bandeau de catégories et feuille de filtres sur mobile, compteur annoncé, état vide.
-- **Fiche plat** : dialog au-dessus de la carte (URL `/menu/:slug`) ou page complète en accès direct, ingrédients, encart type, quantité, ajout, favori, plats du même type.
-- **Formules** : cinq menus composés (Pikachu, Feu, Aqua, Signature, et la Formule Dresseur à composer : entrée + plat + boisson + dessert à prix fixe), toujours moins chers qu'à la carte (vérifié par un test), badges, économie affichée, ajout au panier avec leur composition.
-- **Panier** : tiroir latéral, lignes avec stepper (plats et formules, composition affichée), suppression, total, état vide, « Vider » avec confirmation, « Commander » qui explique la démonstration, **persistance locale validée** (ids de plats et de formules revalidés au chargement).
-- **Favoris** persistants.
-- **Histoire** : trois chapitres, principes, les onze types, l'équipe, le geste du chef, la philosophie, chiffres.
-- **Avis clients** : section de témoignages **clairement identifiée comme contenu de démonstration** (bandeau « Avis de démonstration — contenu fictif, version portfolio », mention « démo » sur chaque date). Aucune note Google, aucun profil réel. Les données passent par `getReviews()` dans `src/data/reviews.js`, prévu pour être remplacé par un vrai flux (fiche Google Business via un proxy serveur) sans toucher au composant.
-- **Contact** : informations, services, carte stylisée hors ligne, formulaire à quatre états.
-- **Réservation** : date, créneau, convives, nom, email, demande spéciale ; validation à la perte de focus, récapitulatif en succès. Simulation côté client (dit explicitement), structure prête pour une vraie API.
-- **404**, skip link, focus géré à chaque changement de page, `prefers-reduced-motion` respecté partout.
-
-## Stack technique
-
-|             |                                                                              |
-| ----------- | ---------------------------------------------------------------------------- |
-| Framework   | React 19, Vite 8, JavaScript (JSX)                                           |
-| Routage     | React Router 8 (mode déclaratif)                                             |
-| Styles      | Tailwind CSS 4 (tokens `@theme`), CSS natif pour les composants clés         |
-| Motion      | GSAP 3 + `@gsap/react`, ScrollTrigger, Lenis (desktop)                       |
-| 3D          | Three.js (chunk lazy)                                                        |
-| Fonts       | Fontsource : Unbounded, Zen Kaku Gothic New, DM Mono (auto-hébergées, latin) |
-| Tests       | Vitest, Playwright                                                           |
-| Qualité     | oxlint, Prettier, EditorConfig                                               |
-| Déploiement | GitHub Pages (script dédié), compatible Vercel / Netlify                     |
-
-Bootstrap, présent dans le TP, a été retiré : deux frameworks CSS doublaient le poids, entraient en collision (`container`, `p-*`) et imposaient un hack de cascade layers. Tailwind 4 seul, avec des tokens centralisés, suffit.
-
-## Architecture
-
-```
-src/
-├── main.jsx, App.jsx        entrée, providers, layout, routes (pages secondaires en lazy)
-├── routes/                  HomePage, MenuPage, ProductPage, ComboPage, StoryPage, ContactPage, ReservationPage, NotFoundPage
-├── components/
-│   ├── layout/              Header, MobileMenu, Footer, Belt, Logo, Seo, SkipLink, RouteEffects
-│   ├── ui/                  Button, Chip, TypeBadge, Stepper, Field, Dialog, Icons
-│   ├── home/                Hero, HeroBall, TypesSection, SignatureDishes, StoryTeaser, ReviewsSection, ReservationCta
-│   ├── menu/                SearchField, FilterControls, FilterSheet, ProductGrid, ProductCard, ProductDetail, ProductDialog, ComboCard, ComboDetail, ComboDialog, EmptyResults
-│   ├── cart/                CartButton, CartDrawer, CartLine
-│   ├── forms/               useForm, ContactForm, ReservationForm
-│   ├── loading/             LoadingScreen (+ état de session)
-│   └── motion/              Reveal
-├── contexts/                CartContext (useReducer + localStorage), FavoritesContext, ToastContext
-├── hooks/                   useMenuFilters (URL), useMediaQuery, useScrolled
-├── reducers/                cartReducer (+ tests)
-├── data/                    products (44), combos (formules), reviews (démo), types, filters, facts, restaurant, story, navigation
-├── utils/                   filterProducts, cartItems (ids produit / formule), storage, validation, formatPrice, text, cn (+ tests)
-├── api/                     couche « fetch » simulée (contact, réservation)
-├── lib/                     motion (GSAP), SmoothScroll (Lenis)
-├── three/                   pokeball (scène), PokeballCanvas
-├── styles/globals.css       tokens, base, composants, transitions des dialogs
-└── assets/                  products (WebP), branding
-```
-
-Flux : l'URL porte les filtres de la carte ; le panier ne stocke que `{ id, quantité }` (id numérique pour un plat, chaîne `combo:…` pour une formule et sa composition) et relit prix, noms et composition dans le catalogue ; tout ce qui vient du `localStorage` est validé. Détails dans [`docs/architecture/site-architecture.md`](docs/architecture/site-architecture.md).
-
-## Design system
-
-Palette **laque** `#C9211B` / **porcelaine** `#FCFBF8` / **washi** `#F7EEDC` / **encre** `#17151A` / **or** `#F2B826`, plus huit couleurs de type à usage strictement fonctionnel. Typographie : Unbounded (display), Zen Kaku Gothic New (texte), DM Mono (prix, étiquettes). Rayons, ombres (seulement pour ce qui flotte), rythme de section fluide, composants et états documentés dans [`docs/design/design-system.md`](docs/design/design-system.md). Signature : **la ceinture** de la Poké Ball, qui traverse le hero, ferme le header et sépare les sections.
-
-## UX
-
-Trois parcours principaux (commander, choisir par type, réserver) et les cas limites (aucun résultat, slug inconnu, panier vide, stockage indisponible, clavier seul, reduced motion) sont décrits dans [`docs/ux/user-flows.md`](docs/ux/user-flows.md). Les maquettes SVG qui ont servi de référence sont dans [`docs/mockups/`](docs/mockups/).
-
-## Motion design
-
-Lent, précis, physique : un loader de 1,35 s, une séquence de hero (ceinture, titre mot à mot, balle, texte, médaillons), des reveals uniques au scroll, des chiffres qui comptent, des dialogs qui glissent, un menu mobile en cascade. Tokens de durée et d'easing partagés entre CSS et GSAP ; tout se réduit à des fondus courts avec `prefers-reduced-motion`. Voir [`docs/motion/motion-direction.md`](docs/motion/motion-direction.md).
-
-## WebGL / 3D
-
-Une seule expérience : la Poké Ball du hero, construite en Three.js (sphère en deux matériaux, ceinture, bouton, trois lumières, clearcoat). Chargée en chunk séparé uniquement sur desktop avec pointeur fin, WebGL disponible, motion autorisé et sans data saver ; sinon, une Poké Ball SVG. Rendu mis en pause hors viewport et onglet caché, `pixelRatio` plafonné, tout est libéré au démontage. Voir [`docs/webgl/webgl-strategy.md`](docs/webgl/webgl-strategy.md).
-
-## Images
-
-Deux séries cohabitent, même direction artistique (fond crème, plat isolé, plongée 3/4) :
-
-- **16 plats (seconde planche Gemini, 25/09/2026)** : planche 4 × 4 de 2048 × 2048 découpée par script (Python + Pillow + NumPy) en 16 images **512 × 410** (5:4, le bloc image des cartes). La bande de titre de chaque case est détectée (lignes de texte noir) et retirée ; le reste de la case est conservé tel quel, sans remplissage ni redimensionnement, donc fond, ombre et échelle sont identiques pour les 16. Planche de contrôle : `docs/images/new-products-preview.webp`. 400 Ko au total.
-- **28 plats (première planche, TP)** : 198 × 168 px, WebP, corrects mais en basse définition dans les cartes. Leur régénération en haute définition est préparée (prompts par plat dans [`docs/images/gemini-prompts.md`](docs/images/gemini-prompts.md), plan dans [`docs/images/image-plan.md`](docs/images/image-plan.md)) et ne bloque pas la livraison : il suffira de déposer `<slug>.webp` dans `src/assets/products/`.
-
-Toutes les images sont affichées avec un masque radial qui fond les angles dans la surface (le haut et le bas restent visibles pour les flammes, vagues et éclairs), en `loading="lazy"` avec dimensions déclarées.
-
-## Performance
-
-Bundle initial : 110 Ko gzip (React, Router, accueil, carte à 44 plats, UI) + 53 Ko (motion) + 12,5 Ko de CSS. Three.js (133 Ko gzip) et les pages secondaires sont chargés à la demande. Aucune requête tierce, fonts en `swap`, images lazy avec dimensions déclarées, animations sur `transform` et `opacity`. Détails et pistes dans [`docs/qa/qa-report.md`](docs/qa/qa-report.md).
-
-## Accessibilité
-
-Dialogs natifs (piège de focus, Échap, restauration du focus), skip link, focus déplacé sur le contenu à chaque page, `aria-pressed` / `aria-live` / `aria-describedby` là où il faut, contrastes vérifiés (encre / porcelaine 16,5:1, porcelaine / laque 5,2:1), cibles ≥ 44 px, reduced motion. Vérifications listées dans le rapport QA.
-
-## SEO
-
-Titre et description par page (React 19 hisse les balises), canonical, Open Graph et Twitter card avec image 1200 × 630, données structurées `Restaurant` (horaires, adresse, réservation) et `MenuItem` par plat, `robots.txt`, `sitemap.xml` (pages + 28 plats), URLs propres. Voir [`docs/seo/seo.md`](docs/seo/seo.md).
-
-## Installation
+## Lancer le projet
 
 ```bash
 npm install
+npm run dev          # http://localhost:5173
 ```
-
-Node 20 ou plus récent.
-
-## Développement
 
 ```bash
-npm run dev
+npm run build        # nettoie dist, build Vite, pré-rend les 74 routes, sitemap
+npm run preview      # sert dist sur http://localhost:4173
+npm run check        # lint + tests unitaires + build + budget
+npm run test:e2e     # Playwright (construit et sert le build lui-même)
+npm run deploy       # build en mode pages puis publication sur la branche gh-pages
 ```
 
-Serveur sur `http://localhost:5173`. Autres commandes :
+Autres scripts : `lint`, `format`, `format:check`, `test`, `test:watch`, `size` (budget), `prerender`, `clean`, `csp-hash`.
 
-```bash
-npm run lint          # oxlint
-npm run format        # prettier --write
-npm test              # tests unitaires (Vitest)
-npm run test:e2e      # tests de bout en bout (Playwright, build + preview automatiques)
+## Structure
+
+```
+src/
+  api/          fausse couche réseau (délai, échec si l'email commence par "erreur@")
+  components/   cart, forms, home, layout, loading, menu, motion, order, ui
+  contexts/     panier, favoris, toasts
+  data/         plats (59), formules, filtres, types (+ glyphes), restaurant, avis, histoire, contenu, éditorial
+  hooks/        filtres dans l'URL, media queries, défilement
+  reducers/     panier (lignes objets, clés stables)
+  routes/       une page par route
+  seo/          pageMeta : titres, descriptions, canonical, JSON-LD, routes, sitemap
+  three/        Poké Ball
+  utils/        panier, filtres, horaires, suggestions, ics, stockage, validation…
+  entry-server.jsx   rendu statique
+scripts/        prerender, clean, size-budget, csp-hash, image-variants, cut-dessert-sheet
+docs/           audit, design, ux, architecture, motion, webgl, images, seo, qa, mockups
+e2e/            tests de bout en bout
 ```
 
-Pour la première exécution de Playwright : `npx playwright install chromium`.
+## Décisions notables
 
-## Build
+- **Le hero montre un plat, pas un logo.** Le titre est une phrase, visible dès la première peinture ; l'intro n'anime que ce qui est déjà là.
+- **Glyphes de types originaux.** Onze pictogrammes dessinés pour le site ; aucun logo ou sprite officiel.
+- **Une signature dessert faite de pâte à choux.** Quinze profiteroles et un croquembouche où le Pokémon est fait de glaçage, de crème, de fruits et de sucre : pas de figurine, pas de jouet. Une seule création du chef, quatre desserts mis en avant, tout se change dans `src/data/editorial.js`.
+- **Aucune donnée inventée présentée comme réelle.** Les avis, les allergènes, la commande, la réservation et leur disponibilité sont marqués « démonstration ». Pas de « Populaire », pas de note Google.
+- **Pré-rendu plutôt que SSR.** Le site est statique et le reste : chaque page est un fichier HTML, React s'y attache. Sur GitHub Pages, les sous-pages se terminent par `/` ; les canonicals aussi.
+- **Panier en lignes objets.** Un plat ou une formule avec ses choix, une clé stable, une validation à la lecture du stockage. Le passage en formule est proposé, jamais imposé.
+- **Un budget de taille en CI.** JavaScript hors Three ≤ 210 kB gzip, Three ≤ 137 kB, CSS ≤ 16 kB, polices latin ≤ 127 kB.
 
-```bash
-npm run build         # base "/" (Vercel, Netlify, domaine racine) -> dist/
-npm run preview       # sert dist/ en local
-npm run build:pages   # base "/PokeBistro/" + 404.html pour GitHub Pages
-```
+## Limites connues
 
-## Déploiement
+- 28 des 59 plats gardent leur visuel basse définition (198 × 168) : aucune nouvelle planche n'était disponible. Les prompts sont prêts dans `docs/images/gemini-prompts.md`.
+- GitHub Pages ne permet aucun en-tête HTTP : les en-têtes de sécurité (CSP, HSTS…) ne s'appliquent que sur Vercel ou Netlify.
+- Commande, réservation et contact sont simulés côté client ; l'API est prête à être branchée (`src/api`).
+- Les avis viennent d'un jeu de données de démonstration ; le modèle prévoit une source Google (via un proxy serveur, jamais de clé dans le navigateur) ou un livre d'or maison.
 
-- **GitHub Pages** : `npm run deploy` (build en mode `pages`, publication de `dist/` sur la branche `gh-pages`). Le fichier `404.html` copié au build permet aux liens profonds (`/menu/pikachu-bento`) de charger l'application.
-- **Vercel** : `vercel.json` réécrit toutes les routes vers `index.html` et met les assets en cache un an.
-- **Netlify** : `netlify.toml`, même logique.
+## Documentation
 
-Le site n'est jamais enfermé dans GitHub Pages : la base est une variable d'environnement, les URLs publiques sont centralisées dans `Seo.jsx`.
+- [`docs/design/design-direction.md`](docs/design/design-direction.md) — thèse, hero, palette, typographie, glyphes
+- [`docs/ux/user-flows.md`](docs/ux/user-flows.md) — parcours, micro-décisions, accessibilité
+- [`docs/architecture/site-architecture.md`](docs/architecture/site-architecture.md) — routes, données, panier, rendu
+- [`docs/motion/motion-direction.md`](docs/motion/motion-direction.md) — tokens, séquences, reduced motion
+- [`docs/webgl/webgl-strategy.md`](docs/webgl/webgl-strategy.md) — Poké Ball 3D, chargement différé
+- [`docs/images/image-plan.md`](docs/images/image-plan.md) et [`gemini-prompts.md`](docs/images/gemini-prompts.md) — pipeline et prompts
+- [`docs/seo/seo.md`](docs/seo/seo.md) — pré-rendu, données structurées, hébergement
+- [`docs/qa/qa-report.md`](docs/qa/qa-report.md) — tests, budget, vérifications manuelles
+- [`docs/mockups/`](docs/mockups/README.md) — maquettes SVG
 
-## Difficultés rencontrées
+## Crédits
 
-### 1. Un dossier `cart/` effacé par la suppression de `Cart/`
-
-**Problème.** En supprimant les anciens composants du TP (`src/components/Cart/`), les nouveaux fichiers de `src/components/cart/` ont disparu et le build a échoué sur `CartDrawer` introuvable.
-**Cause.** Le système de fichiers Windows ignore la casse : `Cart` et `cart` sont le même dossier.
-**Solution.** Réécrire les trois fichiers, puis ne plus jamais réutiliser un nom de dossier du TP en changeant seulement la casse.
-
-### 2. `manualChunks` refusé par Vite 8
-
-**Problème.** Avertissement `Invalid output options: manualChunks expected Function but received Object` et chunks non isolés.
-**Cause.** Vite 8 repose sur Rolldown, qui n'accepte plus la forme objet de `manualChunks`.
-**Solution.** Une fonction qui normalise l'identifiant (`\` → `/`) et renvoie `three` ou `motion` selon le chemin dans `node_modules`.
-
-### 3. Faux positifs du linter React sur les formulaires
-
-**Problème.** Une trentaine d'avertissements `Cannot access refs during render` sur `form.values`, `form.errors`…
-**Cause.** Le hook `useForm` renvoie un objet qui contient une ref (`formRef`) ; la règle considère alors tout l'objet comme une ref.
-**Solution.** Destructurer le résultat du hook (`const { values, errors, formRef, … } = useForm(...)`) : code plus lisible, plus d'avertissement.
-
-### 4. `setState` dans des effets
-
-**Problème.** Règle `react(set-state-in-effect)` sur la synchronisation du champ de recherche avec l'URL, la remise à zéro du tiroir à l'ouverture et la pulsation du badge.
-**Solution.** Le pattern « ajuster l'état pendant le rendu » (comparer à la valeur précédente mémorisée) pour les deux premiers, et un simple `key={lastAddedAt}` qui remonte le badge pour rejouer l'animation CSS. Le calcul « faut-il charger la 3D ? » est devenu une dérivation au rendu avec une détection WebGL mémorisée au niveau du module.
-
-### 5. Tests Playwright et contrôles personnalisés
-
-**Problème.** `getByLabel('10 € à 15 €').check()` expirait : l'input radio est visuellement masqué (`sr-only`) et l'indicateur dessiné devant lui intercepte le clic. Sur mobile, le test « types → carte filtrée » ne trouvait pas la chip active.
-**Cause.** Playwright clique au centre de l'élément ciblé ; la chip vit dans la feuille de filtres, fermée par défaut sur petit écran.
-**Solution.** Cliquer sur le label (ce que fait un utilisateur), et ouvrir la feuille avant d'affirmer sur mobile. Au passage, les tuiles de type ont reçu un `aria-label` qui commence par le nom du type.
-
-### 6. La Poké Ball recouvrait le texte sur mobile
-
-**Problème.** À 390 px, la balle centrée sur la ceinture chevauchait l'accroche et la fin du titre.
-**Solution.** Balle plus petite sous 768 px, titre limité en largeur, marge haute du bloc bas augmentée pour passer sous la balle.
-
-### 7. Le dossier `cart` suivi par Git en `Cart/`
-
-**Problème.** `git status` affichait `src/components/Cart/CartLine.jsx` alors que le code importe `./components/cart/…`. Sur Windows tout fonctionnait ; sur Linux (Vercel, Netlify, CI) le build aurait échoué avec un module introuvable.
-**Cause.** Le dossier `Cart/` du TP existait encore quand les nouveaux fichiers ont été créés : le système de fichiers, insensible à la casse, a gardé l'ancien nom et Git l'a enregistré.
-**Solution.** Renommer en deux temps (`git mv Cart cart_tmp`, puis `git mv cart_tmp cart`) pour que l'index reflète la bonne casse, et vérifier avec `git ls-files`.
-
-### 8. Découper la seconde planche sans raccord visible
-
-**Problème.** La première méthode (boîte englobante du plat + canvas carré rempli de la couleur de fond) laissait un rectangle visible : le fond des cases n'est pas uniforme (léger dégradé), et la détection « encre » prenait tout le fond des bols pour du plat.
-**Solution.** Garder la case entière moins la bande de titre (512 × 410, un ratio 5:4 naturel), sans remplissage ni redimensionnement, et détecter le texte par ses lignes noires plutôt que par distance au fond. Zéro raccord, échelle identique pour les 16 plats, contrôle visuel sur une planche générée et sur un zoom des bandes hautes.
-
-### 9. Quatre plats sans image
-
-**Problème.** Quatre cartes (Salamèche Bento, Salamèche Bento Maxi, Mew Berry Bowl, Mew Berry Bowl Chantilly) affichaient une zone image vide.
-**Cause.** Le catalogue charge les images par slug (`import.meta.glob`), mais ces quatre fichiers avaient gardé le nom de la planche du TP (`salameche-bento-01.webp`, `mew-berry-bowl-02.webp`…) : `image('salameche-bento')` renvoyait `undefined` sans erreur.
-**Solution.** Renommer les fichiers pour qu'ils suivent les slugs, et ajouter un test unitaire qui vérifie que les 44 produits résolvent bien un fichier `.webp`, plus un test Playwright qui charge la carte et contrôle que chaque image a une largeur naturelle non nulle.
-**Appris.** Une convention « fichier = slug » ne vaut que si un test la garde.
-
-### 10. Attributs SVG en double dans le générateur de maquettes
-
-**Problème.** Les maquettes générées ne s'affichaient pas (`Attribute font-weight redefined`).
-**Cause.** La constante de police display embarquait déjà `font-weight`, réinjecté par l'appel.
-**Solution.** Un seul point de vérité pour la graisse, validation XML des neuf fichiers après génération.
-
-## Décisions techniques
-
-- **Bootstrap retiré**, Tailwind 4 conservé : un seul système, des tokens centralisés, pas de collision de classes.
-- **Filtres dans l'URL** plutôt que dans un contexte : partageables, compatibles avec le bouton retour, et l'accueil peut ouvrir la carte déjà filtrée.
-- **Dialogs natifs** (`<dialog>` + `showModal`) : piège de focus, Échap et restauration du focus fournis par la plateforme ; transitions CSS avec `@starting-style` et `allow-discrete`.
-- **Panier minimal en stockage** (`id`, `quantité`) : les prix ne sont jamais lus depuis le navigateur.
-- **React 19 pour le SEO** : `<title>` et `<meta>` rendus par page, pas de bibliothèque supplémentaire.
-- **Three.js en chunk lazy, desktop seulement** : la 3D sert le hero, pas l'inverse ; sur mobile une Poké Ball SVG est plus juste que 133 Ko de plus.
-- **Lenis limité au desktop** et coupé en reduced motion ; le tactile reste natif.
-- **Pas de backend factice** : une couche `api/` qui imite `fetch` (promesse, délai, échec possible), remplaçable en une ligne.
-- **Fonts auto-hébergées** : aucune requête vers Google Fonts, sous-ensembles latin uniquement.
-- **Carte regroupée par catégorie** quand aucun filtre n'est actif : avec 44 plats, on lit la carte comme un menu ; un filtre, une recherche ou un tri la remettent à plat.
-- **Un badge maximum par carte** (Nouveau, sinon Signature) et plus de ligne de tags : les plats restent les stars, les détails sont dans la fiche.
-- **Formules = compositions, pas des produits** : elles vivent dans `data/combos.js`, référencent les plats par slug et entrent dans le panier avec un identifiant qui encode leur composition. Le catalogue reste à 44 plats et le prix d'une formule est toujours inférieur à la somme de ses plats (test).
-- **Avis clients fictifs, assumés** : pas de faux avis Google ; une section « démo » avec une seule fonction à remplacer le jour où une vraie fiche existe.
-- **Aucun fichier d'assistant** dans le dépôt (`.claude`, `.kilo`, etc. ignorés).
-
-## Améliorations futures
-
-- Régénérer les 28 visuels de la première série en haute définition (prompts prêts), puis une image de hero dédiée.
-- Pré-rendu statique des 34 URLs au build (SEO et LCP).
-- Vraie API pour le contact et la réservation (la couche `api/` est prête), puis commande en ligne.
-- Mode sombre (les tokens le permettent : porcelaine ↔ encre).
-- Internationalisation (anglais) des données et de l'interface.
-- Tests d'accessibilité automatisés (axe) dans la suite Playwright.
-
-## GitHub
-
-https://github.com/drakurei/PokeBistro.git
-
-### Branches
-
-- `main` : la version publiée (déployée sur GitHub Pages) ;
-- `develop` : la branche d'intégration, d'où partent les nouvelles fonctionnalités ;
-- `feature/<nom>` : une branche par fonctionnalité, créée depuis `develop`, fusionnée dans `develop` puis dans `main` (`feature/design-system`, `feature/home-hero-3d`, `feature/menu-filters`, `feature/cart-drawer`, `feature/pages-forms`, `feature/seo`, `feature/e2e-tests`) ;
-- `gh-pages` : générée par `npm run deploy`, ne contient que le site compilé.
-
-Nouvelle fonctionnalité : `git checkout develop && git checkout -b feature/xxx`, merge dans `develop` puis dans `main`, puis `npm run deploy` depuis `main`.
-
-Pokémon est une marque de Nintendo / Creatures Inc. / GAME FREAK inc. PokéBistro est un restaurant fictif et un projet de portfolio sans but commercial.
+Pokémon est une marque de Nintendo / Creatures Inc. / GAME FREAK inc. PokéBistro est un restaurant fictif et un projet de portfolio sans lien avec ces sociétés. Visuels des plats générés avec Gemini à partir des prompts du dossier `docs/images`.

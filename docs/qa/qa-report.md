@@ -1,106 +1,45 @@
 # Rapport QA
 
-Date : 25/09/2026 (mise à jour après l'intégration des 16 nouveaux plats) · Build testé : `main` (Vite 8, React 19, React Router 8).
+Date : 26/09/2026 (mise en œuvre de l'audit senior, puis collection de desserts) · Build testé : `main` (Vite 8, React 19.3, React Router 8, pré-rendu statique de 74 routes).
 
 ## 1. Tests automatisés
 
-| Suite        | Outil                                                                          | Couverture                                                                                                                                                                                                                                                                                                                                                                                                                  | Résultat            |
-| ------------ | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------- |
-| Unitaire     | Vitest (`npm test`)                                                            | `cartReducer` (8 cas), `filterProducts` (7), `storage` (4), `validation` (6)                                                                                                                                                                                                                                                                                                                                                | **25 / 25**         |
-| Bout en bout | Playwright (`npm run test:e2e`), projets `desktop` et `mobile`, reduced-motion | navigation, loader, skip link, 404, types → carte filtrée, recherche, filtres + URL + rechargement, fiche en dialog et en page, favoris, panier (plats et formules, stepper, suppression, vide, persistance, stockage corrompu, clavier), formulaires contact et réservation (dont demande spéciale), carte groupée dans l'ordre d'un menu, **44 images chargées**, formule fixe et formule composée, avis marqués « démo » | **44 / 44**         |
-| Lint         | oxlint (`npm run lint`)                                                        | règles React (hooks, deps, refs, set-state-in-effect) + oxc                                                                                                                                                                                                                                                                                                                                                                 | **0 avertissement** |
-| Format       | Prettier (`npm run format:check`)                                              | tout le dépôt                                                                                                                                                                                                                                                                                                                                                                                                               | conforme            |
+| Suite        | Outil                                                                    | Couverture                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Résultat                 |
+| ------------ | ------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ |
+| Unitaire     | Vitest (`npm test`)                                                      | `cartReducer` (8), `cartItems` (6 : formules moins chères que la carte pour toute composition, options, validation des lignes, résolution, passage en formule), `filterProducts` (8, dont régime), `products` (6 : 59 plats, images, catégories/tags/régimes/allergènes valides, sous-groupes des desserts et 15 choux, badges rares, contenu), `schedule` (5), `suggestions` (5), `storage` (4), `validation` (6)                                                                                                                                                       | **48 / 48**              |
+| Bout en bout | Playwright (`npm run test:e2e`), projets `desktop` et `mobile` (Pixel 7) | navigation, loader, skip link, 404, types → carte filtrée, recherche, filtres + URL, fiche en dialog et en page (`<h1>`), favoris (carte, header, page, état vide), panier (plats, formules, stepper, annulation, vide, persistance, stockage corrompu, clavier), formule fixe et composeur, carte dans l'ordre d'un repas + sommaire, **commande simulée** (5 étapes, retour, clavier, panier vide), suggestions et passage en formule, contact (succès, échec), réservation (créneau complet, jour fermé, récapitulatif, .ics), avis démo, **desserts** (section d'accueil, vitrine en quatre groupes, recherche, fiche, favori, panier, composeur, histoire), **axe WCAG 2.1 A/AA** sur 9 écrans + tiroir + feuille de filtres, **SEO** (titre, canonical unique, OG, JSON-LD `Menu`/`MenuItem`, sitemap, robots, page lisible sans JavaScript), **plein mouvement** (loader < 1 s, `<h1>` visible, dialog, marquee) | **102 / 102**            |
+| Lint         | oxlint (`npm run lint`)                                                  | règles React (hooks, deps, refs, set-state-in-effect) + oxc                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | **0 avertissement**      |
+| Format       | Prettier (`npm run format:check`)                                        | tout le dépôt                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | conforme                 |
+| Budget       | `npm run size` (gzip)                                                    | JS hors Three 197,4 kB / 210 · Three 128,7 kB / 136,7 · CSS 13,4 kB / 15,6 · polices latin 107 kB / 127 · HTML accueil 13,1 kB / 23,4                                                                                                                                                                                                                                                                                                                                                                                                                                     | **5 / 5 sous le budget** |
+| Pré-rendu    | `scripts/prerender.mjs`                                                  | 74 routes écrites (accueil, carte, 59 plats, 8 formules, 5 pages), chacune avec un `<h1>`, sans placeholder Suspense ; JSON-LD dans `<head>` ; sitemap de 72 URL ; coquille `404.html`                                                                                                                                                                                                                                                                                                                                                                                    | OK                       |
 
-## 2. Parcours vérifiés à la main (navigateur)
+Tout tourne aussi dans GitHub Actions (`.github/workflows/ci.yml`).
 
-| Parcours                                                                                    | Desktop 1440                 | Mobile 390   | Notes                                                               |
-| ------------------------------------------------------------------------------------------- | ---------------------------- | ------------ | ------------------------------------------------------------------- |
-| Loader → hero                                                                               | OK                           | OK           | Une fois par session, sortie en 1,35 s, timeout 2,4 s.              |
-| Poké Ball 3D                                                                                | OK (WebGL, parallaxe souris) | Fallback SVG | Chunk `three` chargé après le hero, jamais sur mobile.              |
-| Header transparent → opaque + ceinture                                                      | OK                           | OK           | Bascule à 24 px de scroll.                                          |
-| Marquee, types (teinte au survol), plateau, chiffres, bandeau                               | OK                           | OK           | Reveals une seule fois.                                             |
-| Carte : recherche, rail / feuille de filtres, compteur                                      | OK                           | OK           | Feuille en bottom sheet, bouton « Voir N plats ».                   |
-| Fiche plat (dialog), Échap, clic extérieur, URL                                             | OK                           | OK           | Accès direct = page complète + « Aussi de type ».                   |
-| Panier : ajout, stepper sur carte, tiroir, total, Vider (confirmation), Commander (message) | OK                           | OK           | Persistance vérifiée après rechargement.                            |
-| Contact / Réservation : erreurs, focus, envoi, succès                                       | OK                           | OK           | Simulation 900 ms.                                                  |
-| 404                                                                                         | OK                           | OK           |                                                                     |
-| Reduced motion                                                                              | OK                           | OK           | Pas de Lenis, pas de 3D, fondus courts, page lisible immédiatement. |
+## 2. Vérifications manuelles (captures Playwright à 1366 × 900 et 390 × 844)
 
-## 3. Accessibilité (vérifications faites)
+| Vérification                                        | Résultat                                                                                                                                                                            |
+| --------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hero à 375 / 768 / 1366 px                          | Titre sur 3 lignes, plat sur la ceinture, Poké Ball sans chevauchement, section < 1 écran.                                                                                          |
+| Section desserts de l'accueil                       | Titre sur 3 lignes à 1366 px, croquembouche fondu dans le washi (masque doux), création du chef lisible, quatre cartes ; sur mobile, texte puis image puis cartes en une colonne.    |
+| Carte, section Desserts                             | Quatre sous-groupes titrés et comptés, 15 choux, cartes homogènes avec la série HD (même fond, même ombre).                                                                          |
+| Fiche du croquembouche                              | Visuel vertical (455 × 558) sur le panneau teinté, fil d'Ariane « Dessert · Choux & profiteroles · Électrik », allergènes démo, « À déguster avec ».                                 |
+| Fiche d'un chou sur mobile                          | Image pleine largeur, fil d'Ariane, prix, description, panier.                                                                                                                       |
+| Histoire                                            | Chapitre « Le laboratoire des douceurs », trois médaillons cliquables.                                                                                                              |
+| Loader, Poké Ball 3D, clavier, contraste            | Inchangés depuis la phase précédente (voir `docs/audit/senior-audit-implementation.md`).                                                                                            |
+| GitHub Pages                                        | Sous-pages en fichiers réels (`/PokeBistro/menu/pikachu-croquembouche/`), adresses inconnues → `404.html` → page 404 de l'application.                                              |
 
-- Un `<h1>` par page ; sections avec `aria-labelledby` ; landmarks `header` / `nav` / `main` / `footer`.
-- Skip link premier élément focalisable ; focus déplacé sur `<main>` à chaque changement de page.
-- Dialogs natifs (`showModal`) : piège de focus, Échap, restauration du focus sur le déclencheur (testé).
-- Tous les boutons icône ont un `aria-label` ; chips en `aria-pressed` ; compteur de résultats et quantités en `aria-live`.
-- Formulaires : labels visibles, `aria-invalid`, erreurs liées par `aria-describedby` et annoncées (`role="alert"`), premier champ invalide focalisé.
-- Contrastes : encre sur porcelaine 16,5:1 ; encre muette sur porcelaine 5,5:1 ; porcelaine sur laque 5,2:1 ; porcelaine sur encre 16:1. Texte sur les couleurs de type choisi (encre ou porcelaine) selon la luminance.
-- Cibles tactiles ≥ 44 px (boutons, chips 40 px avec marge 8 px, stepper 36–40 px).
-- `prefers-reduced-motion` respecté (CSS + `gsap.matchMedia`).
-- Images décoratives en `alt=""`, visuel de la fiche nommé.
+## 3. Décisions prises pendant la QA
 
-Points à surveiller : la Poké Ball SVG anime un flottement en CSS (désactivé en reduced motion) ; les couleurs de type Fée et Glace sont claires et ne servent jamais de fond de texte.
+- **Balises `<head>` dupliquées sur les pages paresseuses** : React 19 n'adopte les balises hissées (`<meta>`, `<link>`) que lors de la première passe d'hydratation ; rendues dans une page chargée à la demande, elles étaient réinsérées. `<Seo>` est désormais rendu une fois à la racine de l'application, à partir de l'URL réelle ; le JSON-LD est écrit dans `<head>` par le pré-rendu.
+- **Préchargement du hero** : appelé au niveau du module, il partait sur toutes les routes ; il est maintenant dans le composant, donc sur l'accueil seulement.
+- `content-visibility: auto` sur les sections de la carte : retiré (sauts de défilement en une colonne, clics instables).
+- `size-limit` : remplacé par `scripts/size-budget.mjs` (mesures incohérentes des globs sur ce poste Windows).
+- `fs.rmSync` récursif silencieusement inopérant dans l'environnement de développement utilisé : `scripts/clean.mjs` supprime fichier par fichier.
+- Fizz externalise les Suspense de plus de 12,8 kB avec un script inline : `progressiveChunkSize` relevé, et le pré-rendu refuse toute page qui en contiendrait.
+- Captures d'écran : le volet navigateur de l'éditeur rend blanc quand la fenêtre est masquée ; les vérifications visuelles ont été faites avec des captures Playwright (chromium headless), plus fiables.
 
-## 4. Performance (build de production)
+## 4. Non couvert / à surveiller
 
-| Chunk                                                | Taille min | gzip         | Chargement                      |
-| ---------------------------------------------------- | ---------- | ------------ | ------------------------------- |
-| `index` (React, Router, accueil, carte, UI)          | 349 Ko     | 118 Ko       | initial                         |
-| `motion` (GSAP, ScrollTrigger, Lenis)                | 142 Ko     | 53 Ko        | initial                         |
-| `three` (Poké Ball 3D)                               | 536 Ko     | 133 Ko       | lazy, desktop + WebGL seulement |
-| pages Histoire / Contact / Réservation / Fiche / 404 | 1–7 Ko     | 0,5–2,6 Ko   | lazy                            |
-| CSS                                                  | 54 Ko      | 12,5 Ko      | initial                         |
-| Fonts (latin)                                        | 3 familles | ~ 100 Ko     | swap                            |
-| Images produits                                      | 28 WebP    | 157 Ko total | lazy (hors hero)                |
-
-Mesures : aucune requête tierce (fonts auto-hébergées, pas de carte externe), images en `loading="lazy"` + `decoding="async"`, dimensions déclarées (pas de décalage), animations sur `transform` / `opacity` uniquement, rendu 3D mis en pause hors viewport et onglet caché, `pixelRatio` plafonné à 1,5.
-
-Piste suivante : pré-rendu statique des 34 URLs (SEO + LCP) et suppression de Lenis si l'on veut encore alléger le bundle initial (~ 10 Ko).
-
-## 5. Sécurité (revue frontend)
-
-- Aucune donnée interprétée comme HTML : tout passe par JSX ; pas de `dangerouslySetInnerHTML` (le JSON-LD est sérialisé via `JSON.stringify`).
-- Entrées de formulaire : nettoyage des caractères de contrôle, longueurs bornées, validation email, dates bornées (aujourd'hui → 3 mois), créneaux et couverts restreints à des listes fermées, honeypot.
-- Stockage local : préfixé, taille plafonnée (32 Ko), validation de forme, ids vérifiés contre le catalogue, prix jamais lus depuis le stockage.
-- Paramètres d'URL : valeurs inconnues ignorées, recherche tronquée à 60 caractères.
-- Liens externes (réseaux) ouverts sans `target="_blank"` ; aucun secret, aucune clé, aucun `.env` versionné (seul `.env.pages` avec la base publique).
-- Dépendances : `npm audit` → 0 vulnérabilité au 25/09/2026.
-
-## 6. Bugs trouvés et corrigés pendant la QA
-
-1. Poké Ball qui recouvrait le texte d'accroche sur mobile → marge haute du bloc bas et taille de balle réduite.
-2. « 100 % » qui passait à la ligne dans les chiffres → taille fluide + `white-space: nowrap`.
-3. Six boutons laque dans le plateau des plats signatures (trop de rouge) → CTA des cartes en encre.
-4. Stepper du panier bloqué à 1 → prop `allowRemove` (retrait à 1, comme dans le TP).
-5. Tests e2e : radio `sr-only` non cliquable (indicateur custom devant) → clic sur le label ; nom accessible des tuiles de type commençant par le compteur → `aria-label` explicite.
-
-## 7. Intégration des 16 nouveaux plats (25/09/2026)
-
-| Contrôle       | Résultat                                                                                                                                            |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Planche source | `Downloads/Gemini_Generated_Image_ocqkffocqkffocqk.jpg`, 2048 × 2048, grille 4 × 4, 16 plats dans l'ordre attendu, original conservé                |
-| Découpe        | 16 × 512 × 410 WebP (10 – 39 Ko), titres retirés (contrôle sur planche + zoom des bandes hautes), aucun raccord, aucun débord de case voisine       |
-| Catalogue      | 44 plats, ids 29 → 44, slugs uniques, catégorie Entrée, types Vol / Combat / Spectre, tags signature / frais / léger / gourmand                     |
-| Recherche      | « lucario » → 2 plats, « gyoza » → 1, « lavande » → 1 (ingrédient), « spectre » → 1 (type), sans accents                                            |
-| Filtres        | Entrée (3), Combat (2), Spectre (1), Vol (1), Nouveau (16), Signature (11), combinaisons Bento + Feu + 10–15 € → 3 (test e2e)                       |
-| Tri            | prix croissant / décroissant / nouveautés d'abord, dans l'URL (`?sort=`)                                                                            |
-| Fiche          | image, description, prix, ingrédients, type, tags, quantité, ajout, favori : identiques aux anciens plats (vérifié sur Lucario Power Burger)        |
-| Panier         | ajout d'un nouveau plat, double ajout, quantité, retrait, total, fermeture / réouverture, rechargement (suite e2e `cart.spec.js`, 30 / 30 au total) |
-| Console        | 0 erreur React / JS sur accueil, carte, fiche, panier                                                                                               |
-| Mobile 390     | bandeau de catégories défilant, tri, filtres en feuille, cartes 5:4 nettes                                                                          |
-| Git            | dossier `cart` renommé dans l'index (`Cart/` → `cart/`) : build Linux sûr                                                                           |
-
-Points d'attention documentés : les 28 anciens visuels (198 × 168) restent moins nets que les 16 nouveaux ; leur régénération est préparée dans `docs/images/`.
-
-## 8. Vraie carte de restaurant (25/09/2026, soir)
-
-| Contrôle          | Résultat                                                                                                                                                                                                                                          |
-| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Images manquantes | 4 plats (Salamèche Bento, Salamèche Bento Maxi, Mew Berry Bowl, Mew Berry Bowl Chantilly) pointaient vers des fichiers `-01`/`-02` : fichiers renommés selon les slugs, test unitaire + test e2e « toutes les images chargent » ajoutés → 44 / 44 |
-| Formules          | 5 formules (Pikachu 21,90 €, Feu 29,90 €, Aqua 21,90 €, Dresseur 26,90 € à composer, Signature 39,90 €) ; économie affichée ; test : toujours moins chères que la somme des plats, même avec la composition la moins chère                        |
-| Panier            | une formule fixe et une formule composée ajoutées, composition affichée dans le tiroir, persistance après rechargement, ids de formules invalides rejetés au chargement                                                                           |
-| Carte             | section Formules en tête, puis Entrées → Menus ; chip « Formules » dans le rail et le bandeau mobile ; conteneur élargi (90 rem) et rail réduit (264 px) pour des cartes plus grandes                                                             |
-| Avis              | section « Ce que les dresseurs en disent » avec bandeau « Avis de démonstration — contenu fictif, version portfolio » et mention « démo » sur chaque date ; aucune référence à Google                                                             |
-| Réservation       | champ « Demande spéciale » facultatif (300 caractères), repris dans la confirmation                                                                                                                                                               |
-| Histoire          | équipe, geste du chef, philosophie ajoutés                                                                                                                                                                                                        |
-| Fiche             | entrée du visuel (scale 0,9 → 1) et du contenu en cascade, désactivée en reduced motion                                                                                                                                                           |
-| Console           | 0 erreur sur accueil, carte, formule, fiche, panier                                                                                                                                                                                               |
+- Lighthouse n'est pas exécuté en CI : à lancer à la main sur le site déployé.
+- Les visuels des 28 plats historiques restent en basse définition.
+- Le composeur de formule liste 14 choux dans l'emplacement dessert : long mais lisible ; à surveiller si la collection grandit encore (un filtre par sous-groupe serait la suite).

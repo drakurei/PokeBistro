@@ -1,28 +1,33 @@
 # SEO
 
-## Mise en place
+## Principe
 
-| Élément                                           | Où                          | Détail                                                                                                                                                                 |
-| ------------------------------------------------- | --------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `<title>` et `<meta name="description">` par page | `components/layout/Seo.jsx` | React 19 hisse les balises rendues dans `<head>`. Titre = `Page — PokéBistro`, description propre à chaque page, y compris chaque plat.                                |
-| Canonical                                         | `Seo.jsx`                   | `https://drakurei.github.io/PokeBistro` + chemin.                                                                                                                      |
-| Open Graph / Twitter                              | `Seo.jsx`                   | `og:title`, `og:description`, `og:url`, `og:image` (1200 × 630), `og:type` (`product` pour un plat), `twitter:card=summary_large_image`.                               |
-| Données structurées `Restaurant`                  | `index.html`                | Nom, adresse, téléphone, horaires (`openingHoursSpecification`), `servesCuisine`, `acceptsReservations`, `hasMenu`.                                                    |
-| Données structurées `MenuItem`                    | `routes/ProductPage.jsx`    | Nom, description, image, prix (`Offer`), régime végétarien le cas échéant.                                                                                             |
-| Structure sémantique                              | partout                     | Un `<h1>` par page, `<header>` / `<nav aria-label>` / `<main>` / `<footer>`, sections avec `aria-labelledby`, listes pour les grilles.                                 |
-| URLs propres                                      | React Router                | `/menu`, `/menu/pikachu-bento`, `/histoire`, `/contact`, `/reservation`. Les filtres sont des paramètres (`?type=feu`) : jamais de doublon d'URL pour un même contenu. |
-| `robots.txt` + `sitemap.xml`                      | `public/`                   | Le sitemap liste les 6 pages et les 28 plats.                                                                                                                          |
-| Favicon, `theme-color`, manifest                  | `index.html`, `public/`     | SVG + PNG 180.                                                                                                                                                         |
-| Langue                                            | `<html lang="fr">`          | Copy entièrement en français, typographie française (espaces insécables avant `?` `:`).                                                                                |
-| Images                                            | `<img alt>`                 | Images décoratives en `alt=""` (le nom du plat est dans le texte), image de la fiche avec le nom du plat.                                                              |
+Le site est une SPA React, mais **chaque adresse existe en HTML statique** : `scripts/prerender.mjs` rend les 59 routes (accueil, carte, 44 plats, 8 formules, histoire, contact, réservation, commande, favoris) avec React (`prerenderToNodeStream`) après `vite build`, et écrit `dist/<route>/index.html`. Le navigateur reçoit une page complète (titre, description, balises sociales, JSON-LD, contenu) puis React s'y attache (`hydrateRoot`). Sans JavaScript, la page reste lisible.
 
-## Limites connues (SPA)
+## Une seule source : `src/seo/pageMeta.js`
 
-Le site est une application monopage rendue côté client : les robots modernes exécutent le JavaScript, mais un rendu serveur (Vite SSR, ou un pré-rendu statique des 34 URLs au build) améliorerait encore l'indexation. La structure (`Seo` par route, données dans `data/`) le permet sans refonte : c'est l'amélioration future n° 1 côté SEO.
+| Élément                | Détail                                                                                                                                                      |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `<title>`, description | Par route (statique, plat, formule). Titre = `Page — PokéBistro`.                                                                                           |
+| Canonical              | `https://drakurei.github.io/PokeBistro/<route>/` : les sous-pages finissent par `/`, c'est l'adresse que GitHub Pages sert (redirection 301 sans le slash). |
+| Open Graph / Twitter   | `og:type` (`product` pour un plat), `og:image` (le plat lui-même, sinon `og-image.png`), `twitter:card=summary_large_image`.                                |
+| `robots`               | `noindex` sur `/commande`, `/favoris` et la 404 (contenu local ou vide).                                                                                    |
+| JSON-LD `Restaurant`   | Accueil : nom, adresse, téléphone, horaires structurés (`openingHoursSpecification` dérivées de `restaurant.schedule`), `hasMenu`.                          |
+| JSON-LD `Menu`         | Carte : `MenuSection` par catégorie + une section Formules, `MenuItem` pour chaque plat (nom, description, image, `Offer`, régimes) et chaque formule.      |
+| JSON-LD `MenuItem`     | Fiches plat et formule, avec `BreadcrumbList`.                                                                                                              |
+| `sitemap.xml`          | Généré au build (57 URL avec `lastmod` = date du build, `changefreq`, `priority`) ; `robots.txt` le référence.                                              |
 
-## Vérifications faites
+`<Seo>` rend ces balises dans React (hissées dans `<head>` par React 19) et le script de pré-rendu écrit exactement les mêmes : à l'hydratation, React adopte les balises existantes, aucune n'est dupliquée (vérifié par `e2e/seo.spec.js`).
 
-- Titres et descriptions uniques par page (contrôlés dans les tests Playwright pour l'accueil, la carte et une fiche).
-- Une seule balise `<h1>` par page.
-- Aucun texte porteur d'information dans une image.
-- `og:image` servie en PNG, dimensions 1200 × 630.
+## Structure
+
+Un `<h1>` par page (y compris les fiches en accès direct), `<header>` / `<nav aria-label>` / `<main>` / `<footer>`, sections avec `aria-labelledby`, sommaire de la carte avec ancres, texte alternatif vide sur les visuels décoratifs et nom du plat sur l'image de la fiche.
+
+## Hébergement
+
+- **GitHub Pages** (`npm run deploy`) : `base=/PokeBistro/`, `404.html` = coquille de l'application pour les adresses inconnues, `.nojekyll`. Pages **ne permet aucun en-tête HTTP** : pas de CSP, pas de HSTS, pas de cache-control personnalisé. C'est une limite de l'hébergeur, documentée ici plutôt que contournée.
+- **Vercel / Netlify** (`vercel.json`, `netlify.toml`) : réécriture SPA, cache immuable des assets et en-têtes de sécurité (CSP stricte avec le hash du script inline du loader, `X-Content-Type-Options`, `X-Frame-Options`, `Referrer-Policy`, `Permissions-Policy`, HSTS, COOP). `npm run csp-hash` recalcule le hash si le script inline change.
+
+## Performance perçue par les moteurs
+
+HTML pré-rendu, image du hero préchargée avec `fetchpriority="high"`, AVIF/WebP avec `srcset`, polices auto-hébergées (sous-ensembles latin), chunks `three` et `motion` séparés, budget de taille vérifié à chaque build (`npm run size`).

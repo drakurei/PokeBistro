@@ -1,41 +1,52 @@
 # Plan images
 
-## État au 25/09/2026
+## État au 26/09/2026
 
-Le catalogue compte **44 plats** et deux générations de visuels, toutes deux découpées à partir d'une planche Gemini, rangées dans `src/assets/products/<slug>.webp` et chargées par `import.meta.glob` (aucun code à toucher pour remplacer un fichier).
+Le catalogue compte **59 plats** et trois générations de visuels, toutes découpées à partir de planches Gemini, rangées dans `src/assets/products/` et chargées par `import.meta.glob` (aucun code à toucher pour remplacer un fichier).
 
-| Série                 | Plats | Source                    | Format final              | Poids                        | Qualité                                                             | Statut                              |
-| --------------------- | ----- | ------------------------- | ------------------------- | ---------------------------- | ------------------------------------------------------------------- | ----------------------------------- |
-| Première planche (TP) | 28    | grille 7 × 4, 1408 × 768  | 198 × 168, WebP           | 157 Ko au total              | correcte mais **basse définition** (upscalée ×2 dans les cartes)    | **à régénérer** avec les prompts HD |
-| Deuxième planche      | 16    | grille 4 × 4, 2048 × 2048 | 512 × 410 (5:4), WebP q86 | 400 Ko au total (10 – 39 Ko) | **bonne** : nette dans les cartes (~ 400 px) et la fiche (≤ 420 px) | **terminée**                        |
+| Série                            | Plats | Source                    | Fichiers par plat                                            | Qualité                                              | Statut                                                               |
+| -------------------------------- | ----- | ------------------------- | ------------------------------------------------------------ | ---------------------------------------------------- | -------------------------------------------------------------------- |
+| Première planche (TP)            | 28    | grille 7 × 4, 1408 × 768  | `slug.webp` 198 × 168 + `slug.avif`                          | correcte mais **basse définition** (upscalée ×2)     | **à régénérer** : aucune nouvelle planche disponible                 |
+| Deuxième planche (plats)         | 16    | grille 4 × 4, 2048 × 2048 | `slug.webp` 512 × 410 + `slug.avif` + `slug-256.{webp,avif}` | **bonne** : nette dans les cartes et la fiche        | terminée                                                             |
+| Troisième planche (profiteroles) | 15    | grille 6 × 4, 2816 × 1536 | idem, + `pikachu-croquembouche-tall.{webp,avif}` (455 × 558) | **bonne**, même lumière et même fond que la deuxième | terminée (25/09/2026, `Gemini_Generated_Image_hx04jmhx04jmhx04.jpg`) |
 
-Les deux séries partagent la même direction artistique (fond crème uni, plat isolé vu en plongée 3/4, lumière douce), donc elles cohabitent sans rupture de style ; seule la définition diffère.
+Les 28 basses définitions restent à régénérer (prompts prêts dans `gemini-prompts.md`) ; elles ne sont jamais agrandies par un script.
 
-## Découpage de la deuxième planche
+## La planche des profiteroles
 
-Script Python + Pillow + NumPy, exécuté hors du dépôt (original conservé intact dans `Downloads`) :
+24 cases, titres imprimés en bas de case, plusieurs doublons (Goupix, Lucario, Mentali, Psykokwak) : **15 desserts distincts** ont été retenus, dont le croquembouche qui occupe deux cases en hauteur. Découpe par `scripts/cut-dessert-sheet.py` :
 
-1. la planche est divisée en 16 cases de 512 × 512 ;
-2. dans chaque case, la bande de titre est détectée par les lignes contenant du texte noir dans le cinquième supérieur (« ROUCOOL CRISPY », « (Inspired by Pidgey) ») ;
-3. la découpe commence sous le texte et garde **410 lignes** : la case entière moins le titre, soit un cadre 5:4 identique au bloc image des cartes ;
-4. aucun canvas synthétique, aucun redimensionnement : le fond, l'ombre et l'échelle d'origine sont conservés, donc les 16 plats sont à la même échelle ;
-5. export WebP qualité 86 ; planche de contrôle dans [`new-products-preview.webp`](new-products-preview.webp).
+1. cases repérées par la grille (6 × 4), séparateurs ignorés (7 px) ;
+2. bande de titre détectée (pixels sombres dans le quart bas) et retirée ;
+3. cadrage 5:4 : toute la largeur, la hauteur au-dessus du titre, le **haut prolongé avec le dégradé du fond** (mesuré sur les marges sans dessert) pour ne laisser aucune bande ;
+4. le croquembouche (455 × 558) est gardé tel quel pour la section d'accueil et **composé sur un canvas 5:4** pour les cartes (fond continué et fondu sur les bords) ;
+5. WebP q86, puis `scripts/image-variants.py` : AVIF et vignettes 256 px.
 
-Les cases dont le fond présente un léger dégradé (bols, boissons) ont été gardées entières précisément pour éviter tout raccord visible.
+Poids : 59 WebP = 747 Ko, 59 AVIF = 475 Ko. Planche de contrôle : `docs/images/desserts-preview.webp`.
 
-## Affichage
+## Pipeline commun
 
-- Cartes : bloc image 5:4, `object-cover`, masque radial `.dish-image` (fondu des angles uniquement ; le haut et le bas restent visibles pour les flammes, vagues et éclairs).
-- Fiche : `object-contain`, largeur max 420 px sur un fond washi teinté par le type.
-- Médaillons (hero, histoire) : 112 – 144 px, `rounded-full`.
-- Attributs `width="512" height="410"` déclarés partout : aucun décalage de mise en page ; les 28 anciennes images (198 × 168, ratio 1,18) s'y adaptent avec un recadrage de 3 %.
+- `products.js › imageSet(slug)` expose `{ width, height, srcSet, avif }` ; `<DishImage>` rend `<picture>` avec la source AVIF, `srcset`/`sizes`, `width`/`height` (zéro CLS), `loading="lazy"` par défaut, `fetchpriority="high"` + `decoding="sync"` pour le plat du hero, préchargé depuis le `<head>`.
+- Le masque radial `.dish-image` fond le crème de la planche dans la surface derrière (washi, porcelaine, plateau encre).
 
-## Ce qui reste à faire (n'empêche pas la livraison)
+## Où les images sont utilisées
 
-| Plat                                                                                 | Fichier                                       | Action                                                                                               | Prompt                                          |
-| ------------------------------------------------------------------------------------ | --------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------- |
-| Les 28 plats de la première série                                                    | `src/assets/products/<slug>.webp` (198 × 168) | **Régénérer** en 1200 × 1200 ou en planche 4 × 4 haute définition, puis découper avec le même script | `gemini-prompts.md`, section « Première série » |
-| Hero (H1, H2)                                                                        | `src/assets/hero/`                            | Créer                                                                                                | `gemini-prompts.md`, « Visuels du restaurant »  |
-| Cuisine, chef, salle, comptoir, table, soir, dessert, réservation, origine (K1 → S1) | `src/assets/sections/`                        | Créer, puis intégrer dans Histoire, Contact et Réservation                                           | idem                                            |
+| Endroit                       | Taille rendue  | Source choisie              |
+| ----------------------------- | -------------- | --------------------------- |
+| Hero                          | 330 → 500 px   | 512 (AVIF)                  |
+| Section desserts (accueil)    | ≤ 420 × 600 px | `croquembouche-tall` (AVIF) |
+| Cartes de la carte / favoris  | ≈ 360 px       | 512 (AVIF)                  |
+| Fiche                         | ≤ 440 px       | 512 (AVIF)                  |
+| Composeur de formule          | ≈ 160 px       | 256                         |
+| Panier, plateaux, suggestions | 40 – 80 px     | 256                         |
+| Histoire (médaillons)         | 112 – 144 px   | 256                         |
 
-Marche à suivre pour une planche 4 × 4 : générer en 2048 × 2048 avec le bloc de style commun, adapter la liste `SLUGS` du script de découpe, lancer, contrôler la planche produite, remplacer les fichiers. Rien d'autre à changer.
+## Pages secondaires
+
+Histoire utilise des médaillons de plats HD (dont trois profiteroles dans le chapitre « Le laboratoire des douceurs ») ; Réservation et Contact restent typographiques. Des prompts pour une ambiance de salle, une terrasse et une image Open Graph plus « plat » sont en fin de `gemini-prompts.md` : à générer quand une session Gemini sera disponible (aucune génération n'est lancée par le site).
+
+## Règles
+
+- Un seul style : fond crème uni, sujet isolé en plongée 3/4, lumière douce, ombre portée courte.
+- Les fichiers sont nommés par slug ; `products.test.js` vérifie que chaque plat a une image et que chaque chou pointe vers un visuel de la collection.
+- Aucun logo ou sprite officiel Pokémon dans les visuels ; les Pokémon sont faits de pâte à choux, de glaçage, de sucre et de fruits.
