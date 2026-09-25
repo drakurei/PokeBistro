@@ -1,34 +1,53 @@
-import { priceRanges } from '../data/filters'
+import { priceRangesById, categoriesById, tagsById } from '../data/filters'
+import { typesById } from '../data/types'
+import { normalize } from './text'
 
-// Lowercase without accents, so that "epice" also matches "épicé"
-function normalize(text) {
-  return text
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
+export const emptyFilters = { q: '', category: '', types: [], tags: [], price: 'all' }
+
+// Builds the text a product can be found by: name, Pokémon, category, type, tags, keywords, ingredients.
+function searchableText(product) {
+  return normalize(
+    [
+      product.name,
+      product.pokemon,
+      categoriesById[product.category]?.label,
+      typesById[product.type]?.label,
+      ...product.tags.map((tag) => tagsById[tag]?.label ?? tag),
+      ...product.keywords,
+      ...product.ingredients,
+    ].join(' '),
+  )
 }
 
-// Returns the products that match ALL the active filters
-function filterProducts(products, filters) {
-  const search = normalize(filters.search.trim())
-  const range = priceRanges.find((priceRange) => priceRange.id === filters.price)
+// Returns the products matching ALL active filters.
+// - q: every word must be found (order-free): "bento épicé" matches "Goupix Fire Box"
+// - category / price: single choice
+// - types: any of the selected types
+// - tags: all of the selected tags
+export default function filterProducts(products, filters = emptyFilters) {
+  const words = normalize(filters.q).split(/\s+/).filter(Boolean)
+  const range = priceRangesById[filters.price] ?? priceRangesById.all
+  const types = new Set(filters.types ?? [])
+  const tags = filters.tags ?? []
 
   return products.filter((product) => {
-    // 1. Text search on the name, the category, the keywords and the tags
-    const searchableText = normalize([product.name, product.category, ...product.keywords, ...product.tags].join(' '))
-    const matchesSearch = search === '' || searchableText.includes(search)
-
-    // 2. Category
-    const matchesCategory = filters.category === '' || product.category === filters.category
-
-    // 3. Tag
-    const matchesTag = filters.tag === '' || product.tags.includes(filters.tag)
-
-    // 4. Price range (min included, max excluded)
-    const matchesPrice = product.price >= range.min && product.price < range.max
-
-    return matchesSearch && matchesCategory && matchesTag && matchesPrice
+    if (words.length > 0) {
+      const text = searchableText(product)
+      if (!words.every((word) => text.includes(word))) return false
+    }
+    if (filters.category && product.category !== filters.category) return false
+    if (types.size > 0 && !types.has(product.type)) return false
+    if (tags.length > 0 && !tags.every((tag) => product.tags.includes(tag))) return false
+    return product.price >= range.min && product.price < range.max
   })
 }
 
-export default filterProducts
+export function countActiveFilters(filters) {
+  return [
+    filters.q.trim() !== '',
+    filters.category !== '',
+    filters.types.length > 0,
+    filters.tags.length > 0,
+    filters.price !== 'all',
+  ].filter(Boolean).length
+}

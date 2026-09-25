@@ -1,74 +1,61 @@
-// Reducer of the cart: receives the current state and an action, returns the new state.
-// state.items = [{ id, name, price, image, quantity }]
+// Cart reducer. The state only stores ids and quantities: names, prices and images are read from
+// the product catalogue at render time, so nothing persisted in the browser can alter a price.
+// state.items = [{ id, quantity }]
 
+export const MAX_QUANTITY = 20
 export const initialState = { items: [] }
 
-function cartReducer(state, action) {
+const clamp = (quantity) => Math.min(MAX_QUANTITY, Math.max(1, quantity))
+
+function updateQuantity(state, id, quantity) {
+  return {
+    ...state,
+    items: state.items.map((item) => (item.id === id ? { ...item, quantity: clamp(quantity) } : item)),
+  }
+}
+
+export default function cartReducer(state, action) {
   switch (action.type) {
-    case 'ADD_TO_CART': {
-      const product = action.product
-      const existingItem = state.items.find((item) => item.id === product.id)
-
-      // Already in the cart: only the quantity changes (never two lines for the same product)
-      if (existingItem) {
-        return {
-          ...state,
-          items: state.items.map((item) =>
-            item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item,
-          ),
-        }
-      }
-
-      // New product: one line with quantity 1
-      const newItem = {
-        id: product.id,
-        name: product.name,
-        price: product.price,
-        image: product.image,
-        quantity: 1,
-      }
-      return { ...state, items: [...state.items, newItem] }
+    case 'ADD': {
+      const quantity = action.quantity ?? 1
+      const existing = state.items.find((item) => item.id === action.id)
+      // Already in the cart: the quantity grows, never a second line for the same product
+      if (existing) return updateQuantity(state, action.id, existing.quantity + quantity)
+      return { ...state, items: [...state.items, { id: action.id, quantity: clamp(quantity) }] }
     }
 
-    case 'INCREMENT_QUANTITY':
-      return {
-        ...state,
-        items: state.items.map((item) =>
-          item.id === action.id ? { ...item, quantity: item.quantity + 1 } : item,
-        ),
-      }
+    case 'INCREMENT': {
+      const existing = state.items.find((item) => item.id === action.id)
+      if (!existing) return state
+      return updateQuantity(state, action.id, existing.quantity + 1)
+    }
 
-    case 'DECREMENT_QUANTITY': {
-      const existingItem = state.items.find((item) => item.id === action.id)
-
-      // Not in the cart: nothing to do
-      if (!existingItem) {
-        return state
-      }
-
-      // Last unit: the line is removed (the quantity can never be 0 or negative)
-      if (existingItem.quantity === 1) {
+    case 'DECREMENT': {
+      const existing = state.items.find((item) => item.id === action.id)
+      // Not in the cart: nothing to do. Last unit: the line disappears (quantity is never 0)
+      if (!existing) return state
+      if (existing.quantity === 1)
         return { ...state, items: state.items.filter((item) => item.id !== action.id) }
-      }
-
-      return {
-        ...state,
-        items: state.items.map((item) =>
-          item.id === action.id ? { ...item, quantity: item.quantity - 1 } : item,
-        ),
-      }
+      return updateQuantity(state, action.id, existing.quantity - 1)
     }
 
-    // Removes the whole line, whatever the quantity
-    case 'REMOVE_FROM_CART':
+    case 'SET_QUANTITY': {
+      if (!Number.isInteger(action.quantity)) return state
+      if (action.quantity <= 0)
+        return { ...state, items: state.items.filter((item) => item.id !== action.id) }
+      const existing = state.items.find((item) => item.id === action.id)
+      if (!existing)
+        return { ...state, items: [...state.items, { id: action.id, quantity: clamp(action.quantity) }] }
+      return updateQuantity(state, action.id, action.quantity)
+    }
+
+    case 'REMOVE':
       return { ...state, items: state.items.filter((item) => item.id !== action.id) }
 
-    case 'CLEAR_CART':
+    case 'CLEAR':
       return initialState
 
     default:
       return state
   }
 }
-
-export default cartReducer

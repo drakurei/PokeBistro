@@ -1,6 +1,6 @@
-// 12.9 -> "12,90 €"
-function formatPrice(price) {
-  return price.toLocaleString('fr-FR', { style: 'currency', currency: 'EUR' })
-}
+const formatter = new Intl.NumberFormat('fr-FR', { style: 'currency', currency: 'EUR' })
 
-export default formatPrice
+// 12.9 -> "12,90 €"
+export default function formatPrice(price) {
+  return formatter.format(price)
+}
