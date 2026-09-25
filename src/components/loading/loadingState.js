@@ -1,5 +1,7 @@
-// The brand loader plays once per browser session. Decided at module load so the hero can
-// schedule its own intro right after it (see LOADER_DURATION).
+// The brand loader plays once per browser session and never with reduced motion.
+// The decision is taken here, at module load, so the hero can schedule its own intro right after it.
+// The pre-rendered HTML always contains the loader; an inline script in index.html hides it before
+// the first paint when this session has already seen it (see html[data-loader]).
 const KEY = 'pokebistro:loaded'
 
 function readFlag() {
@@ -23,5 +25,5 @@ export const prefersReducedMotion =
 
 export const showLoader = typeof window !== 'undefined' && !readFlag() && !prefersReducedMotion
 
-// Seconds before the page underneath is fully revealed
-export const LOADER_DURATION = showLoader ? 1.35 : 0
+// Seconds before the page underneath is fully revealed (the veil lifts at the end of this)
+export const LOADER_DURATION = showLoader ? 0.9 : 0

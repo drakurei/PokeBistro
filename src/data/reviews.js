@@ -6,6 +6,14 @@
 
 export const DEMO_NOTICE = 'Avis de démonstration — contenu fictif, version portfolio'
 
+// Where a set of reviews comes from. Only 'demo' exists today; the two others describe what a real
+// integration would return (never called from the browser with a key: a backend proxy does it).
+export const sourceLabels = {
+  demo: 'Démonstration',
+  google: 'Google Business Profile',
+  'first-party': 'Livre d’or PokéBistro',
+}
+
 const demoReviews = {
   source: 'demo',
   rating: 4.8,

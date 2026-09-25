@@ -1,22 +1,27 @@
-import { DEMO_NOTICE, getReviews } from '../../data/reviews'
+import { DEMO_NOTICE, getReviews, sourceLabels } from '../../data/reviews'
+import { reviewsSection } from '../../data/content'
 import cn from '../../utils/cn'
 import { IconInfo, IconStar } from '../ui/Icons'
 import Reveal from '../motion/Reveal'
 
 const dateFormatter = new Intl.DateTimeFormat('fr-FR', { month: 'long', year: 'numeric' })
 
-function Stars({ rating, size = 16, className }) {
+// Five stars, announced as one image ("4 sur 5"), never as five decorative icons
+export function Stars({ rating, size = 16, className }) {
+  const rounded = Math.round(rating)
   return (
     <span
+      role="img"
+      aria-label={`Note : ${rating} sur 5`}
       className={cn('inline-flex items-center gap-0.5 text-gold', className)}
-      aria-label={`${rating} sur 5`}
     >
       {[1, 2, 3, 4, 5].map((star) => (
         <IconStar
           key={star}
           size={size}
-          filled={star <= Math.round(rating)}
-          className={star <= Math.round(rating) ? '' : 'opacity-30'}
+          filled={star <= rounded}
+          className={star <= rounded ? '' : 'opacity-30'}
+          aria-hidden="true"
         />
       ))}
     </span>
@@ -24,7 +29,8 @@ function Stars({ rating, size = 16, className }) {
 }
 
 // Customer voices. The content is demonstration material and is labelled as such on the page;
-// the section reads from getReviews() so a real source can replace it later.
+// the section reads from getReviews() so a real source (a first-party form, a Google Business
+// Profile read through a backend proxy) can replace it without touching this component.
 export default function ReviewsSection() {
   const reviews = getReviews()
 
@@ -33,9 +39,11 @@ export default function ReviewsSection() {
       <div className="container-pb">
         <Reveal className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
           <div className="max-w-xl">
-            <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">Ils sont venus</p>
+            <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">
+              {reviewsSection.eyebrow}
+            </p>
             <h2 id="reviews-title" className="mt-4 font-display text-display-lg text-balance">
-              Ce que les dresseurs en disent.
+              {reviewsSection.title}
             </h2>
           </div>
           <div className="flex items-center gap-4">
@@ -44,18 +52,22 @@ export default function ReviewsSection() {
             </span>
             <div>
               <Stars rating={reviews.rating} size={18} />
-              <p className="mt-1 font-mono text-xs text-ink-mute">{reviews.count} témoignages</p>
+              <p className="mt-1 font-mono text-xs text-ink-mute">
+                {reviews.count} témoignages · {sourceLabels[reviews.source]}
+              </p>
             </div>
           </div>
         </Reveal>
 
-        <p
-          role="note"
-          className="mt-8 inline-flex items-center gap-2 rounded-full border border-ink/15 bg-porcelain px-4 py-2 font-mono text-xs tracking-[0.08em] text-ink-soft uppercase"
-        >
-          <IconInfo size={16} className="shrink-0 text-lacquer" />
-          {DEMO_NOTICE}
-        </p>
+        {reviews.source === 'demo' && (
+          <p
+            role="note"
+            className="mt-8 inline-flex items-center gap-2 rounded-full border border-ink/15 bg-porcelain px-4 py-2 font-mono text-xs tracking-[0.08em] text-ink-soft uppercase"
+          >
+            <IconInfo size={16} className="shrink-0 text-lacquer" />
+            {DEMO_NOTICE}
+          </p>
+        )}
 
         <ul className="mt-8 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {reviews.items.map((review, index) => (
@@ -71,7 +83,8 @@ export default function ReviewsSection() {
                   <div className="min-w-0">
                     <p className="font-bold">{review.author}</p>
                     <p className="font-mono text-xs text-ink-mute">
-                      {dateFormatter.format(new Date(`${review.date}T12:00:00`))} · démo
+                      {dateFormatter.format(new Date(`${review.date}T12:00:00`))} ·{' '}
+                      {sourceLabels[reviews.source].toLowerCase()}
                     </p>
                   </div>
                   <Stars rating={review.rating} className="ml-auto" />

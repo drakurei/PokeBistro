@@ -2,8 +2,10 @@ import { useState } from 'react'
 import { Link } from 'react-router'
 import { types } from '../../data/types'
 import products from '../../data/products'
+import { typesSection } from '../../data/content'
 import cn from '../../utils/cn'
 import { IconArrowRight, IconArrowUpRight } from '../ui/Icons'
+import TypeIcon from '../ui/TypeIcon'
 import Reveal from '../motion/Reveal'
 
 const tileClass =
@@ -11,7 +13,8 @@ const tileClass =
   'transition-[border-color,background-color] duration-(--duration-base) ease-(--ease-out)'
 
 // "Choisissez votre type": one tile per Pokémon type plus the door to the whole carte.
-// Hovering a tile tints the whole section, clicking opens the menu already filtered on that type.
+// Hovering a tile tints it and the whole section (through a CSS variable, no DOM writes);
+// clicking opens the menu already filtered on that type.
 export default function TypesSection() {
   const [ambient, setAmbient] = useState(null)
 
@@ -25,14 +28,11 @@ export default function TypesSection() {
     >
       <div className="container-pb">
         <Reveal className="max-w-2xl">
-          <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">Choisissez votre type</p>
+          <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">{typesSection.eyebrow}</p>
           <h2 id="types-title" className="mt-4 font-display text-display-lg text-balance">
-            Onze types, autant de façons de manger.
+            {typesSection.title}
           </h2>
-          <p className="mt-5 text-lg text-ink-soft">
-            Chaque plat de la carte appartient à un type. Feu pour ce qui pique, Eau pour ce qui vient de la
-            mer, Combat pour les grands appétits, Fée pour ce qui finit le repas en douceur.
-          </p>
+          <p className="mt-5 text-lg text-ink-soft">{typesSection.lead}</p>
         </Reveal>
 
         <ul className="mt-12 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" onMouseLeave={() => setAmbient(null)}>
@@ -46,18 +46,23 @@ export default function TypesSection() {
                   onMouseEnter={() => setAmbient(type.color)}
                   onFocus={() => setAmbient(type.color)}
                   onBlur={() => setAmbient(null)}
-                  className={cn(tileClass, 'bg-porcelain hover:border-transparent')}
-                  onMouseOver={(event) =>
-                    (event.currentTarget.style.backgroundColor = `color-mix(in oklab, ${type.color} 22%, var(--color-porcelain))`)
-                  }
-                  onMouseOut={(event) => (event.currentTarget.style.backgroundColor = '')}
+                  style={{ '--tint': type.color }}
+                  className={cn(
+                    tileClass,
+                    'bg-porcelain hover:border-transparent hover:bg-[color-mix(in_oklab,var(--tint)_22%,var(--color-porcelain))]',
+                  )}
                 >
                   <div className="flex items-start justify-between">
                     <span
                       aria-hidden="true"
-                      className="size-12 rounded-full transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-125"
-                      style={{ backgroundColor: type.color }}
-                    />
+                      className="flex size-12 items-center justify-center rounded-full text-porcelain transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-110"
+                      style={{
+                        backgroundColor: type.color,
+                        color: type.onColor === 'ink' ? 'var(--color-ink)' : 'var(--color-porcelain)',
+                      }}
+                    >
+                      <TypeIcon typeId={type.id} size={24} />
+                    </span>
                     <span className="font-mono text-xs text-ink-mute">
                       {count} plat{count > 1 ? 's' : ''}
                     </span>

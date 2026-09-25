@@ -1,12 +1,14 @@
-import { Component, lazy, Suspense } from 'react'
+import { Component, lazy, Suspense, useEffect, useState } from 'react'
 import { useIsDesktop, useReducedMotion } from '../../hooks/useMediaQuery'
+import { LOADER_DURATION } from '../loading/loadingState'
 import cn from '../../utils/cn'
 
 const PokeballCanvas = lazy(() => import('../../three/PokeballCanvas'))
 
-// Probed once, the first time a hero asks for it
+// Probed once, the first time a hero asks for it (never during pre-rendering)
 let webglSupport
 function webglAvailable() {
+  if (typeof document === 'undefined') return false
   if (webglSupport === undefined) {
     try {
       const canvas = document.createElement('canvas')
@@ -57,11 +59,31 @@ export function PokeballSvg({ className }) {
   )
 }
 
+// The 3D chunk (Three.js) is requested once the browser is idle and the loader is gone: the dish and
+// the title are painted first, the ball upgrades itself afterwards.
+function useIdleAfterLoader(enabled) {
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    if (!enabled) return
+    let idle = 0
+    const timer = setTimeout(() => {
+      const schedule = window.requestIdleCallback ?? ((callback) => setTimeout(callback, 200))
+      idle = schedule(() => setReady(true), { timeout: 2000 })
+    }, LOADER_DURATION * 1000)
+    return () => {
+      clearTimeout(timer)
+      if (idle && window.cancelIdleCallback) window.cancelIdleCallback(idle)
+    }
+  }, [enabled])
+  return ready
+}
+
 export default function HeroBall({ className }) {
   const desktop = useIsDesktop()
   const reduced = useReducedMotion()
-  // The 3D chunk is only worth it on a desktop with a fine pointer, motion allowed, no data saver, WebGL available
-  const enable3d = desktop && !reduced && !saveData && webglAvailable()
+  // Only worth it on a desktop with a fine pointer, motion allowed, no data saver, WebGL available
+  const wanted = desktop && !reduced && !saveData && webglAvailable()
+  const enable3d = useIdleAfterLoader(wanted)
 
   return (
     <div className={cn('relative aspect-square', className)}>

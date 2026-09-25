@@ -280,6 +280,13 @@
     -webkit-mask-image: radial-gradient(ellipse 72% 72% at 50% 50%, #000 68%, transparent 100%);
   }
 
+  /* Large isolated visuals (product detail, the croquembouche): the edges of the sheet melt away,
+     the subject in the middle stays fully opaque */
+  .dish-image-soft {
+    mask-image: radial-gradient(ellipse 62% 62% at 50% 52%, #000 42%, transparent 96%);
+    -webkit-mask-image: radial-gradient(ellipse 62% 62% at 50% 52%, #000 42%, transparent 96%);
+  }
+
   /* Text on lacquer / ink */
   .on-dark {
     color: var(--color-porcelain);
@@ -392,6 +399,20 @@ dialog[data-variant='full'][open] {
   }
 }
 
+/* ---------- Loader: hidden before first paint when the session has already seen it ---------- */
+
+html[data-loader='done'] #loader {
+  display: none;
+}
+
+/* ---------- Page transitions (View Transitions API, when the browser has it) ---------- */
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: var(--ease-out);
+}
+
 /* ---------- Reduced motion ---------- */
 
 @media (prefers-reduced-motion: reduce) {
@@ -407,5 +428,15 @@ dialog[data-variant='full'][open] {
   dialog[data-variant] {
     translate: 0 0 !important;
     scale: 1 !important;
+  }
+
+  #loader {
+    display: none;
+  }
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

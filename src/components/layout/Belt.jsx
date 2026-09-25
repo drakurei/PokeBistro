@@ -1,3 +1,4 @@
+import { useEffect, useRef } from 'react'
 import cn from '../../utils/cn'
 
 // The signature line: a 2px rule with the Poké Ball button in the middle.
@@ -7,8 +8,20 @@ export default function Belt({ light = false, className }) {
 }
 
 // A belt whose line is a slow marquee of words (used under the hero).
+// The animation only runs while the band is on screen.
 export function BeltMarquee({ items, light = false, className }) {
   const track = [...items, ...items]
+  const ref = useRef(null)
+
+  useEffect(() => {
+    const element = ref.current
+    if (!element || typeof IntersectionObserver === 'undefined') return
+    const observer = new IntersectionObserver(([entry]) => {
+      element.style.animationPlayState = entry.isIntersecting ? 'running' : 'paused'
+    })
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [])
 
   return (
     <div
@@ -19,7 +32,10 @@ export function BeltMarquee({ items, light = false, className }) {
         className,
       )}
     >
-      <div className="flex w-max shrink-0 animate-marquee motion-reduce:animate-none group-hover:[animation-play-state:paused]">
+      <div
+        ref={ref}
+        className="flex w-max shrink-0 animate-marquee motion-reduce:animate-none group-hover:[animation-play-state:paused]"
+      >
         {track.map((item, index) => (
           <span
             key={index}

@@ -1,5 +1,4 @@
 import { Link } from 'react-router'
-import Seo from '../components/layout/Seo'
 import Belt from '../components/layout/Belt'
 import Reveal from '../components/motion/Reveal'
 import Button from '../components/ui/Button'
@@ -38,16 +37,10 @@ function DishCluster({ slugs, className }) {
 }
 
 export default function StoryPage() {
-  const [origin, cuisine, typesChapter] = chapters
+  const [origin, cuisine, typesChapter, sweets] = chapters
 
   return (
     <>
-      <Seo
-        title="Notre histoire"
-        path="/histoire"
-        description="Comment PokéBistro est né à Évry en 2019, ce qu’on y cuisine, et pourquoi les types Pokémon sont devenus notre carte."
-      />
-
       <section className="pt-(--spacing-header)">
         <div className="container-pb pt-12 md:pt-20">
           <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">Notre histoire</p>
@@ -149,6 +142,30 @@ export default function StoryPage() {
         </ul>
       </section>
 
+      {/* Chapter 4: the sweet laboratory */}
+      <section aria-labelledby={sweets.id} className="border-t border-line">
+        <div className="container-pb grid gap-12 py-section lg:grid-cols-12 lg:gap-8">
+          <Reveal className="lg:col-span-6">
+            <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">{sweets.eyebrow}</p>
+            <h2 id={sweets.id} className="mt-4 font-display text-display-md text-balance">
+              {sweets.title}
+            </h2>
+            {sweets.paragraphs.map((text) => (
+              <p key={text} className="mt-5 text-lg text-ink-soft">
+                {text}
+              </p>
+            ))}
+            <Button to="/menu?category=dessert" variant="outline" className="mt-8">
+              Voir les desserts
+              <IconArrowRight size={18} />
+            </Button>
+          </Reveal>
+          <Reveal className="lg:col-span-5 lg:col-start-8 lg:self-center" delay={0.1}>
+            <DishCluster slugs={sweets.dishes} />
+          </Reveal>
+        </div>
+      </section>
+
       {/* The team and the chef's gestures */}
       <section aria-labelledby="team-title" className="bg-washi">
         <div className="container-pb grid gap-12 py-section lg:grid-cols-12 lg:gap-8">
@@ -198,11 +215,11 @@ export default function StoryPage() {
       <section aria-labelledby="philosophy-title" className="bg-lacquer text-porcelain">
         <div className="container-pb py-section">
           <Reveal className="max-w-4xl">
-            <p className="font-mono text-xs tracking-[0.18em] uppercase opacity-80">Notre philosophie</p>
+            <p className="font-mono text-xs tracking-[0.18em] uppercase">Notre philosophie</p>
             <h2 id="philosophy-title" className="mt-4 font-display text-display-lg text-balance">
               {philosophy.title}
             </h2>
-            <p className="mt-6 max-w-2xl text-lg opacity-90">{philosophy.text}</p>
+            <p className="mt-6 max-w-2xl text-lg">{philosophy.text}</p>
           </Reveal>
         </div>
       </section>
