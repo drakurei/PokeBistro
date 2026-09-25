@@ -17,6 +17,7 @@ Le panier est un **tiroir** disponible sur toutes les pages, pas une route.
 ## Stack
 
 - **React 19 + Vite 8** (JS, JSX). React 19 hisse `<title>` / `<meta>` dans `<head>` : le SEO par page ne nécessite aucune bibliothèque.
+- **Découpage** : accueil et carte dans le bundle initial ; fiche, histoire, contact, réservation et 404 chargés à la demande (`React.lazy`), Three.js dans son propre chunk.
 - **React Router 8** (mode déclaratif) : routes ci-dessus, `useSearchParams` pour les filtres, `location.state.background` pour le détail en dialog.
 - **Tailwind CSS 4** : tokens `@theme`, utilitaires, quelques classes composant dans `globals.css`. Bootstrap retiré (raisons dans `docs/audit/tp-audit.md`).
 - **GSAP 3 + @gsap/react** : reveals, hero, marquee, transitions. **ScrollTrigger** pour les sections. **Lenis** (desktop, hors reduced-motion) pour le défilement.
