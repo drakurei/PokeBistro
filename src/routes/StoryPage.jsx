@@ -8,7 +8,7 @@ import ReservationCta from '../components/home/ReservationCta'
 import { chapters, principles } from '../data/story'
 import { types } from '../data/types'
 import products from '../data/products'
-import { facts } from '../data/restaurant'
+import { facts } from '../data/facts'
 
 // Dishes illustrating a chapter, shown as floating "coins"
 function DishCluster({ slugs, className }) {
@@ -25,8 +25,8 @@ function DishCluster({ slugs, className }) {
             <img
               src={product.image}
               alt=""
-              width="198"
-              height="168"
+              width="512"
+              height="410"
               loading="lazy"
               className="dish-image h-full w-full rounded-full object-cover transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-105"
             />

@@ -15,6 +15,7 @@ const columns = [
   {
     title: 'La carte',
     links: [
+      { label: 'Entrées', to: '/menu?category=entree' },
       { label: 'Bentos', to: '/menu?category=bento' },
       { label: 'Burgers', to: '/menu?category=burger' },
       { label: 'Bowls', to: '/menu?category=bowl' },

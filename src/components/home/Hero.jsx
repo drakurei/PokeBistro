@@ -1,14 +1,17 @@
 import { useRef } from 'react'
 import { Link } from 'react-router'
 import { gsap, useGSAP, FULL } from '../../lib/motion'
-import { featuredProducts } from '../../data/products'
+import { productsBySlug } from '../../data/products'
 import { restaurant } from '../../data/restaurant'
 import { LOADER_DURATION } from '../loading/loadingState'
 import Button from '../ui/Button'
 import { IconArrowRight } from '../ui/Icons'
 import HeroBall from './HeroBall'
 
-const coins = featuredProducts.slice(0, 3)
+// Three dishes from the high-definition sheet, shown as medallions under the ball
+const coins = ['lucario-power-burger', 'marill-aqua-bowl', 'poussifeu-mochi'].map(
+  (slug) => productsBySlug[slug],
+)
 
 // The hero is an open Poké Ball: lacquer on top, porcelain below, the belt in the middle and the
 // 3D ball as its button.
@@ -109,14 +112,14 @@ export default function Hero() {
               <li key={product.id} className="hero-coin" style={{ marginBottom: `${(2 - index) * 14}px` }}>
                 <Link
                   to={`/menu/${product.slug}`}
-                  className="group relative block size-24 rounded-full bg-washi no-underline transition-transform duration-(--duration-base) ease-(--ease-out) hover:scale-105 sm:size-28"
+                  className="group relative block size-28 rounded-full bg-washi no-underline transition-transform duration-(--duration-base) ease-(--ease-out) hover:scale-105 sm:size-32 lg:size-36"
                   aria-label={`${product.name}, voir le plat`}
                 >
                   <img
                     src={product.image}
                     alt=""
-                    width="198"
-                    height="168"
+                    width="512"
+                    height="410"
                     className="dish-image absolute inset-0 h-full w-full rounded-full object-cover"
                   />
                   <span className="pointer-events-none absolute -bottom-2 left-1/2 -translate-x-1/2 rounded-full bg-ink px-2.5 py-1 font-mono text-[10px] whitespace-nowrap text-porcelain opacity-0 transition-opacity duration-(--duration-fast) group-hover:opacity-100 group-focus-visible:opacity-100">

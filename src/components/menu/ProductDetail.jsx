@@ -37,14 +37,16 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
       {/* Visual on a tinted washi surface */}
       <div
         className="relative flex aspect-square items-center justify-center overflow-hidden bg-washi md:aspect-auto md:min-h-[520px]"
-        style={{ backgroundColor: `color-mix(in oklab, ${type?.color ?? '#fff'} 16%, var(--color-washi))` }}
+        style={{
+          background: `radial-gradient(ellipse at 50% 50%, var(--color-washi) 38%, color-mix(in oklab, ${type?.color ?? '#fff'} 24%, var(--color-washi)) 100%)`,
+        }}
       >
         <div aria-hidden="true" className="absolute inset-x-0 top-1/2 h-0.5 bg-ink/10" />
         <img
           src={product.image}
           alt={product.name}
-          width="198"
-          height="168"
+          width="512"
+          height="410"
           className="dish-image relative w-[88%] max-w-[420px] object-contain"
         />
       </div>

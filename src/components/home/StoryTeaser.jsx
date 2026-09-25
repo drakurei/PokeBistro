@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { gsap, useGSAP, FULL } from '../../lib/motion'
-import { facts } from '../../data/restaurant'
+import { facts } from '../../data/facts'
 import Button from '../ui/Button'
 import { IconArrowRight } from '../ui/Icons'
 import Reveal from '../motion/Reveal'
@@ -51,7 +51,7 @@ export default function StoryTeaser() {
           <p className="mt-6 max-w-xl text-lg text-ink-soft">
             PokéBistro est né d’un pari entre deux cuisiniers et une dresseuse : servir des plats qu’on
             reconnaît au premier coup d’œil, sans jamais sacrifier le goût au clin d’œil. Sept ans plus tard,
-            la carte compte vingt-huit recettes et un seul principe : tout est fait maison.
+            la carte compte quarante-quatre recettes et un seul principe : tout est fait maison.
           </p>
           <Button to="/histoire" variant="outline" className="mt-8">
             Lire notre histoire

@@ -1,20 +1,22 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { Link } from 'react-router'
 import { types } from '../../data/types'
 import products from '../../data/products'
 import cn from '../../utils/cn'
-import { IconArrowUpRight } from '../ui/Icons'
+import { IconArrowRight, IconArrowUpRight } from '../ui/Icons'
 import Reveal from '../motion/Reveal'
 
-// "Choisissez votre type": eight tiles, one per Pokémon type. Hovering a tile tints the whole section,
-// clicking opens the menu already filtered on that type.
+const tileClass =
+  'group flex h-full flex-col justify-between gap-8 rounded-(--radius-md) border border-line p-5 no-underline ' +
+  'transition-[border-color,background-color] duration-(--duration-base) ease-(--ease-out)'
+
+// "Choisissez votre type": one tile per Pokémon type plus the door to the whole carte.
+// Hovering a tile tints the whole section, clicking opens the menu already filtered on that type.
 export default function TypesSection() {
   const [ambient, setAmbient] = useState(null)
-  const section = useRef(null)
 
   return (
     <section
-      ref={section}
       aria-labelledby="types-title"
       className="relative py-section transition-[background-color] duration-700 ease-(--ease-out)"
       style={{
@@ -25,11 +27,11 @@ export default function TypesSection() {
         <Reveal className="max-w-2xl">
           <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">Choisissez votre type</p>
           <h2 id="types-title" className="mt-4 font-display text-display-lg text-balance">
-            Huit types, huit façons de manger.
+            Onze types, autant de façons de manger.
           </h2>
           <p className="mt-5 text-lg text-ink-soft">
             Chaque plat de la carte appartient à un type. Feu pour ce qui pique, Eau pour ce qui vient de la
-            mer, Fée pour ce qui finit le repas en douceur.
+            mer, Combat pour les grands appétits, Fée pour ce qui finit le repas en douceur.
           </p>
         </Reveal>
 
@@ -37,18 +39,14 @@ export default function TypesSection() {
           {types.map((type, index) => {
             const count = products.filter((product) => product.type === type.id).length
             return (
-              <Reveal as="li" key={type.id} delay={index * 0.05}>
+              <Reveal as="li" key={type.id} delay={(index % 4) * 0.05}>
                 <Link
                   to={`/menu?type=${type.id}`}
                   aria-label={`Type ${type.label}, voir les ${count} plats`}
                   onMouseEnter={() => setAmbient(type.color)}
                   onFocus={() => setAmbient(type.color)}
                   onBlur={() => setAmbient(null)}
-                  className={cn(
-                    'group flex h-full flex-col justify-between gap-8 rounded-(--radius-md) border border-line bg-porcelain p-5 no-underline',
-                    'transition-[border-color,background-color] duration-(--duration-base) ease-(--ease-out) hover:border-transparent',
-                  )}
-                  style={{ '--type': type.color }}
+                  className={cn(tileClass, 'bg-porcelain hover:border-transparent')}
                   onMouseOver={(event) =>
                     (event.currentTarget.style.backgroundColor = `color-mix(in oklab, ${type.color} 22%, var(--color-porcelain))`)
                   }
@@ -60,7 +58,9 @@ export default function TypesSection() {
                       className="size-12 rounded-full transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-125"
                       style={{ backgroundColor: type.color }}
                     />
-                    <span className="font-mono text-xs text-ink-mute">{count} plats</span>
+                    <span className="font-mono text-xs text-ink-mute">
+                      {count} plat{count > 1 ? 's' : ''}
+                    </span>
                   </div>
                   <div>
                     <span className="flex items-center justify-between font-display text-display-sm">
@@ -76,6 +76,24 @@ export default function TypesSection() {
               </Reveal>
             )
           })}
+          <Reveal as="li" delay={0.15}>
+            <Link
+              to="/menu"
+              onMouseEnter={() => setAmbient(null)}
+              className={cn(tileClass, 'border-ink bg-ink text-porcelain hover:bg-ink-soft')}
+            >
+              <span className="font-mono text-xs tracking-[0.14em] text-gold uppercase">Sans hésiter</span>
+              <span>
+                <span className="flex items-center justify-between font-display text-display-sm">
+                  Toute la carte
+                  <IconArrowRight size={20} />
+                </span>
+                <span className="mt-1 block text-sm text-porcelain/70">
+                  {products.length} plats, tous types confondus
+                </span>
+              </span>
+            </Link>
+          </Reveal>
         </ul>
       </div>
     </section>

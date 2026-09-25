@@ -1,10 +1,10 @@
 import { useCallback, useMemo } from 'react'
 import { useSearchParams } from 'react-router'
-import { categoriesById, tagsById, priceRangesById } from '../data/filters'
+import { categoriesById, tagsById, priceRangesById, sortOptionsById } from '../data/filters'
 import { typesById } from '../data/types'
 import { emptyFilters } from '../utils/filterProducts'
 
-// The menu filters live in the URL: /menu?q=bento&category=bento&type=feu,eau&tag=epice&price=10-15
+// The menu filters live in the URL: /menu?q=bento&category=bento&type=feu,eau&tag=epice&price=10-15&sort=price-asc
 // Shareable, back-button friendly, and the home page can open the menu already filtered.
 // Unknown values are dropped silently.
 
@@ -25,6 +25,7 @@ export default function useMenuFilters() {
       types: parseList(params.get('type'), typesById),
       tags: parseList(params.get('tag'), tagsById),
       price: priceRangesById[params.get('price')] ? params.get('price') : 'all',
+      sort: sortOptionsById[params.get('sort')] && params.get('sort') ? params.get('sort') : '',
     }),
     [params],
   )
@@ -42,6 +43,7 @@ export default function useMenuFilters() {
           set('type', merged.types.join(','))
           set('tag', merged.tags.join(','))
           set('price', merged.price === 'all' ? '' : merged.price)
+          set('sort', merged.sort)
           return next
         },
         { replace: true, preventScrollReset: true },
@@ -59,6 +61,7 @@ export default function useMenuFilters() {
     toggleType: (type) => update({ types: toggleIn(filters.types, type) }),
     toggleTag: (tag) => update({ tags: toggleIn(filters.tags, tag) }),
     setPrice: (price) => update({ price }),
+    setSort: (sort) => update({ sort }),
     reset: () => update(emptyFilters),
   }
 }

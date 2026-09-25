@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import Seo from '../components/layout/Seo'
 import Button from '../components/ui/Button'
+import Chip from '../components/ui/Chip'
 import { IconFilter } from '../components/ui/Icons'
 import SearchField from '../components/menu/SearchField'
 import FilterControls from '../components/menu/FilterControls'
@@ -8,25 +9,30 @@ import FilterSheet from '../components/menu/FilterSheet'
 import ProductGrid from '../components/menu/ProductGrid'
 import useMenuFilters from '../hooks/useMenuFilters'
 import products from '../data/products'
-import filterProducts, { countActiveFilters } from '../utils/filterProducts'
-import { typesById } from '../data/types'
-import { categoriesById } from '../data/filters'
+import filterProducts, { countActiveFilters, groupByCategory, sortProducts } from '../utils/filterProducts'
+import { types, typesById } from '../data/types'
+import { categories, categoriesById, sortOptions } from '../data/filters'
 import { plural } from '../utils/text'
+import { controlClass } from '../components/ui/formStyles'
+import cn from '../utils/cn'
 
 export default function MenuPage() {
-  const { filters, setQuery, setCategory, toggleType, toggleTag, setPrice, reset } = useMenuFilters()
+  const { filters, setQuery, setCategory, toggleType, toggleTag, setPrice, setSort, reset } = useMenuFilters()
   const [sheetOpen, setSheetOpen] = useState(false)
 
-  const visible = useMemo(() => filterProducts(products, filters), [filters])
+  const visible = useMemo(() => sortProducts(filterProducts(products, filters), filters.sort), [filters])
   const activeCount = countActiveFilters(filters)
   const controls = { filters, setCategory, toggleType, toggleTag, setPrice }
+
+  // The full carte reads like a real menu: grouped by category. Any filter or sort flattens it.
+  const grouped = activeCount === 0 && filters.sort === '' ? groupByCategory(visible) : null
 
   // A short title reflecting the current selection ("Les plats Feu", "Les burgers")
   const heading =
     filters.types.length === 1 && !filters.category
       ? `Les plats ${typesById[filters.types[0]].label}`
       : filters.category
-        ? `Les ${categoriesById[filters.category].label.toLowerCase()}s`
+        ? `Les ${categoriesById[filters.category].plural.toLowerCase()}`
         : 'La carte'
 
   return (
@@ -34,12 +40,14 @@ export default function MenuPage() {
       <Seo
         title="La carte"
         path="/menu"
-        description="Les 28 plats de PokéBistro : bentos, burgers, bowls, desserts et boissons inspirés des Pokémon. Filtrez par type, par envie ou par prix."
+        description={`Les ${products.length} plats de PokéBistro : entrées, bentos, burgers, bowls, desserts et boissons inspirés des Pokémon. Filtrez par type, par envie ou par prix.`}
       />
 
       <section className="pt-(--spacing-header)">
         <div className="container-pb pt-12 pb-8 md:pt-16">
-          <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">28 plats · 8 types</p>
+          <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">
+            {products.length} plats · {types.length} types
+          </p>
           <h1 className="mt-4 font-display text-display-lg text-balance">{heading}</h1>
           <p className="mt-4 max-w-xl text-lg text-ink-soft">
             Cherchez un Pokémon, un ingrédient ou une envie. Les filtres se combinent, et l’adresse de la page
@@ -47,32 +55,65 @@ export default function MenuPage() {
           </p>
         </div>
 
-        {/* Toolbar: search, count, mobile filters */}
-        <div className="sticky top-(--spacing-header) z-30 border-y border-line bg-porcelain/92 backdrop-blur-md">
-          <div className="container-pb flex flex-wrap items-center gap-3 py-3">
-            <SearchField value={filters.q} onChange={setQuery} className="min-w-0 flex-1 basis-64" />
-            <p
-              className="order-last basis-full font-mono text-xs text-ink-mute sm:order-none sm:basis-auto"
-              role="status"
-              aria-live="polite"
-            >
-              {plural(visible.length, 'plat')}
-              {visible.length < products.length && ` sur ${products.length}`}
-            </p>
-            {activeCount > 0 && (
-              <Button variant="ghost" size="sm" onClick={reset} className="hidden sm:inline-flex">
-                Tout effacer
+        {/* Toolbar: search, categories (small screens), count, sort, mobile filters */}
+        <div className="sticky top-(--spacing-header) z-30 border-y border-line bg-porcelain/95 backdrop-blur-md">
+          <div className="container-pb flex flex-col gap-3 py-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <SearchField value={filters.q} onChange={setQuery} className="min-w-0 flex-1 basis-64" />
+              <label className="flex items-center gap-2 font-mono text-xs text-ink-mute">
+                <span className="sr-only sm:not-sr-only">Trier</span>
+                <select
+                  value={filters.sort}
+                  onChange={(event) => setSort(event.target.value)}
+                  aria-label="Trier les plats"
+                  className={cn(controlClass, 'h-12 w-auto rounded-full py-0 pr-9 pl-4 text-sm')}
+                >
+                  {sortOptions.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <Button variant="outline" size="sm" onClick={() => setSheetOpen(true)} className="lg:hidden">
+                <IconFilter size={18} />
+                Filtres
+                {activeCount > 0 && (
+                  <span className="rounded-full bg-lacquer px-1.5 py-0.5 font-mono text-[11px] leading-none text-porcelain">
+                    {activeCount}
+                  </span>
+                )}
               </Button>
-            )}
-            <Button variant="outline" size="sm" onClick={() => setSheetOpen(true)} className="lg:hidden">
-              <IconFilter size={18} />
-              Filtres
+              <p className="font-mono text-xs text-ink-mute" role="status" aria-live="polite">
+                {plural(visible.length, 'plat')}
+                {visible.length < products.length && ` sur ${products.length}`}
+              </p>
               {activeCount > 0 && (
-                <span className="rounded-full bg-lacquer px-1.5 py-0.5 font-mono text-[11px] leading-none text-porcelain">
-                  {activeCount}
-                </span>
+                <Button variant="ghost" size="sm" onClick={reset} className="hidden lg:inline-flex">
+                  Tout effacer
+                </Button>
               )}
-            </Button>
+            </div>
+
+            {/* On small screens the categories are the quickest way through 44 dishes */}
+            <div className="-mx-(--spacing-gutter) flex gap-2 overflow-x-auto px-(--spacing-gutter) pb-1 lg:hidden [scrollbar-width:none]">
+              <Chip
+                active={filters.category === ''}
+                onClick={() => filters.category && setCategory(filters.category)}
+              >
+                Tout
+              </Chip>
+              {categories.map((category) => (
+                <Chip
+                  key={category.id}
+                  active={filters.category === category.id}
+                  onClick={() => setCategory(category.id)}
+                  className="shrink-0"
+                >
+                  {category.plural}
+                </Chip>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -83,7 +124,26 @@ export default function MenuPage() {
             </div>
           </aside>
           <div>
-            <ProductGrid products={visible} onReset={reset} hasFilters={activeCount > 0} />
+            {grouped ? (
+              <div className="flex flex-col gap-14">
+                {grouped.map((group) => (
+                  <section key={group.category.id} aria-labelledby={`group-${group.category.id}`}>
+                    <div className="mb-5 flex items-baseline justify-between gap-4 border-b border-ink pb-3">
+                      <h2 id={`group-${group.category.id}`} className="font-display text-display-sm">
+                        {group.category.plural}
+                        <span className="ml-3 font-mono text-sm font-normal text-ink-mute">
+                          {group.items.length}
+                        </span>
+                      </h2>
+                      <p className="hidden text-sm text-ink-mute sm:block">{group.category.description}</p>
+                    </div>
+                    <ProductGrid products={group.items} onReset={reset} hasFilters={false} />
+                  </section>
+                ))}
+              </div>
+            ) : (
+              <ProductGrid products={visible} onReset={reset} hasFilters={activeCount > 0} />
+            )}
           </div>
         </div>
       </section>

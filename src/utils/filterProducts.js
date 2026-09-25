@@ -1,8 +1,8 @@
-import { priceRangesById, categoriesById, tagsById } from '../data/filters'
+import { priceRangesById, categoriesById, tagsById, categories } from '../data/filters'
 import { typesById } from '../data/types'
 import { normalize } from './text'
 
-export const emptyFilters = { q: '', category: '', types: [], tags: [], price: 'all' }
+export const emptyFilters = { q: '', category: '', types: [], tags: [], price: 'all', sort: '' }
 
 // Builds the text a product can be found by: name, Pokémon, category, type, tags, keywords, ingredients.
 function searchableText(product) {
@@ -40,6 +40,25 @@ export default function filterProducts(products, filters = emptyFilters) {
     if (tags.length > 0 && !tags.every((tag) => product.tags.includes(tag))) return false
     return product.price >= range.min && product.price < range.max
   })
+}
+
+// Orders a list without mutating it. '' keeps the order of the carte.
+export function sortProducts(products, sort) {
+  const list = [...products]
+  if (sort === 'price-asc') return list.sort((a, b) => a.price - b.price)
+  if (sort === 'price-desc') return list.sort((a, b) => b.price - a.price)
+  if (sort === 'new') {
+    const isNew = (product) => (product.tags.includes('nouveau') ? 0 : 1)
+    return list.sort((a, b) => isNew(a) - isNew(b))
+  }
+  return list
+}
+
+// Splits a list by category, in menu order, skipping empty categories
+export function groupByCategory(products) {
+  return categories
+    .map((category) => ({ category, items: products.filter((product) => product.category === category.id) }))
+    .filter((group) => group.items.length > 0)
 }
 
 export function countActiveFilters(filters) {

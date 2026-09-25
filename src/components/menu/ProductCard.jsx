@@ -3,7 +3,6 @@ import { Link, useLocation } from 'react-router'
 import { useCart } from '../../contexts/CartContext'
 import { useFavorites } from '../../contexts/FavoritesContext'
 import { useToast } from '../../contexts/ToastContext'
-import { tagsById } from '../../data/filters'
 import formatPrice from '../../utils/formatPrice'
 import cn from '../../utils/cn'
 import Button from '../ui/Button'
@@ -12,7 +11,8 @@ import TypeBadge from '../ui/TypeBadge'
 import { IconCheck, IconHeart, IconPlus } from '../ui/Icons'
 
 // A dish. The image and the name open the detail (as a dialog over the menu); the footer adds to the
-// cart and turns into a quantity stepper once the dish is in it.
+// cart and turns into a quantity stepper once the dish is in it. Only the essentials are shown:
+// image, name, price, two lines of description, the type, and at most one badge.
 export default function ProductCard({ product, className }) {
   const location = useLocation()
   const { add, increment, decrement, getQuantity } = useCart()
@@ -26,6 +26,11 @@ export default function ProductCard({ product, className }) {
   const detailLink = { pathname: `/menu/${product.slug}` }
   // The menu stays behind the dialog: we pass the current location as background
   const detailState = { background: location.state?.background ?? location }
+  const badge = product.tags.includes('nouveau')
+    ? 'Nouveau'
+    : product.tags.includes('signature')
+      ? 'Signature'
+      : null
 
   useEffect(() => () => clearTimeout(timer.current), [])
 
@@ -68,8 +73,8 @@ export default function ProductCard({ product, className }) {
         <img
           src={product.image}
           alt=""
-          width="198"
-          height="168"
+          width="512"
+          height="410"
           loading="lazy"
           decoding="async"
           className="dish-image h-full w-full object-cover transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-[1.04]"
@@ -79,9 +84,14 @@ export default function ProductCard({ product, className }) {
       <div className="flex flex-1 flex-col gap-3 px-5 pt-1 pb-5">
         <div className="flex items-center justify-between gap-3">
           <TypeBadge typeId={product.type} />
-          {product.tags.includes('nouveau') && (
-            <span className="rounded-full bg-gold px-2 py-0.5 font-mono text-[10px] tracking-[0.12em] text-ink uppercase">
-              Nouveau
+          {badge && (
+            <span
+              className={cn(
+                'rounded-full px-2 py-0.5 font-mono text-[10px] tracking-[0.12em] uppercase',
+                badge === 'Nouveau' ? 'bg-gold text-ink' : 'bg-ink text-porcelain',
+              )}
+            >
+              {badge}
             </span>
           )}
         </div>
@@ -100,12 +110,6 @@ export default function ProductCard({ product, className }) {
         </div>
 
         <p className="line-clamp-2 text-sm text-ink-soft">{product.description}</p>
-
-        {product.tags.length > 0 && (
-          <p className="font-mono text-[11px] tracking-[0.1em] text-ink-mute uppercase">
-            {product.tags.map((tag) => tagsById[tag]?.label ?? tag).join(' · ')}
-          </p>
-        )}
 
         {/* Actions sit above the stretched link */}
         <div className="relative z-10 mt-auto pt-2">
