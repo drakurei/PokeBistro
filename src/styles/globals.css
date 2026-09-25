@@ -1,0 +1,320 @@
+/*
+ * Global styles for PokéBistro.
+ *
+ * Bootstrap and Tailwind are both loaded here.
+ * Tailwind v4 puts all its CSS inside cascade layers. A stylesheet loaded
+ * outside of any layer (like Bootstrap imported from main.jsx) would always win
+ * over Tailwind utilities, even with a lower specificity.
+ * So Bootstrap is imported in its own layer, placed BEFORE "utilities":
+ *   - Bootstrap is the base (reset, components),
+ *   - Tailwind utilities can still override it (ex: mb-0, font-bold...).
+ * Tailwind's Preflight reset is not imported: Bootstrap Reboot already does that job.
+ */
+@layer bootstrap, theme, base, components, utilities;
+
+@import 'bootstrap/dist/css/bootstrap.min.css' layer(bootstrap);
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/* Brand tokens, usable as Tailwind classes: bg-poke-yellow, text-poke-blue, font-display... */
+@theme {
+  --color-poke-yellow: #ffcb05;
+  --color-poke-red: #e3350d;
+  --color-poke-blue: #2a75bb;
+  --color-poke-navy: #1b2a4a;
+  --color-poke-cream: #fff8e1;
+  --font-display: 'Fredoka', 'Nunito', sans-serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+}
+
+/* ---------- Bootstrap theme ---------- */
+
+:root {
+  --bs-body-font-family: var(--font-body);
+  --bs-body-bg: #fffdf7;
+  --bs-body-color: #1f2937;
+  --bs-primary: #2a75bb;
+  --bs-primary-rgb: 42, 117, 187;
+  --bs-link-color: #2a75bb;
+  --bs-link-hover-color: #1d4f80;
+}
+
+/* All Bootstrap buttons are pill-shaped and a bit bolder */
+.btn {
+  --bs-btn-border-radius: 999px;
+  --bs-btn-font-weight: 600;
+  --bs-btn-padding-x: 1.25rem;
+}
+
+.btn-primary {
+  --bs-btn-bg: #2a75bb;
+  --bs-btn-border-color: #2a75bb;
+  --bs-btn-hover-bg: #1f5f9a;
+  --bs-btn-hover-border-color: #1f5f9a;
+  --bs-btn-active-bg: #1b4f80;
+  --bs-btn-active-border-color: #1b4f80;
+  --bs-btn-disabled-bg: #2a75bb;
+  --bs-btn-disabled-border-color: #2a75bb;
+  --bs-btn-focus-shadow-rgb: 42, 117, 187;
+}
+
+.btn-outline-primary {
+  --bs-btn-color: #2a75bb;
+  --bs-btn-border-color: #2a75bb;
+  --bs-btn-hover-bg: #2a75bb;
+  --bs-btn-hover-border-color: #2a75bb;
+  --bs-btn-active-bg: #1f5f9a;
+  --bs-btn-active-border-color: #1f5f9a;
+  --bs-btn-focus-shadow-rgb: 42, 117, 187;
+}
+
+.btn-warning {
+  --bs-btn-bg: #ffcb05;
+  --bs-btn-border-color: #ffcb05;
+  --bs-btn-color: #1b2a4a;
+  --bs-btn-hover-bg: #f0bd00;
+  --bs-btn-hover-border-color: #f0bd00;
+  --bs-btn-hover-color: #1b2a4a;
+  --bs-btn-active-bg: #e0b000;
+  --bs-btn-active-border-color: #e0b000;
+}
+
+.form-check-input:checked {
+  background-color: #2a75bb;
+  border-color: #2a75bb;
+}
+
+/* ---------- Base ---------- */
+
+html {
+  scroll-behavior: smooth;
+  /* Keeps anchored sections below the sticky header */
+  scroll-padding-top: 88px;
+}
+
+h1,
+h2,
+h3,
+.navbar-brand {
+  font-family: var(--font-display);
+}
+
+/* Visible keyboard focus on our custom buttons (chips, filter options, quantity buttons) */
+.chip:focus-visible,
+.filter-option:focus-visible,
+.qty-btn:focus-visible {
+  outline: 3px solid rgba(42, 117, 187, 0.45);
+  outline-offset: 2px;
+}
+
+/* ---------- Header ---------- */
+
+.navbar .nav-link {
+  padding: 0.45rem 1rem;
+  border-radius: 999px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link:focus-visible {
+  background-color: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+/* Feedback when the cart changes: the counter "pops" */
+@keyframes pop {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(1.4);
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.badge-pop {
+  animation: pop 0.3s ease;
+}
+
+/* ---------- Product cards ---------- */
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.product-card {
+  animation: fade-up 0.35s ease both;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 1rem 2rem rgba(27, 42, 74, 0.16);
+}
+
+/* Product images are 198 x 168 px: the box keeps the same ratio, so nothing is cropped or stretched */
+.ratio-product {
+  --bs-aspect-ratio: calc(168 / 198 * 100%);
+  background-color: #f7efdb;
+}
+
+.product-card-image {
+  transition: transform 0.35s ease;
+}
+
+.product-card:hover .product-card-image {
+  transform: scale(1.05);
+}
+
+/* Small tag chips (sidebar + cards). Clicking a chip filters the products. */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.8rem;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background-color: #f1f5f9;
+  color: #475569;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+.chip:hover {
+  background-color: #fff3b0;
+  color: #1b2a4a;
+  transform: translateY(-1px);
+}
+
+.chip.is-active {
+  background-color: #ffcb05;
+  border-color: #e0b000;
+  color: #1b2a4a;
+}
+
+/* ---------- Sidebar ---------- */
+
+.filter-block + .filter-block {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid #eef1f5;
+}
+
+/* One line of the category list */
+.filter-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0.55rem 0.9rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background-color: transparent;
+  color: #1f2937;
+  font-weight: 600;
+  text-align: left;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.filter-option:hover {
+  background-color: #f1f5f9;
+}
+
+.filter-option.is-active {
+  background-color: #2a75bb;
+  color: #fff;
+}
+
+.filter-count {
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background-color: #eef2f7;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.filter-option.is-active .filter-count {
+  background-color: rgba(255, 255, 255, 0.22);
+  color: #fff;
+}
+
+/* ---------- Cart ---------- */
+
+.cart-item + .cart-item {
+  border-top: 1px solid #eef1f5;
+}
+
+/* Round − / + buttons */
+.qty-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 999px;
+  background-color: #fff;
+  color: #1b2a4a;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 1px 3px rgba(27, 42, 74, 0.15);
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+.qty-btn:hover {
+  background-color: #2a75bb;
+  color: #fff;
+}
+
+/* ---------- Modal ---------- */
+
+@keyframes modal-in {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 0.5;
+  }
+}
+
+.modal.d-block .modal-dialog {
+  animation: modal-in 0.25s ease-out;
+}
+
+.modal-backdrop.show {
+  animation: fade-in 0.2s ease-out;
+}
