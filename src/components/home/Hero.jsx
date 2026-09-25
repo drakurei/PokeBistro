@@ -9,7 +9,7 @@ import { IconArrowRight } from '../ui/Icons'
 import HeroBall from './HeroBall'
 
 // Three dishes from the high-definition sheet, shown as medallions under the ball
-const coins = ['lucario-power-burger', 'marill-aqua-bowl', 'poussifeu-mochi'].map(
+const coins = ['lucario-power-burger', 'marill-aqua-bowl', 'ouisticram-gyoza', 'poussifeu-mochi'].map(
   (slug) => productsBySlug[slug],
 )
 
@@ -109,10 +109,10 @@ export default function Hero() {
           {/* Three signature dishes floating under the ball */}
           <ul className="flex items-end gap-4 md:col-span-5 md:col-start-8 md:justify-end lg:col-span-6 lg:col-start-7">
             {coins.map((product, index) => (
-              <li key={product.id} className="hero-coin" style={{ marginBottom: `${(2 - index) * 14}px` }}>
+              <li key={product.id} className="hero-coin" style={{ marginBottom: `${(3 - index) * 12}px` }}>
                 <Link
                   to={`/menu/${product.slug}`}
-                  className="group relative block size-28 rounded-full bg-washi no-underline transition-transform duration-(--duration-base) ease-(--ease-out) hover:scale-105 sm:size-32 lg:size-36"
+                  className="group relative block size-24 rounded-full bg-washi no-underline transition-transform duration-(--duration-base) ease-(--ease-out) hover:scale-105 sm:size-32 lg:size-40"
                   aria-label={`${product.name}, voir le plat`}
                 >
                   <img

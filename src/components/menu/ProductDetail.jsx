@@ -1,4 +1,5 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { gsap, useGSAP, FULL } from '../../lib/motion'
 import { Link } from 'react-router'
 import { useCart } from '../../contexts/CartContext'
 import { useFavorites } from '../../contexts/FavoritesContext'
@@ -18,6 +19,26 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
   const { isFavorite, toggle } = useFavorites()
   const toast = useToast()
   const [quantity, setQuantity] = useState(1)
+  const root = useRef(null)
+
+  useGSAP(
+    () => {
+      const mm = gsap.matchMedia()
+      mm.add(FULL, () => {
+        gsap.fromTo(
+          '.detail-visual',
+          { scale: 0.9, opacity: 0 },
+          { scale: 1, opacity: 1, duration: 0.6, ease: 'power3.out' },
+        )
+        gsap.fromTo(
+          '.detail-content > *',
+          { y: 14, opacity: 0 },
+          { y: 0, opacity: 1, duration: 0.45, stagger: 0.05, ease: 'power3.out', delay: 0.1 },
+        )
+      })
+    },
+    { scope: root },
+  )
 
   const type = getType(product.type)
   const inCart = getQuantity(product.id)
@@ -33,7 +54,7 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
   }
 
   return (
-    <div className="grid md:grid-cols-2">
+    <div ref={root} className="grid md:grid-cols-2">
       {/* Visual on a tinted washi surface */}
       <div
         className="relative flex aspect-square items-center justify-center overflow-hidden bg-washi md:aspect-auto md:min-h-[520px]"
@@ -47,11 +68,11 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
           alt={product.name}
           width="512"
           height="410"
-          className="dish-image relative w-[88%] max-w-[420px] object-contain"
+          className="dish-image detail-visual relative w-[88%] max-w-[420px] object-contain"
         />
       </div>
 
-      <div className="flex flex-col gap-6 p-6 md:p-10">
+      <div className="detail-content flex flex-col gap-6 p-6 md:p-10">
         <div className="flex items-center gap-3 font-mono text-xs tracking-[0.12em] text-ink-mute uppercase">
           <Link
             to={`/menu?category=${product.category}`}
@@ -64,7 +85,7 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
           <TypeBadge typeId={product.type} size="md" />
         </div>
 
-        <div>
+        <div className="pr-10">
           <h2 id={titleId} className="font-display text-display-md text-balance">
             {product.name}
           </h2>

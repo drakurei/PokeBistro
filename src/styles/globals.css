@@ -220,6 +220,14 @@
     padding-inline: var(--spacing-gutter);
   }
 
+  /* The carte needs room for three generous columns next to its filter rail */
+  .container-wide {
+    width: 100%;
+    max-width: 90rem;
+    margin-inline: auto;
+    padding-inline: var(--spacing-gutter);
+  }
+
   /*
    * The belt: signature line of the site (2px ink rule with the Poké Ball button in the middle).
    * `.belt-light` inverts it for dark surfaces.
