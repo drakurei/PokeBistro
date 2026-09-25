@@ -18,6 +18,7 @@ export default function Hero() {
   useGSAP(
     () => {
       const mm = gsap.matchMedia()
+      // With reduced motion the hero is simply rendered: no timeline, no inline styles
       mm.add(FULL, () => {
         const tl = gsap.timeline({ delay: LOADER_DURATION, defaults: { ease: 'power3.out' } })
         tl.fromTo('.hero-belt', { scaleX: 0 }, { scaleX: 1, duration: 0.7, ease: 'power2.inOut' })
@@ -47,11 +48,6 @@ export default function Hero() {
             { scale: 1, opacity: 1, duration: 0.5, stagger: 0.07 },
             '-=0.3',
           )
-      })
-      mm.add('(prefers-reduced-motion: reduce)', () => {
-        gsap.set('.hero-belt, .hero-eyebrow, .hero-word, .hero-ball, .hero-lead, .hero-cta, .hero-coin', {
-          clearProps: 'all',
-        })
       })
     },
     { scope: root },

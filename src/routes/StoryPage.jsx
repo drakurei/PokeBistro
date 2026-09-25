@@ -51,7 +51,7 @@ export default function StoryPage() {
       <section className="pt-(--spacing-header)">
         <div className="container-pb pt-12 md:pt-20">
           <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">Notre histoire</p>
-          <h1 className="mt-4 max-w-4xl font-display text-display-xl text-balance">
+          <h1 className="mt-4 max-w-4xl font-display text-display-lg text-balance">
             Et si chaque Pokémon avait son plat ?
           </h1>
         </div>

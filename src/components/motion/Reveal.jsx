@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import { gsap, useGSAP, FULL, REDUCED } from '../../lib/motion'
+import { gsap, useGSAP, FULL } from '../../lib/motion'
 
 // Reveals its content once, when it enters the viewport (opacity + 24px rise).
 // With reduced motion the content is simply visible.
@@ -22,9 +22,6 @@ export default function Reveal({ as: Tag = 'div', delay = 0, y = 24, children, c
             scrollTrigger: { trigger: ref.current, start: 'top 88%', once: true },
           },
         )
-      })
-      mm.add(REDUCED, () => {
-        gsap.set(ref.current, { clearProps: 'all' })
       })
     },
     { scope: ref },
