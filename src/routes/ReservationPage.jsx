@@ -1,23 +1,22 @@
-import Seo from '../components/layout/Seo'
 import ReservationForm from '../components/forms/ReservationForm'
 import Reveal from '../components/motion/Reveal'
 import { restaurant } from '../data/restaurant'
 
 const steps = [
-  { title: 'Choisissez', text: 'Une date, un horaire, le nombre de convives.' },
-  { title: 'On confirme', text: 'Un email avant le service, avec le nom de la table.' },
+  {
+    title: 'Choisissez',
+    text: 'Une date, un horaire libre, le nombre de convives, la salle ou la terrasse.',
+  },
+  {
+    title: 'On confirme',
+    text: 'Un récapitulatif à vérifier, puis un email avant le service, avec le nom de la table.',
+  },
   { title: 'Vous arrivez', text: 'La table est prête, la carte aussi. Bon appétit.' },
 ]
 
 export default function ReservationPage() {
   return (
     <>
-      <Seo
-        title="Réserver une table"
-        path="/reservation"
-        description="Réservez une table chez PokéBistro à Évry : déjeuner ou dîner, jusqu’à 8 personnes."
-      />
-
       <section className="pt-(--spacing-header)">
         <div className="container-pb pt-12 md:pt-16">
           <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">Réservation</p>

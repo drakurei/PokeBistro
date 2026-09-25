@@ -1,6 +1,8 @@
 // Form validation helpers. Each validator returns an error message (string) or '' when valid.
 // Inputs are trimmed and length-limited before any use; nothing is ever interpreted as HTML.
 
+import { isClosed } from './schedule'
+
 const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/
 
 export const LIMITS = { name: 60, email: 254, message: 1000, messageMin: 10, request: 300 }
@@ -25,6 +27,17 @@ export function validateEmail(value) {
   const email = clean(value, LIMITS.email)
   if (!email) return 'Indiquez votre adresse email.'
   if (!EMAIL_RE.test(email)) return 'Cette adresse email ne semble pas valide (ex. sacha@bourg-palette.fr).'
+  return ''
+}
+
+// Landline or mobile, French or international: at least 9 digits, only phone punctuation around them
+export function validatePhone(value) {
+  const phone = clean(value, 20)
+  if (!phone) return 'Indiquez un numéro de téléphone.'
+  const digits = phone.replace(/\D/g, '')
+  if (digits.length < 9 || digits.length > 15 || !/^\+?[\d\s.()-]+$/.test(phone)) {
+    return 'Ce numéro ne semble pas valide (ex. 06 12 34 56 78).'
+  }
   return ''
 }
 
@@ -53,6 +66,7 @@ export function validateDate(value) {
   const inThreeMonths = new Date()
   inThreeMonths.setMonth(inThreeMonths.getMonth() + 3)
   if (new Date(value) > inThreeMonths) return 'Les réservations ouvrent trois mois à l’avance.'
+  if (isClosed(value)) return 'Le restaurant est fermé ce jour-là.'
   return ''
 }
 

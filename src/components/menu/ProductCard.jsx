@@ -69,7 +69,6 @@ export default function ProductCard({ product, className, priority = false }) {
       <Link
         to={detailLink}
         state={detailState}
-        viewTransition
         className="relative block aspect-[5/4] overflow-hidden no-underline"
         aria-hidden="true"
         tabIndex={-1}
@@ -79,7 +78,6 @@ export default function ProductCard({ product, className, priority = false }) {
           priority={priority}
           sizes="(min-width: 1280px) 360px, (min-width: 640px) 45vw, 92vw"
           className="h-full w-full object-cover transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-[1.04]"
-          style={{ viewTransitionName: `dish-${product.slug}` }}
         />
       </Link>
 
@@ -103,7 +101,6 @@ export default function ProductCard({ product, className, priority = false }) {
             <Link
               to={detailLink}
               state={detailState}
-              viewTransition
               className="no-underline after:absolute after:inset-0 after:content-['']"
             >
               {product.name}

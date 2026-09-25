@@ -52,7 +52,6 @@ export default function ContactForm() {
         required
         autoComplete="name"
         maxLength={LIMITS.name}
-        placeholder="Sacha Ketchum"
         value={values.name}
         onChange={handleChange}
         onBlur={handleBlur}
@@ -67,7 +66,7 @@ export default function ContactForm() {
         autoComplete="email"
         inputMode="email"
         maxLength={LIMITS.email}
-        placeholder="sacha@bourg-palette.fr"
+        hint="Pour vous répondre."
         value={values.email}
         onChange={handleChange}
         onBlur={handleBlur}
@@ -80,7 +79,6 @@ export default function ContactForm() {
         label="Message"
         required
         maxLength={LIMITS.message}
-        placeholder="Une table pour dix dresseurs samedi ? Une allergie ? Une idée de plat ?"
         hint={`${values.message.length} / ${LIMITS.message}`}
         value={values.message}
         onChange={handleChange}

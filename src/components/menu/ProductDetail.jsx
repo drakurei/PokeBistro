@@ -4,8 +4,16 @@ import { gsap, useGSAP, FULL } from '../../lib/motion'
 import { useCart } from '../../contexts/CartContext'
 import { useFavorites } from '../../contexts/FavoritesContext'
 import { useToast } from '../../contexts/ToastContext'
-import { allergensById, categoriesById, dietsById, spicyLabels, tagsById } from '../../data/filters'
+import {
+  allergensById,
+  categoriesById,
+  dessertGroupsById,
+  dietsById,
+  spicyLabels,
+  tagsById,
+} from '../../data/filters'
 import { combosContaining } from '../../data/combos'
+import { suggestedWith } from '../../utils/suggestions'
 import { getType } from '../../data/types'
 import formatPrice from '../../utils/formatPrice'
 import cn from '../../utils/cn'
@@ -17,7 +25,13 @@ import TypeIcon from '../ui/TypeIcon'
 import { IconArrowRight, IconCart, IconHeart, IconInfo } from '../ui/Icons'
 
 // Full detail of a dish: shared by the dialog (over the menu) and the standalone page
-export default function ProductDetail({ product, titleId = 'product-title', onNavigate }) {
+export default function ProductDetail({
+  product,
+  titleId = 'product-title',
+  headingLevel = 'h2',
+  onNavigate,
+}) {
+  const Heading = headingLevel
   const { addProduct, getProductQuantity } = useCart()
   const { isFavorite, toggle } = useFavorites()
   const toast = useToast()
@@ -43,6 +57,7 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
   const inCart = getProductQuantity(product.id)
   const favorite = isFavorite(product.id)
   const formulas = combosContaining(product.slug)
+  const companions = suggestedWith(product.id)
   const diets = (product.diet ?? []).map((id) => dietsById[id]?.label).filter(Boolean)
   const allergens = (product.allergens ?? []).map((id) => allergensById[id]?.label).filter(Boolean)
 
@@ -65,14 +80,28 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
         }}
       >
         <div aria-hidden="true" className="absolute inset-x-0 top-1/2 h-0.5 bg-ink/10" />
-        <DishImage
-          product={product}
-          priority
-          sizes="(min-width: 768px) 480px, 90vw"
-          alt={product.name}
-          className="detail-visual relative w-[88%] max-w-[440px] object-contain drop-shadow-[0_24px_30px_rgb(23_21_26_/_0.18)]"
-          style={{ viewTransitionName: `dish-${product.slug}` }}
-        />
+        {product.tallImage ? (
+          <picture>
+            <source type="image/avif" srcSet={product.tallImage.avif} />
+            <img
+              src={product.tallImage.webp}
+              width={product.tallImage.width}
+              height={product.tallImage.height}
+              alt={product.name}
+              loading="eager"
+              fetchPriority="high"
+              className="detail-visual dish-image-soft relative max-h-[min(70vh,560px)] w-auto object-contain drop-shadow-[0_24px_30px_rgb(23_21_26_/_0.18)]"
+            />
+          </picture>
+        ) : (
+          <DishImage
+            product={product}
+            priority
+            sizes="(min-width: 768px) 480px, 90vw"
+            alt={product.name}
+            className="detail-visual dish-image-soft relative w-[88%] max-w-[440px] object-contain drop-shadow-[0_24px_30px_rgb(23_21_26_/_0.18)]"
+          />
+        )}
       </div>
 
       <div className="detail-content flex flex-col gap-6 p-6 md:p-10">
@@ -84,6 +113,18 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
           >
             {categoriesById[product.category]?.label}
           </Link>
+          {product.subcategory && dessertGroupsById[product.subcategory] && (
+            <>
+              <span aria-hidden="true">·</span>
+              <Link
+                to={`/menu?category=dessert#dessert-${product.subcategory}`}
+                onClick={onNavigate}
+                className="text-ink-mute no-underline hover:text-ink"
+              >
+                {dessertGroupsById[product.subcategory].label}
+              </Link>
+            </>
+          )}
           <span aria-hidden="true">·</span>
           <TypeBadge typeId={product.type} size="md" />
           {product.spicy > 0 && (
@@ -95,9 +136,9 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
         </div>
 
         <div className="pr-10">
-          <h2 id={titleId} className="font-display text-display-md text-balance">
+          <Heading id={titleId} className="font-display text-display-md text-balance">
             {product.name}
-          </h2>
+          </Heading>
           <p className="mt-3 font-mono text-2xl font-medium">{formatPrice(product.price)}</p>
         </div>
 
@@ -169,6 +210,31 @@ export default function ProductDetail({ product, titleId = 'product-title', onNa
                     <span className="flex shrink-0 items-center gap-2 font-mono">
                       {formatPrice(combo.price)}
                       <IconArrowRight size={16} />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {companions.length > 0 && (
+          <div>
+            <h3 className="font-mono text-xs tracking-[0.14em] text-ink-mute uppercase">À déguster avec</h3>
+            <ul className="mt-3 grid grid-cols-3 gap-2">
+              {companions.map((item) => (
+                <li key={item.id}>
+                  <Link
+                    to={`/menu/${item.slug}`}
+                    onClick={onNavigate}
+                    className="flex h-full flex-col gap-2 rounded-(--radius-sm) bg-washi p-2 no-underline transition-colors hover:bg-washi-deep"
+                  >
+                    <span className="block aspect-[5/4] overflow-hidden rounded-[6px]">
+                      <DishImage product={item} sizes="120px" className="h-full w-full object-cover" />
+                    </span>
+                    <span className="text-xs leading-tight font-bold">{item.name}</span>
+                    <span className="mt-auto font-mono text-[11px] text-ink-mute">
+                      {formatPrice(item.price)}
                     </span>
                   </Link>
                 </li>

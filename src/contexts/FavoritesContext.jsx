@@ -9,18 +9,31 @@ const isValidList = (value) =>
   Array.isArray(value) && value.length <= 100 && value.every((id) => isPositiveInt(id) && productsById[id])
 
 export function FavoritesProvider({ children }) {
-  const [ids, setIds] = useState(() => readJSON(STORAGE_KEY, isValidList) ?? [])
+  // Empty on the first render (it must match the pre-rendered HTML), read from storage right after
+  const [ids, setIds] = useState([])
+  const [hydrated, setHydrated] = useState(false)
 
   useEffect(() => {
-    writeJSON(STORAGE_KEY, ids)
-  }, [ids])
+    const stored = readJSON(STORAGE_KEY, isValidList)
+    // oxlint-disable-next-line react/set-state-in-effect -- localStorage is an external system, read once after mount
+    if (stored) setIds(stored)
+    // oxlint-disable-next-line react/set-state-in-effect -- localStorage is an external system, read once after mount
+    setHydrated(true)
+  }, [])
+
+  useEffect(() => {
+    if (hydrated) writeJSON(STORAGE_KEY, ids)
+  }, [ids, hydrated])
 
   const isFavorite = useCallback((id) => ids.includes(id), [ids])
   const toggle = useCallback((id) => {
     setIds((current) => (current.includes(id) ? current.filter((item) => item !== id) : [...current, id]))
   }, [])
 
-  const value = useMemo(() => ({ ids, count: ids.length, isFavorite, toggle }), [ids, isFavorite, toggle])
+  const value = useMemo(
+    () => ({ ids, count: ids.length, isFavorite, toggle, hydrated }),
+    [ids, isFavorite, toggle, hydrated],
+  )
 
   return <FavoritesContext.Provider value={value}>{children}</FavoritesContext.Provider>
 }

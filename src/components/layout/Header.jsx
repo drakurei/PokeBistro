@@ -6,6 +6,7 @@ import { navLinks } from '../../data/navigation'
 import Button, { IconButton } from '../ui/Button'
 import { IconMenu } from '../ui/Icons'
 import CartButton from '../cart/CartButton'
+import FavoritesButton from './FavoritesButton'
 import Logo from './Logo'
 import MobileMenu from './MobileMenu'
 
@@ -63,6 +64,7 @@ export default function Header() {
             >
               Réserver
             </Button>
+            <FavoritesButton tone={tone} />
             <CartButton tone={tone} />
             <IconButton
               label="Ouvrir le menu"

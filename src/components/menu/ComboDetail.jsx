@@ -12,7 +12,8 @@ import { IconCart } from '../ui/Icons'
 import ChoiceGrid from './ChoiceGrid'
 
 // A formule in full: its dishes (or the choices to make), the set price and what it saves
-export default function ComboDetail({ combo, titleId = 'combo-title' }) {
+export default function ComboDetail({ combo, titleId = 'combo-title', headingLevel = 'h2' }) {
+  const Heading = headingLevel
   const { addFormula } = useCart()
   const toast = useToast()
   const [choices, setChoices] = useState(() => defaultChoices(combo))
@@ -70,9 +71,9 @@ export default function ComboDetail({ combo, titleId = 'combo-title' }) {
 
       <div className="flex flex-col gap-6 p-6 md:p-10">
         <div className="pr-10">
-          <h2 id={titleId} className="font-display text-display-md text-balance">
+          <Heading id={titleId} className="font-display text-display-md text-balance">
             {combo.name}
-          </h2>
+          </Heading>
           <p className="mt-3 font-mono text-2xl font-medium">{formatPrice(combo.price)}</p>
           {type && (
             <p className="mt-1 flex items-center gap-1.5 font-mono text-[11px] tracking-[0.12em] text-ink-mute uppercase">

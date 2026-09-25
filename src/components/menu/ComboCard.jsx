@@ -57,7 +57,6 @@ export default function ComboCard({ combo }) {
           <Link
             to={detailLink}
             state={detailState}
-            viewTransition
             className="no-underline after:absolute after:inset-0 after:content-['']"
           >
             {combo.name}
@@ -104,7 +103,7 @@ export default function ComboCard({ combo }) {
         </div>
         <div className="relative z-10">
           {combo.slots ? (
-            <Button to={detailLink} state={detailState} viewTransition variant="light" size="sm">
+            <Button to={detailLink} state={detailState} variant="light" size="sm">
               Composer
               <IconArrowRight size={16} />
             </Button>

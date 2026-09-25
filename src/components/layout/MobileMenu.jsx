@@ -6,10 +6,13 @@ import Button, { IconButton } from '../ui/Button'
 import { IconClose, IconArrowRight } from '../ui/Icons'
 import Logo from './Logo'
 import { navLinks } from '../../data/navigation'
+import { useFavorites } from '../../contexts/FavoritesContext'
 
 // Full-screen navigation for small screens. Built on the native dialog, so Escape and the focus
 // trap are free; links close it on click.
 export default function MobileMenu({ open, onClose }) {
+  const { count } = useFavorites()
+  const links = [...navLinks, { to: '/favoris', label: count > 0 ? `Favoris (${count})` : 'Favoris' }]
   return (
     <Dialog
       open={open}
@@ -33,7 +36,7 @@ export default function MobileMenu({ open, onClose }) {
 
         <nav aria-label="Navigation principale" className="container-pb flex-1 py-8">
           <ul className="flex flex-col">
-            {navLinks.map((link, index) => (
+            {links.map((link, index) => (
               <li
                 key={link.to}
                 className="border-b border-porcelain/10"

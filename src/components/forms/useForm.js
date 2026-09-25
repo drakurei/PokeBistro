@@ -27,22 +27,24 @@ export default function useForm(initialValues, validators, submit) {
     setErrors((current) => ({ ...current, [name]: validateField(name, value) }))
   }
 
-  const handleSubmit = async (event) => {
-    event.preventDefault()
-    if (status === 'submitting') return
-
+  // Validates everything, focuses the first invalid field; returns true when the form is valid
+  const validateAll = () => {
     const nextErrors = Object.fromEntries(
       Object.keys(validators).map((name) => [name, validateField(name, values[name])]),
     )
     setErrors(nextErrors)
     setTouched(Object.fromEntries(Object.keys(validators).map((name) => [name, true])))
-
     const firstInvalid = Object.keys(validators).find((name) => nextErrors[name])
     if (firstInvalid) {
       formRef.current?.querySelector(`[name="${firstInvalid}"]`)?.focus()
-      return
+      return false
     }
+    return true
+  }
 
+  // Sends the current values (used by a summary screen after validation already happened)
+  const submitValues = async () => {
+    if (status === 'submitting') return
     setStatus('submitting')
     try {
       const response = await submit(values)
@@ -51,6 +53,18 @@ export default function useForm(initialValues, validators, submit) {
     } catch {
       setStatus('error')
     }
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    if (status === 'submitting') return
+    if (!validateAll()) return
+    await submitValues()
+  }
+
+  const setAllErrors = (nextErrors) => {
+    setErrors(nextErrors)
+    setTouched(Object.fromEntries(Object.keys(nextErrors).map((name) => [name, true])))
   }
 
   const reset = () => {
@@ -63,5 +77,19 @@ export default function useForm(initialValues, validators, submit) {
 
   const retry = () => setStatus('idle')
 
-  return { values, errors, status, result, formRef, handleChange, handleBlur, handleSubmit, reset, retry }
+  return {
+    values,
+    errors,
+    status,
+    result,
+    formRef,
+    handleChange,
+    handleBlur,
+    handleSubmit,
+    submitValues,
+    validateAll,
+    setAllErrors,
+    reset,
+    retry,
+  }
 }

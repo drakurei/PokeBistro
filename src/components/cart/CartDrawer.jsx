@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router'
 import { useCart } from '../../contexts/CartContext'
 import formatPrice from '../../utils/formatPrice'
 import { upgradableFormulas } from '../../utils/cartItems'
+import { cartSuggestions } from '../../utils/suggestions'
+import DishImage from '../ui/DishImage'
+import { IconPlus } from '../ui/Icons'
 import Dialog from '../ui/Dialog'
 import Button, { IconButton } from '../ui/Button'
 import { IconArrowRight, IconClose } from '../ui/Icons'
@@ -72,6 +75,9 @@ export default function CartDrawer() {
   }
 
   const upgrades = upgradableFormulas(lines)
+  const suggestions = cartSuggestions(
+    lines.filter((line) => line.kind === 'product').map((line) => line.productId),
+  )
   const savings = regularTotal - totalPrice
 
   return (
@@ -119,6 +125,44 @@ export default function CartDrawer() {
                 <CartLine key={item.key} item={item} onRemove={handleRemove} />
               ))}
             </ul>
+
+            {suggestions.length > 0 && (
+              <div className="border-t border-line px-6 py-3">
+                <p className="font-mono text-[11px] tracking-[0.12em] text-ink-mute uppercase">
+                  {suggestions.every((product) => product.category === 'dessert')
+                    ? 'Ajouter un dessert ?'
+                    : suggestions.every((product) => product.category === 'boisson')
+                      ? 'Et une boisson ?'
+                      : 'Complétez votre commande'}
+                </p>
+                <ul className="mt-2 flex gap-2">
+                  {suggestions.map((product) => (
+                    <li
+                      key={product.id}
+                      className="flex min-w-0 flex-1 items-center gap-2 rounded-(--radius-sm) bg-washi p-2"
+                    >
+                      <span className="size-10 shrink-0 overflow-hidden rounded-full bg-porcelain">
+                        <DishImage product={product} sizes="40px" className="h-full w-full object-cover" />
+                      </span>
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-xs font-bold">{product.name}</span>
+                        <span className="block font-mono text-[11px] text-ink-mute">
+                          {formatPrice(product.price)}
+                        </span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => addProduct(product.id)}
+                        aria-label={`Ajouter ${product.name} au panier`}
+                        className="flex size-8 shrink-0 items-center justify-center rounded-full bg-ink text-porcelain hover:bg-ink-soft"
+                      >
+                        <IconPlus size={16} />
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
 
             <div className="border-t border-line px-6 pt-4 pb-[max(1.25rem,env(safe-area-inset-bottom))]">
               {removed && (
