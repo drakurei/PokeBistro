@@ -16,7 +16,6 @@ export default function ComboDialog() {
   const close = () => {
     if (closing) return
     setClosing(true)
-    setTimeout(() => navigate(-1), 260)
   }
 
   if (!combo) return null
@@ -25,6 +24,7 @@ export default function ComboDialog() {
     <Dialog
       open={!closing}
       onClose={close}
+      onClosed={() => navigate(-1)}
       variant="center"
       labelledBy="combo-title"
       className="max-h-[92dvh] w-[min(92vw,64rem)] overflow-hidden rounded-(--radius-lg) bg-porcelain text-ink shadow-float-lg"

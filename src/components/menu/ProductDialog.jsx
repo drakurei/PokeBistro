@@ -7,17 +7,21 @@ import { IconClose } from '../ui/Icons'
 import ProductDetail from './ProductDetail'
 
 // /menu/:slug opened from the grid: the detail in a dialog, the menu still behind it.
-// Closing plays the exit transition first, then goes back in history.
+// Closing plays the exit transition first, then goes back in history (or to a chosen page).
 export default function ProductDialog() {
   const { slug } = useParams()
   const navigate = useNavigate()
-  const [closing, setClosing] = useState(false)
+  const [closing, setClosing] = useState(null) // null | { target?: string }
   const product = getProductBySlug(slug)
 
   const close = (target) => {
     if (closing) return
-    setClosing(true)
-    setTimeout(() => (target ? navigate(target) : navigate(-1)), 260)
+    setClosing({ target })
+  }
+
+  const afterClose = () => {
+    if (closing?.target) navigate(closing.target)
+    else navigate(-1)
   }
 
   if (!product) return null
@@ -26,9 +30,10 @@ export default function ProductDialog() {
     <Dialog
       open={!closing}
       onClose={() => close()}
+      onClosed={afterClose}
       variant="center"
       labelledBy="product-title"
-      className="w-[min(92vw,64rem)] max-h-[92dvh] overflow-hidden rounded-(--radius-lg) bg-porcelain text-ink shadow-float-lg"
+      className="max-h-[92dvh] w-[min(92vw,64rem)] overflow-hidden rounded-(--radius-lg) bg-porcelain text-ink shadow-float-lg"
     >
       <div className="scroll-panel relative max-h-[92dvh] overflow-y-auto" data-lenis-prevent>
         <IconButton

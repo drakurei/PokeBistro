@@ -3,10 +3,10 @@ import { gsap, useGSAP, FULL } from '../../lib/motion'
 import ProductCard from './ProductCard'
 import EmptyResults from './EmptyResults'
 
-// The filtered grid. Cards rise in with a small stagger each time the result set changes.
-export default function ProductGrid({ products, onReset, hasFilters }) {
+// The filtered grid. Cards rise in with a small stagger when the grid mounts and when a filter
+// changes (`animationKey`); typing in the search or sorting only re-renders, without motion.
+export default function ProductGrid({ products, onReset, hasFilters, animationKey = '' }) {
   const grid = useRef(null)
-  const key = products.map((product) => product.id).join('-')
 
   useGSAP(
     () => {
@@ -27,7 +27,7 @@ export default function ProductGrid({ products, onReset, hasFilters }) {
         )
       })
     },
-    { scope: grid, dependencies: [key] },
+    { scope: grid, dependencies: [animationKey] },
   )
 
   if (products.length === 0) return <EmptyResults onReset={onReset} hasFilters={hasFilters} />

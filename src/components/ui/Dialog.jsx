@@ -7,9 +7,11 @@ import cn from '../../utils/cn'
 // animations are CSS (see dialog[data-variant] in globals.css).
 //
 // variant: 'center' (product detail) | 'right' (cart) | 'bottom' (mobile filters) | 'full' (mobile menu)
+// onClosed fires once the exit transition has actually ended (or right away without transitions).
 export default function Dialog({
   open,
   onClose,
+  onClosed,
   variant = 'center',
   label,
   labelledBy,
@@ -18,12 +20,38 @@ export default function Dialog({
 }) {
   const ref = useRef(null)
   const lenis = useLenis()
+  const closedCallback = useRef(onClosed)
+  useEffect(() => {
+    closedCallback.current = onClosed
+  })
 
   useEffect(() => {
     const dialog = ref.current
     if (!dialog) return
     if (open && !dialog.open) dialog.showModal()
-    else if (!open && dialog.open) dialog.close()
+    else if (!open && dialog.open) {
+      dialog.close()
+      if (!closedCallback.current) return
+      // Wait for the exit transition (opacity / translate) before telling the parent, with a guard
+      // for browsers that skip transitions
+      let done = false
+      const finish = () => {
+        if (done) return
+        done = true
+        dialog.removeEventListener('transitionend', onEnd)
+        clearTimeout(guard)
+        closedCallback.current?.()
+      }
+      const onEnd = (event) => {
+        if (event.target === dialog) finish()
+      }
+      dialog.addEventListener('transitionend', onEnd)
+      const guard = setTimeout(finish, 600)
+      return () => {
+        dialog.removeEventListener('transitionend', onEnd)
+        clearTimeout(guard)
+      }
+    }
   }, [open])
 
   // Smooth scroll is paused while a modal is open (the page behind must not move)
