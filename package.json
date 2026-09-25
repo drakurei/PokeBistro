@@ -8,8 +8,10 @@
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "build:pages": "vite build --mode pages",
+    "clean": "node scripts/clean.mjs",
+    "build": "npm run clean && vite build && node scripts/prerender.mjs",
+    "build:pages": "npm run clean && vite build --mode pages && node scripts/prerender.mjs --mode pages",
+    "prerender": "node scripts/prerender.mjs",
     "preview": "vite preview",
     "lint": "oxlint",
     "format": "prettier --write .",
@@ -17,8 +19,11 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test",
+    "size": "node scripts/size-budget.mjs",
+    "check": "npm run lint && npm test && npm run build && npm run size",
     "predeploy": "npm run build:pages",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist --nojekyll",
+    "csp-hash": "node scripts/csp-hash.mjs"
   },
   "dependencies": {
     "@fontsource-variable/unbounded": "^5.3.0",
@@ -35,6 +40,7 @@
     "three": "^0.186.1"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.63.0",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
@@ -44,5 +50,38 @@
     "prettier": "^3.9.9",
     "vite": "^8.3.0",
     "vitest": "^5.0.2"
-  }
+  },
+  "budget": [
+    {
+      "name": "JavaScript, everything but Three",
+      "files": "dist/assets/*.js",
+      "exclude": [
+        "three-"
+      ],
+      "limit": 215000
+    },
+    {
+      "name": "Three.js chunk (deferred, desktop only)",
+      "files": "dist/assets/three-*.js",
+      "limit": 140000
+    },
+    {
+      "name": "Styles",
+      "files": "dist/assets/*.css",
+      "limit": 16000
+    },
+    {
+      "name": "Fonts actually downloaded (latin subsets)",
+      "files": "dist/assets/*-latin-*.woff2",
+      "exclude": [
+        "latin-ext"
+      ],
+      "limit": 130000
+    },
+    {
+      "name": "Home page HTML (pre-rendered)",
+      "files": "dist/index.html",
+      "limit": 24000
+    }
+  ]
 }

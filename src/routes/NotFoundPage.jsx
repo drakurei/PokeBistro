@@ -1,11 +1,9 @@
-import Seo from '../components/layout/Seo'
 import Button from '../components/ui/Button'
 import { PokeballMark } from '../components/layout/Logo'
 
 export default function NotFoundPage() {
   return (
     <section className="container-pb flex min-h-[80vh] flex-col items-center justify-center pt-(--spacing-header) text-center">
-      <Seo title="Page introuvable" path="/404" />
       <PokeballMark size={72} className="text-ink-mute" />
       <p className="mt-8 font-mono text-xs tracking-[0.18em] text-lacquer uppercase">Erreur 404</p>
       <h1 className="mt-4 font-display text-display-lg text-balance">Cette page s’est enfuie.</h1>

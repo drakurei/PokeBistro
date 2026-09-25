@@ -1,19 +1,30 @@
-import { copyFileSync } from 'node:fs'
-import { resolve } from 'node:path'
+import { existsSync, readFileSync } from 'node:fs'
+import { join, resolve } from 'node:path'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig, loadEnv } from 'vite'
 
-// GitHub Pages serves a SPA from a sub-folder and has no rewrite rules:
-// in "pages" mode we copy index.html to 404.html so deep links (/menu/pikachu-bento) still load the app.
-function spaFallbackForPages(mode) {
+// `vite preview` serves the pre-rendered site the way a static host with clean URLs does
+// (Vercel, Netlify): /menu/pikachu-bento -> dist/menu/pikachu-bento/index.html, and unknown
+// addresses get the 404 shell, which then renders the app. GitHub Pages does the same with a
+// redirect to the trailing-slash form.
+function staticSiteInPreview() {
   return {
-    name: 'spa-fallback-for-pages',
-    apply: 'build',
-    closeBundle() {
-      if (mode !== 'pages') return
-      const dist = resolve(process.cwd(), 'dist')
-      copyFileSync(resolve(dist, 'index.html'), resolve(dist, '404.html'))
+    name: 'static-site-in-preview',
+    configurePreviewServer(server) {
+      const dist = resolve(server.config.root, server.config.build.outDir)
+      server.middlewares.use((req, res, next) => {
+        if (req.method !== 'GET' && req.method !== 'HEAD') return next()
+        const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname)
+        if (/\.[a-z0-9]+$/i.test(pathname)) return next()
+        const page = join(dist, pathname.replace(/\/$/, ''), 'index.html')
+        const html = existsSync(page) ? readFileSync(page) : null
+        const shell = join(dist, '404.html')
+        if (!html && !existsSync(shell)) return next()
+        res.statusCode = html ? 200 : 404
+        res.setHeader('Content-Type', 'text/html; charset=utf-8')
+        res.end(html ?? readFileSync(shell))
+      })
     },
   }
 }
@@ -32,8 +43,11 @@ export default defineConfig(({ mode }) => {
 
   return {
     base: env.VITE_BASE || '/',
-    plugins: [react(), tailwindcss(), spaFallbackForPages(mode)],
+    plugins: [react(), tailwindcss(), staticSiteInPreview()],
     build: {
+      // Dish images stay files (cacheable, lazy) even when tiny; icons and fonts follow the default
+      assetsInlineLimit: (file) =>
+        file.replace(/\\/g, '/').includes('/assets/products/') ? false : undefined,
       rollupOptions: {
         output: { manualChunks },
       },

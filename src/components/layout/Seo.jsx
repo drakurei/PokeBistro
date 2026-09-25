@@ -1,44 +1,22 @@
-import { restaurant } from '../../data/restaurant'
+import { getPageMeta, headTags, SITE_URL } from '../../seo/pageMeta'
 
-const SITE_URL = 'https://drakurei.github.io/PokeBistro'
-const DEFAULT_DESCRIPTION =
-  'PokéBistro, le bistro qui sert l’univers Pokémon dans l’assiette : bentos, burgers, bowls, desserts et boissons inspirés des Pokémon, à Évry. Réservez votre table.'
-
-// Per-page metadata. React 19 hoists <title>, <meta> and <link> rendered anywhere into <head>.
-export default function Seo({
-  title,
-  description = DEFAULT_DESCRIPTION,
-  path = '/',
-  image = '/og-image.png',
-  type = 'website',
-}) {
-  const fullTitle = title ? `${title} — ${restaurant.name}` : `${restaurant.name} — Restaurant Pokémon à Évry`
-  const url = `${SITE_URL}${path}`
-  const imageUrl = image.startsWith('http') ? image : `${SITE_URL}${image}`
+// Page metadata, derived from the current URL and rendered once at the root of the app. React 19 hoists <title>, <meta> and <link> rendered
+// anywhere into <head>; when the page was pre-rendered, the same tags are already there and React
+// adopts them instead of adding duplicates. The JSON-LD of a page is written into <head> by the
+// pre-render script (scripts/prerender.mjs) from the same metadata: static, never re-rendered.
+export default function Seo({ path = '/' }) {
+  const meta = getPageMeta(path)
 
   return (
     <>
-      <title>{fullTitle}</title>
-      <meta name="description" content={description} />
-      <link rel="canonical" href={url} />
-      <meta property="og:type" content={type} />
-      <meta property="og:site_name" content={restaurant.name} />
-      <meta property="og:locale" content="fr_FR" />
-      <meta property="og:title" content={fullTitle} />
-      <meta property="og:description" content={description} />
-      <meta property="og:url" content={url} />
-      <meta property="og:image" content={imageUrl} />
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={fullTitle} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={imageUrl} />
+      {headTags(meta).map(([tag, attrs, text]) => {
+        const key = attrs.name ?? attrs.property ?? attrs.rel ?? tag
+        if (tag === 'title') return <title key="title">{text}</title>
+        if (tag === 'link') return <link key={key} {...attrs} />
+        return <meta key={key} {...attrs} />
+      })}
     </>
   )
-}
-
-// JSON-LD helper: renders structured data for a page (Restaurant, MenuItem…)
-export function JsonLd({ data }) {
-  return <script type="application/ld+json">{JSON.stringify(data)}</script>
 }
 
 export { SITE_URL }

@@ -1,5 +1,5 @@
 import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
+import { createRoot, hydrateRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router'
 
 // Self-hosted fonts (latin subsets only): display, text, mono
@@ -16,10 +16,16 @@ import App from './App.jsx'
 // BASE_URL is "/" locally and on Vercel/Netlify, "/PokeBistro/" on GitHub Pages (see .env.pages)
 const basename = import.meta.env.BASE_URL.replace(/\/$/, '')
 
-createRoot(document.getElementById('root')).render(
+const root = document.getElementById('root')
+const app = (
   <StrictMode>
     <BrowserRouter basename={basename}>
       <App />
     </BrowserRouter>
-  </StrictMode>,
+  </StrictMode>
 )
+
+// Pre-rendered pages (see scripts/prerender.mjs) already contain the markup: React attaches to it.
+// The dev server and the 404 fallback start from an empty root.
+if (root.hasChildNodes()) hydrateRoot(root, app)
+else createRoot(root).render(app)

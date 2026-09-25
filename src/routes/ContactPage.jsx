@@ -1,4 +1,3 @@
-import Seo from '../components/layout/Seo'
 import ContactForm from '../components/forms/ContactForm'
 import Reveal from '../components/motion/Reveal'
 import { IconClock, IconMail, IconPhone, IconPin } from '../components/ui/Icons'
@@ -76,12 +75,6 @@ export default function ContactPage() {
 
   return (
     <>
-      <Seo
-        title="Contact"
-        path="/contact"
-        description="Adresse, horaires, téléphone et formulaire de contact de PokéBistro à Évry-Courcouronnes."
-      />
-
       <section className="pt-(--spacing-header)">
         <div className="container-pb pt-12 md:pt-16">
           <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">Contact</p>

@@ -1,5 +1,4 @@
 import { Link, useParams } from 'react-router'
-import Seo from '../components/layout/Seo'
 import ComboDetail from '../components/menu/ComboDetail'
 import ComboCard from '../components/menu/ComboCard'
 import Button from '../components/ui/Button'
@@ -15,7 +14,6 @@ export default function ComboPage() {
   if (!combo) {
     return (
       <section className="container-pb flex min-h-[70vh] flex-col items-center justify-center pt-(--spacing-header) text-center">
-        <Seo title="Formule introuvable" path={`/menu/formule/${slug}`} />
         <PokeballMark size={64} className="text-ink-mute" />
         <h1 className="mt-6 font-display text-display-md">Cette formule n’existe pas.</h1>
         <Button to="/menu?category=formules" className="mt-8">
@@ -29,11 +27,6 @@ export default function ComboPage() {
 
   return (
     <>
-      <Seo
-        title={combo.name}
-        path={`/menu/formule/${combo.id}`}
-        description={`${combo.description} ${combo.price.toFixed(2).replace('.', ',')} € chez PokéBistro.`}
-      />
       <section className="pt-(--spacing-header)">
         <div className="container-pb pt-6">
           <Link
@@ -46,7 +39,7 @@ export default function ComboPage() {
         </div>
         <div className="container-pb py-6">
           <div className="overflow-hidden rounded-(--radius-lg) border border-line bg-porcelain">
-            <ComboDetail combo={combo} titleId="combo-page-title" />
+            <ComboDetail combo={combo} titleId="combo-page-title" headingLevel="h1" />
           </div>
         </div>
       </section>
