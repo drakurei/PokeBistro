@@ -1,3 +1,11 @@
+# Dependencies
+node_modules
+
+# Build
+dist
+dist-ssr
+*.local
+
 # Logs
 logs
 *.log
@@ -5,20 +13,26 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
-lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Environment (the only tracked env file is .env.pages, which holds no secret)
+.env
+.env.*
+!.env.pages
 
-# Editor directories and files
+# Tests
+playwright-report
+test-results
+coverage
+
+# Editors / OS
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+Thumbs.db
+
+# AI assistants
+.claude
+claude
+.kilo
+.cursor
