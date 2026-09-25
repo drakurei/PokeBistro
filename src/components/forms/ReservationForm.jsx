@@ -8,6 +8,7 @@ import {
   validateEmail,
   validateGuests,
   validateName,
+  validateRequest,
   validateSlot,
 } from '../../utils/validation'
 import Button from '../ui/Button'
@@ -22,8 +23,9 @@ const validators = {
   guests: (value) => validateGuests(value, restaurant.maxGuests),
   name: validateName,
   email: validateEmail,
+  request: validateRequest,
 }
-const initialValues = { date: '', slot: '', guests: '2', name: '', email: '', website: '' }
+const initialValues = { date: '', slot: '', guests: '2', name: '', email: '', request: '', website: '' }
 const lunchSlots = restaurant.reservationSlots.filter((slot) => slot < '15:00')
 const dinnerSlots = restaurant.reservationSlots.filter((slot) => slot >= '15:00')
 const guestOptions = Array.from({ length: restaurant.maxGuests }, (_, index) => index + 1)
@@ -38,6 +40,7 @@ function submit(values) {
     guests: Number(values.guests),
     name: clean(values.name, LIMITS.name),
     email: clean(values.email, LIMITS.email),
+    request: clean(values.request, LIMITS.request),
   })
 }
 
@@ -60,6 +63,7 @@ export default function ReservationForm() {
           Table pour <strong className="text-ink">{values.guests}</strong> {when}, à{' '}
           <strong className="text-ink">{hour(values.slot)}</strong>. On confirme par email à{' '}
           <strong className="text-ink">{values.email.trim()}</strong> avant le service.
+          {values.request.trim() && ' Votre demande a bien été notée.'}
         </p>
         <Button variant="outline" onClick={reset}>
           Nouvelle réservation
@@ -169,6 +173,20 @@ export default function ReservationForm() {
           error={errors.email}
         />
       </div>
+      <Field
+        id="resa-request"
+        name="request"
+        as="textarea"
+        label="Demande spéciale"
+        maxLength={LIMITS.request}
+        placeholder="Anniversaire, allergie, poussette, table près de la fenêtre…"
+        hint="Facultatif. On fait au mieux, promis."
+        value={values.request}
+        onChange={handleChange}
+        onBlur={handleBlur}
+        error={errors.request}
+        className="[&_textarea]:min-h-24"
+      />
       <div className="absolute -left-[9999px]" aria-hidden="true">
         <label htmlFor="resa-website">Site web</label>
         <input

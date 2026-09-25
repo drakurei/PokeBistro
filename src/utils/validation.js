@@ -3,7 +3,7 @@
 
 const EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,255}\.[^\s@]{2,}$/
 
-export const LIMITS = { name: 60, email: 254, message: 1000, messageMin: 10 }
+export const LIMITS = { name: 60, email: 254, message: 1000, messageMin: 10, request: 300 }
 
 export function clean(value, max) {
   return (
@@ -32,6 +32,10 @@ export function validateMessage(value) {
   const message = clean(value, LIMITS.message)
   if (message.length < LIMITS.messageMin) return `Écrivez au moins ${LIMITS.messageMin} caractères.`
   return ''
+}
+
+export function validateRequest(value) {
+  return String(value ?? '').length > LIMITS.request ? `${LIMITS.request} caractères maximum.` : ''
 }
 
 // yyyy-mm-dd of today, in local time (used as the min of the date input)

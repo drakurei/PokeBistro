@@ -5,6 +5,7 @@ import TypesSection from '../components/home/TypesSection'
 import SignatureDishes from '../components/home/SignatureDishes'
 import StoryTeaser from '../components/home/StoryTeaser'
 import ReservationCta from '../components/home/ReservationCta'
+import ReviewsSection from '../components/home/ReviewsSection'
 import { categories } from '../data/filters'
 
 const marqueeItems = [
@@ -23,6 +24,7 @@ export default function HomePage() {
       <TypesSection />
       <SignatureDishes />
       <StoryTeaser />
+      <ReviewsSection />
       <ReservationCta />
     </>
   )

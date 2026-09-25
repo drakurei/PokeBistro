@@ -28,6 +28,44 @@ export const chapters = [
   },
 ]
 
+export const team = [
+  {
+    name: 'Nao',
+    role: 'Chef de cuisine',
+    line: 'Formé au bento à Osaka, il règle chaque cuisson à la seconde.',
+  },
+  {
+    name: 'Lila',
+    role: 'Cheffe pâtissière',
+    line: 'Les Pokémon en sucre, les mochis, le Velvet Cake : c’est elle.',
+  },
+  {
+    name: 'Marc',
+    role: 'Salle & dressage',
+    line: 'Il connaît la carte par type et vous trouve toujours une table.',
+  },
+]
+
+export const gestures = [
+  {
+    title: 'Le riz, à chaque service',
+    text: 'Cuit deux fois par jour, jamais réchauffé. C’est la base de tous les bentos.',
+  },
+  {
+    title: 'La sauce flamme',
+    text: 'Piments frais, miel et fumée, réduite lentement. Elle signe tous les plats Feu.',
+  },
+  {
+    title: 'Le Pokémon en dernier',
+    text: 'Le décor se pose à la minute, pour qu’il soit intact quand l’assiette arrive.',
+  },
+]
+
+export const philosophy = {
+  title: 'On ne cuisine pas des Pokémon. On cuisine pour des gens qui les aiment.',
+  text: 'Le clin d’œil ne remplace jamais le goût. Chaque assiette doit tenir toute seule, Pokémon ou pas ; le reste est un jeu qu’on prend très au sérieux.',
+}
+
 export const principles = [
   { title: 'Fait maison', text: 'Sauces, pains, glaçages, décors en sucre : rien n’arrive prêt.' },
   { title: 'Reconnaissable', text: 'Le Pokémon se lit dans l’assiette avant le nom sur la carte.' },

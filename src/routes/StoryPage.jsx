@@ -5,7 +5,7 @@ import Reveal from '../components/motion/Reveal'
 import Button from '../components/ui/Button'
 import { IconArrowRight } from '../components/ui/Icons'
 import ReservationCta from '../components/home/ReservationCta'
-import { chapters, principles } from '../data/story'
+import { chapters, gestures, philosophy, principles, team } from '../data/story'
 import { types } from '../data/types'
 import products from '../data/products'
 import { facts } from '../data/facts'
@@ -147,6 +147,64 @@ export default function StoryPage() {
             </Reveal>
           ))}
         </ul>
+      </section>
+
+      {/* The team and the chef's gestures */}
+      <section aria-labelledby="team-title" className="bg-washi">
+        <div className="container-pb grid gap-12 py-section lg:grid-cols-12 lg:gap-8">
+          <Reveal className="lg:col-span-5">
+            <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">Notre équipe</p>
+            <h2 id="team-title" className="mt-4 font-display text-display-md text-balance">
+              Trois personnes, une seule carte.
+            </h2>
+            <ul className="mt-8 flex flex-col divide-y divide-line border-y border-line">
+              {team.map((member) => (
+                <li key={member.name} className="flex gap-5 py-5">
+                  <span
+                    aria-hidden="true"
+                    className="flex size-12 shrink-0 items-center justify-center rounded-full bg-ink font-display text-lg text-porcelain"
+                  >
+                    {member.name[0]}
+                  </span>
+                  <span>
+                    <span className="block font-display text-lg font-semibold">
+                      {member.name}
+                      <span className="ml-2 font-mono text-xs font-normal tracking-[0.12em] text-ink-mute uppercase">
+                        {member.role}
+                      </span>
+                    </span>
+                    <span className="mt-1 block text-ink-soft">{member.line}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </Reveal>
+          <Reveal className="lg:col-span-6 lg:col-start-7" delay={0.1}>
+            <p className="font-mono text-xs tracking-[0.18em] text-lacquer uppercase">Le geste du chef</p>
+            <ol className="mt-4 flex flex-col gap-4">
+              {gestures.map((gesture, index) => (
+                <li key={gesture.title} className="rounded-(--radius-md) bg-porcelain p-6">
+                  <span className="font-mono text-xs text-lacquer">0{index + 1}</span>
+                  <h3 className="mt-2 font-display text-lg font-semibold">{gesture.title}</h3>
+                  <p className="mt-1 text-ink-soft">{gesture.text}</p>
+                </li>
+              ))}
+            </ol>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Philosophy */}
+      <section aria-labelledby="philosophy-title" className="bg-lacquer text-porcelain">
+        <div className="container-pb py-section">
+          <Reveal className="max-w-4xl">
+            <p className="font-mono text-xs tracking-[0.18em] uppercase opacity-80">Notre philosophie</p>
+            <h2 id="philosophy-title" className="mt-4 font-display text-display-lg text-balance">
+              {philosophy.title}
+            </h2>
+            <p className="mt-6 max-w-2xl text-lg opacity-90">{philosophy.text}</p>
+          </Reveal>
+        </div>
       </section>
 
       {/* Facts */}

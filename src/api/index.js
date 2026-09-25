@@ -21,6 +21,6 @@ export function sendContactMessage({ name, email, message }) {
   return fakeRequest({ name, email, message })
 }
 
-export function requestReservation({ date, slot, guests, name, email }) {
-  return fakeRequest({ date, slot, guests, name, email })
+export function requestReservation({ date, slot, guests, name, email, request }) {
+  return fakeRequest({ date, slot, guests, name, email, request })
 }
