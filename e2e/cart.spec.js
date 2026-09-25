@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-const cartButton = (page) => page.getByRole('button', { name: /Ouvrir le panier/ })
+const cartButton = (page) => page.getByRole('button', { name: /Ouvrir le panier/ }).first()
 const drawer = (page) => page.getByRole('dialog', { name: /^Panier/ })
 
 test.describe('Cart', () => {
@@ -40,13 +40,15 @@ test.describe('Cart', () => {
     await expect(drawer(page).getByText('Votre panier est vide.')).toBeVisible()
   })
 
-  test('"Commander" explains the demo and "Vider" asks for confirmation', async ({ page }) => {
+  test('"Commander" opens the order flow and "Vider" asks for confirmation', async ({ page }) => {
     await page.goto('/menu')
     await page.getByRole('button', { name: 'Ajouter Pikachu Bento au panier' }).click()
     await cartButton(page).click()
     await drawer(page).getByRole('button', { name: 'Commander' }).click()
-    await expect(drawer(page).getByText(/commande en ligne arrive bientôt/)).toBeVisible()
+    await expect(page).toHaveURL(/\/commande$/)
+    await expect(page.getByRole('heading', { level: 2, name: 'Sur place ou à emporter ?' })).toBeVisible()
 
+    await cartButton(page).click()
     await drawer(page).getByRole('button', { name: 'Vider' }).click()
     await drawer(page).getByRole('button', { name: 'Confirmer' }).click()
     await expect(drawer(page).getByText('Votre panier est vide.')).toBeVisible()
@@ -64,7 +66,12 @@ test.describe('Cart', () => {
 
   test('corrupted storage is ignored', async ({ page }) => {
     await page.goto('/')
-    await page.evaluate(() => localStorage.setItem('pokebistro:cart', '{"items":[{"id":999,"quantity":-3}]}'))
+    await page.evaluate(() =>
+      localStorage.setItem(
+        'pokebistro:cart',
+        '{"items":[{"kind":"product","productId":999,"key":"p:999","quantity":-3}]}',
+      ),
+    )
     await page.reload()
     await expect(cartButton(page)).toHaveAccessibleName('Ouvrir le panier, 0 article')
   })

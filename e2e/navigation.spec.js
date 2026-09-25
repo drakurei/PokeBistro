@@ -3,7 +3,7 @@ import { test, expect } from '@playwright/test'
 test.describe('Loading and navigation', () => {
   test('home renders the hero and the loader never blocks the page', async ({ page }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('Poké')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('univers Pokémon')
     // With reduced motion the loader is skipped; otherwise it must be gone within 3 seconds
     await expect(page.getByRole('status', { name: 'Chargement de PokéBistro' })).toHaveCount(0, {
       timeout: 3000,

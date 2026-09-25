@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 
-const cartButton = (page) => page.getByRole('button', { name: /Ouvrir le panier/ })
+const cartButton = (page) => page.getByRole('button', { name: /Ouvrir le panier/ }).first()
 const drawer = (page) => page.getByRole('dialog', { name: /^Panier/ })
 
 test.describe('The carte as a restaurant menu', () => {
@@ -28,20 +28,25 @@ test.describe('The carte as a restaurant menu', () => {
     expect(report.total).toBeGreaterThanOrEqual(44)
   })
 
-  test('the carte is grouped like a menu, with the formules first', async ({ page }) => {
+  test('the carte is grouped like a menu, in the order of a meal, formules last', async ({ page }) => {
     await page.goto('/menu')
-    const headings = await page.locator('h2[id^="group-"]').allInnerTexts()
-    expect(headings[0]).toMatch(/^Formules/)
+    const headings = await page.locator('h2[id^="group-"]').allTextContents()
     expect(headings.map((h) => h.split('\n')[0].replace(/\d+$/, '').trim())).toEqual([
-      'Formules',
       'Entrées',
       'Bentos',
       'Burgers',
       'Bowls',
+      'Grandes assiettes',
       'Desserts',
       'Boissons',
-      'Menus',
+      'Formules',
     ])
+    // The table of contents jumps to a section
+    await page
+      .getByRole('navigation', { name: 'Sections de la carte' })
+      .getByRole('link', { name: 'Desserts' })
+      .click()
+    await expect(page).toHaveURL(/#dessert$/)
     await expect(page.getByRole('heading', { level: 3, name: 'Roucool Crispy' })).toBeVisible()
     await expect(page.getByRole('heading', { level: 3, name: 'Lucario Bento' })).toBeVisible()
     await expect(page.getByRole('heading', { level: 3, name: 'Mew Berry Bowl', exact: true })).toBeVisible()
@@ -63,11 +68,15 @@ test.describe('The carte as a restaurant menu', () => {
 
   test('the configurable formule is composed, then added', async ({ page }) => {
     await page.goto('/menu?category=formules')
-    await page.getByRole('link', { name: 'Composer' }).click()
+    await page
+      .getByRole('article')
+      .filter({ hasText: 'Formule Dresseur' })
+      .getByRole('link', { name: 'Composer' })
+      .click()
     const dialog = page.getByRole('dialog', { name: 'Formule Dresseur' })
     await expect(dialog).toBeVisible()
-    await dialog.getByLabel('Plat').selectOption({ label: 'Lucario Power Burger' })
-    await dialog.getByLabel('Boisson').selectOption({ label: 'Pikachu Spark Soda' })
+    await dialog.getByRole('radio', { name: /Lucario Power Burger/ }).check({ force: true })
+    await dialog.getByRole('radio', { name: /Pikachu Spark Soda/ }).check({ force: true })
     await expect(dialog.getByRole('listitem').filter({ hasText: 'Lucario Power Burger' })).toBeVisible()
     await dialog.getByRole('button', { name: /Ajouter · 26,90 €/ }).click()
     await page.keyboard.press('Escape')
@@ -85,7 +94,7 @@ test.describe('The carte as a restaurant menu', () => {
     await page.getByRole('button', { name: 'Ajouter aux favoris' }).click()
     await expect(page.getByRole('button', { name: 'Retirer des favoris' })).toBeVisible()
     await page.goto('/menu/pikachu-spark-soda')
-    await expect(page.getByRole('heading', { level: 2, name: 'Pikachu Spark Soda' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: 'Pikachu Spark Soda' })).toBeVisible()
   })
 
   test('home reviews are labelled as demonstration content', async ({ page }) => {
@@ -94,17 +103,32 @@ test.describe('The carte as a restaurant menu', () => {
     await expect(page.getByRole('heading', { name: /dresseurs en disent/ })).toBeVisible()
   })
 
-  test('reservation accepts a special request', async ({ page }) => {
+  test('reservation accepts a special request and offers a calendar file', async ({ page }) => {
     await page.goto('/reservation')
     const tomorrow = new Date()
     tomorrow.setDate(tomorrow.getDate() + 1)
     await page.getByLabel('Date').fill(tomorrow.toISOString().slice(0, 10))
-    await page.getByLabel('Horaire').selectOption('19:30')
+    // Some slots are (pretend) full: take the first free dinner slot
+    const free = await page
+      .getByLabel('Horaire')
+      .locator('optgroup[label="Dîner"] option:not([disabled])')
+      .first()
+      .getAttribute('value')
+    await page.getByLabel('Horaire').selectOption(free)
+    await page.getByRole('radio', { name: /Terrasse/ }).check({ force: true })
     await page.getByLabel('Nom').fill('Sacha')
+    await page.getByLabel('Téléphone').fill('06 12 34 56 78')
     await page.getByLabel('Email').fill('sacha@bourg-palette.fr')
     await page.getByLabel('Demande spéciale').fill('Un anniversaire, une bougie sur le Velvet Cake.')
-    await page.getByRole('button', { name: 'Demander une table' }).click()
+    await page.getByRole('button', { name: 'Vérifier ma demande' }).click()
+    await expect(page.getByRole('heading', { name: 'Vérifiez votre demande' })).toBeVisible()
+    await expect(page.getByText('Terrasse', { exact: false }).first()).toBeVisible()
+    await page.getByRole('button', { name: 'Confirmer la demande' }).click()
     await expect(page.getByText('Demande reçue.')).toBeVisible({ timeout: 5000 })
     await expect(page.getByText(/Votre demande a bien été notée/)).toBeVisible()
+    await expect(page.getByRole('link', { name: /Ajouter à mon agenda/ })).toHaveAttribute(
+      'href',
+      /^data:text\/calendar/,
+    )
   })
 })

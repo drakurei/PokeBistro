@@ -9,18 +9,18 @@ const count = (page) =>
 test.describe('Menu: search, filters, detail', () => {
   test('search narrows the grid, is accent-insensitive and can be cleared', async ({ page }) => {
     await page.goto('/menu')
-    await expect(count(page)).toHaveText('44 plats')
+    await expect(count(page)).toHaveText('59 plats')
 
     const search = page.getByRole('searchbox', { name: /Rechercher/ })
     await search.fill('epice')
     await expect(page).toHaveURL(/q=epice/)
-    await expect(count(page)).not.toHaveText('44 plats')
+    await expect(count(page)).not.toHaveText('59 plats')
     await expect(page.getByRole('heading', { level: 3, name: 'Goupix Fire Box' })).toBeVisible()
 
     await search.fill('zzzz')
     await expect(page.getByText('Aucun plat ne correspond.')).toBeVisible()
     await page.getByRole('button', { name: 'Tout effacer' }).first().click()
-    await expect(count(page)).toHaveText('44 plats')
+    await expect(count(page)).toHaveText('59 plats')
     await expect(page).not.toHaveURL(/q=/)
   })
 
@@ -39,11 +39,11 @@ test.describe('Menu: search, filters, detail', () => {
     await expect(page).toHaveURL(/category=bento/)
     await expect(page).toHaveURL(/type=feu/)
     await expect(page).toHaveURL(/price=10-15/)
-    await expect(count(page)).toHaveText('3 plats sur 44')
+    await expect(count(page)).toHaveText('3 plats sur 59')
 
     // The URL is the state: a reload restores the same selection
     await page.reload()
-    await expect(count(page)).toHaveText('3 plats sur 44')
+    await expect(count(page)).toHaveText('3 plats sur 59')
   })
 
   test('a dish opens in a dialog over the menu and has its own page', async ({ page }) => {
@@ -60,7 +60,7 @@ test.describe('Menu: search, filters, detail', () => {
 
     // Direct visit: full page with related dishes
     await page.goto('/menu/pikachu-bento')
-    await expect(page.getByRole('heading', { level: 2, name: 'Pikachu Bento' })).toBeVisible()
+    await expect(page.getByRole('heading', { level: 1, name: 'Pikachu Bento' })).toBeVisible()
     await expect(page).toHaveTitle(/Pikachu Bento/)
     await expect(page.getByRole('heading', { name: /Aussi de type/ })).toBeVisible()
 
