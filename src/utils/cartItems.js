@@ -10,7 +10,8 @@ export function slotOptions(slot) {
   return products.filter(
     (product) =>
       slot.categories.includes(product.category) &&
-      (slot.minPrice === undefined || product.price >= slot.minPrice),
+      (slot.minPrice === undefined || product.price >= slot.minPrice) &&
+      (slot.maxPrice === undefined || product.price <= slot.maxPrice),
   )
 }
 

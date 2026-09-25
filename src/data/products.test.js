@@ -1,14 +1,14 @@
 import { describe, expect, it } from 'vitest'
 import products, { productsBySlug, signatureProducts } from './products'
-import { allergensById, categoriesById, dietsById, tagsById } from './filters'
+import { allergensById, categoriesById, dessertGroupsById, dietsById, tagsById } from './filters'
 import { typesById } from './types'
 
 // The catalogue is data, but it is also a contract for the rest of the site
 describe('catalogue', () => {
-  it('has 44 dishes with unique ids and slugs', () => {
-    expect(products).toHaveLength(44)
-    expect(new Set(products.map((p) => p.id)).size).toBe(44)
-    expect(new Set(products.map((p) => p.slug)).size).toBe(44)
+  it('has 59 dishes with unique ids and slugs', () => {
+    expect(products).toHaveLength(59)
+    expect(new Set(products.map((p) => p.id)).size).toBe(59)
+    expect(new Set(products.map((p) => p.slug)).size).toBe(59)
     expect(products.map((p) => p.id)).toEqual(products.map((_, i) => i + 1))
   })
 
@@ -24,13 +24,32 @@ describe('catalogue', () => {
       expect(typesById[product.type], `${product.slug} type`).toBeDefined()
       for (const tag of product.tags) expect(tagsById[tag], `${product.slug} tag ${tag}`).toBeDefined()
       for (const diet of product.diet) expect(dietsById[diet], `${product.slug} diet ${diet}`).toBeDefined()
-      for (const allergen of product.allergens) expect(allergensById[allergen], `${product.slug} allergen`).toBeDefined()
+      for (const allergen of product.allergens)
+        expect(allergensById[allergen], `${product.slug} allergen`).toBeDefined()
       expect([0, 1, 2, 3]).toContain(product.spicy)
     }
   })
 
+  it('sorts every dessert into a sub-group, and nothing else', () => {
+    const desserts = products.filter((p) => p.category === 'dessert')
+    expect(desserts.length).toBeGreaterThanOrEqual(20)
+    for (const product of desserts) {
+      expect(dessertGroupsById[product.subcategory], product.slug).toBeDefined()
+    }
+    for (const product of products.filter((p) => p.category !== 'dessert')) {
+      expect(product.subcategory, product.slug).toBeUndefined()
+    }
+    const choux = desserts.filter((p) => p.subcategory === 'choux')
+    expect(choux).toHaveLength(15)
+    for (const product of choux) {
+      expect(product.diet).toContain('vegetarien')
+      expect(product.allergens).toEqual(expect.arrayContaining(['gluten', 'oeufs', 'lait']))
+      expect(product.image).toMatch(/profiteroles|croquembouche/)
+    }
+  })
+
   it('keeps editorial badges rare and honest', () => {
-    expect(signatureProducts).toHaveLength(6)
+    expect(signatureProducts).toHaveLength(7) // six dishes and the dessert signature
     expect(products.filter((p) => p.tags.includes('nouveau')).length).toBeLessThanOrEqual(8)
     expect(products.filter((p) => p.tags.includes('chef')).length).toBeLessThanOrEqual(5)
     expect(products.some((p) => p.tags.includes('populaire') || p.tags.includes('bestseller'))).toBe(false)

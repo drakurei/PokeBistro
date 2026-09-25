@@ -7,7 +7,7 @@ const names = (list) => list.map((product) => product.name)
 
 describe('filterProducts', () => {
   it('returns every product without filters', () => {
-    expect(filter({})).toHaveLength(44)
+    expect(filter({})).toHaveLength(59)
   })
 
   it('searches without accents or case, on several fields', () => {
@@ -47,7 +47,7 @@ describe('filterProducts', () => {
   })
 
   it('falls back to all prices for an unknown range', () => {
-    expect(filter({ price: 'nope' })).toHaveLength(44)
+    expect(filter({ price: 'nope' })).toHaveLength(59)
   })
 
   it('combines filters and can return nothing', () => {

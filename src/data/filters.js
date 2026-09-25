@@ -16,6 +16,15 @@ export const categories = [
   { id: 'boisson', label: 'Boisson', plural: 'Boissons', description: 'Sodas, thés, shots' },
 ]
 
+// Sub-groups of the dessert section (product.subcategory), in the order of the carte
+export const dessertGroups = [
+  { id: 'choux', label: 'Choux & profiteroles', description: 'La signature sucrée de la maison' },
+  { id: 'patisserie', label: 'Gâteaux & douceurs', description: 'Moelleux, mochis, puddings' },
+  { id: 'glace', label: 'Desserts glacés', description: 'Parfaits et glaces maison' },
+  { id: 'fruits', label: 'Fruits & bowls', description: 'Légers, frais, colorés' },
+]
+export const dessertGroupsById = Object.fromEntries(dessertGroups.map((group) => [group.id, group]))
+
 // Editorial tags only: nothing here claims sales data
 export const tags = [
   { id: 'signature', label: 'Signature' },

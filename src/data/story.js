@@ -26,6 +26,16 @@ export const chapters = [
       'Les types Pokémon sont devenus notre langue commune avec les clients. « Un truc Feu » veut dire relevé, grillé, fumé. « Plutôt Eau » veut dire frais, iodé, léger. « Combat » veut dire qu’on a faim. On n’a jamais eu besoin d’expliquer davantage.',
     ],
   },
+  {
+    id: 'douceurs',
+    eyebrow: 'Le laboratoire des douceurs',
+    title: 'Un Pokémon en pâte à choux, ça se mérite.',
+    paragraphs: [
+      'La collection est née d’un défi lancé à notre pâtissière : faire reconnaître un Pokémon avec de la pâte à choux, de la crème, du chocolat, des fruits et du sucre. Rien d’autre. Pas de figurine, pas de moule, pas de colorant qui n’ait pas d’abord un goût.',
+      'Chaque profiterole part du type : le Feu se glace à l’orange et au caramel, l’Eau à la myrtille et au yuzu, la Plante au matcha et à la pistache. La forme vient ensuite, avec une tuile, un pétale de sucre, une oreille en meringue. Le croquembouche de Pikachu, trente choux et du caramel filé, est le sommet de la collection : on le partage, on le photographie, puis on le mange.',
+    ],
+    dishes: ['pikachu-spark-profiteroles', 'ectoplasma-dark-profiteroles', 'marill-bubble-profiteroles'],
+  },
 ]
 
 export const team = [
