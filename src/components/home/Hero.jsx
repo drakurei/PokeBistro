@@ -64,7 +64,7 @@ export default function Hero() {
           </p>
           <h1
             id="hero-title"
-            className="mt-5 max-w-[58%] font-display text-display-xl text-balance md:max-w-[62%]"
+            className="mt-5 max-w-[58%] font-display text-display-xl text-balance max-[420px]:text-[2.75rem] md:max-w-[62%]"
           >
             <span className="block overflow-hidden">
               <span className="hero-word block">Poké</span>
@@ -79,7 +79,7 @@ export default function Hero() {
       {/* The belt, with the ball as its button */}
       <div className="relative">
         <div aria-hidden="true" className="hero-belt h-[3px] origin-center bg-ink" />
-        <div className="hero-ball pointer-events-none absolute top-1/2 right-[5%] z-10 w-[clamp(150px,28vw,440px)] -translate-y-1/2 md:right-[8%]">
+        <div className="hero-ball pointer-events-none absolute top-1/2 right-[5%] z-10 w-[clamp(150px,28vw,440px)] -translate-y-1/2 max-[420px]:w-[124px] md:right-[8%]">
           <HeroBall />
         </div>
       </div>
