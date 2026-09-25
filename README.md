@@ -217,4 +217,13 @@ Le site n'est jamais enfermé dans GitHub Pages : la base est une variable d'env
 
 https://github.com/drakurei/PokeBistro.git
 
+### Branches
+
+- `main` : la version publiée (déployée sur GitHub Pages) ;
+- `develop` : la branche d'intégration, d'où partent les nouvelles fonctionnalités ;
+- `feature/<nom>` : une branche par fonctionnalité, créée depuis `develop`, fusionnée dans `develop` puis dans `main` (`feature/design-system`, `feature/home-hero-3d`, `feature/menu-filters`, `feature/cart-drawer`, `feature/pages-forms`, `feature/seo`, `feature/e2e-tests`) ;
+- `gh-pages` : générée par `npm run deploy`, ne contient que le site compilé.
+
+Nouvelle fonctionnalité : `git checkout develop && git checkout -b feature/xxx`, merge dans `develop` puis dans `main`, puis `npm run deploy` depuis `main`.
+
 Pokémon est une marque de Nintendo / Creatures Inc. / GAME FREAK inc. PokéBistro est un restaurant fictif et un projet de portfolio sans but commercial.
