@@ -1,320 +1,403 @@
 /*
- * Global styles for PokéBistro.
- *
- * Bootstrap and Tailwind are both loaded here.
- * Tailwind v4 puts all its CSS inside cascade layers. A stylesheet loaded
- * outside of any layer (like Bootstrap imported from main.jsx) would always win
- * over Tailwind utilities, even with a lower specificity.
- * So Bootstrap is imported in its own layer, placed BEFORE "utilities":
- *   - Bootstrap is the base (reset, components),
- *   - Tailwind utilities can still override it (ex: mb-0, font-bold...).
- * Tailwind's Preflight reset is not imported: Bootstrap Reboot already does that job.
+ * PokéBistro — global styles.
+ * Tokens live in @theme (Tailwind 4) so every value is available both as a utility
+ * class (bg-lacquer, font-display, py-section…) and as a CSS variable (var(--color-lacquer)).
+ * See docs/design/design-system.md.
  */
-@layer bootstrap, theme, base, components, utilities;
+@import 'tailwindcss';
 
-@import 'bootstrap/dist/css/bootstrap.min.css' layer(bootstrap);
-@import 'tailwindcss/theme.css' layer(theme);
-@import 'tailwindcss/utilities.css' layer(utilities);
-
-/* Brand tokens, usable as Tailwind classes: bg-poke-yellow, text-poke-blue, font-display... */
 @theme {
-  --color-poke-yellow: #ffcb05;
-  --color-poke-red: #e3350d;
-  --color-poke-blue: #2a75bb;
-  --color-poke-navy: #1b2a4a;
-  --color-poke-cream: #fff8e1;
-  --font-display: 'Fredoka', 'Nunito', sans-serif;
-  --font-body: 'Nunito', system-ui, sans-serif;
-}
+  /* Colours: lacquer, porcelain, ink, gold */
+  --color-porcelain: #fcfbf8;
+  --color-washi: #f7eedc;
+  --color-washi-deep: #efe3c9;
+  --color-lacquer: #c9211b;
+  --color-lacquer-deep: #9e1913;
+  --color-ink: #17151a;
+  --color-ink-soft: #3c3944;
+  --color-ink-mute: #6b6772;
+  --color-line: #e6e0d3;
+  --color-line-dark: #2c2932;
+  --color-gold: #f2b826;
+  --color-success: #1f7a4d;
+  --color-danger: #b42318;
 
-/* ---------- Bootstrap theme ---------- */
+  /* Pokémon types: functional palette */
+  --color-type-electrik: #f2b826;
+  --color-type-feu: #e8542b;
+  --color-type-eau: #2f7be0;
+  --color-type-plante: #4fb34f;
+  --color-type-normal: #9e9683;
+  --color-type-psy: #e9508a;
+  --color-type-fee: #f2a1b8;
+  --color-type-glace: #7fd3e0;
 
-:root {
-  --bs-body-font-family: var(--font-body);
-  --bs-body-bg: #fffdf7;
-  --bs-body-color: #1f2937;
-  --bs-primary: #2a75bb;
-  --bs-primary-rgb: 42, 117, 187;
-  --bs-link-color: #2a75bb;
-  --bs-link-hover-color: #1d4f80;
-}
+  /* Type */
+  --font-display: 'Unbounded Variable', 'Zen Kaku Gothic New', system-ui, sans-serif;
+  --font-sans: 'Zen Kaku Gothic New', system-ui, sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
 
-/* All Bootstrap buttons are pill-shaped and a bit bolder */
-.btn {
-  --bs-btn-border-radius: 999px;
-  --bs-btn-font-weight: 600;
-  --bs-btn-padding-x: 1.25rem;
-}
+  --text-display-xl: clamp(3.25rem, 9vw, 9rem);
+  --text-display-xl--line-height: 0.92;
+  --text-display-xl--letter-spacing: -0.03em;
+  --text-display-xl--font-weight: 800;
 
-.btn-primary {
-  --bs-btn-bg: #2a75bb;
-  --bs-btn-border-color: #2a75bb;
-  --bs-btn-hover-bg: #1f5f9a;
-  --bs-btn-hover-border-color: #1f5f9a;
-  --bs-btn-active-bg: #1b4f80;
-  --bs-btn-active-border-color: #1b4f80;
-  --bs-btn-disabled-bg: #2a75bb;
-  --bs-btn-disabled-border-color: #2a75bb;
-  --bs-btn-focus-shadow-rgb: 42, 117, 187;
-}
+  --text-display-lg: clamp(2.25rem, 5vw, 4.5rem);
+  --text-display-lg--line-height: 1;
+  --text-display-lg--letter-spacing: -0.02em;
+  --text-display-lg--font-weight: 700;
 
-.btn-outline-primary {
-  --bs-btn-color: #2a75bb;
-  --bs-btn-border-color: #2a75bb;
-  --bs-btn-hover-bg: #2a75bb;
-  --bs-btn-hover-border-color: #2a75bb;
-  --bs-btn-active-bg: #1f5f9a;
-  --bs-btn-active-border-color: #1f5f9a;
-  --bs-btn-focus-shadow-rgb: 42, 117, 187;
-}
+  --text-display-md: clamp(1.75rem, 3vw, 2.75rem);
+  --text-display-md--line-height: 1.1;
+  --text-display-md--letter-spacing: -0.01em;
+  --text-display-md--font-weight: 700;
 
-.btn-warning {
-  --bs-btn-bg: #ffcb05;
-  --bs-btn-border-color: #ffcb05;
-  --bs-btn-color: #1b2a4a;
-  --bs-btn-hover-bg: #f0bd00;
-  --bs-btn-hover-border-color: #f0bd00;
-  --bs-btn-hover-color: #1b2a4a;
-  --bs-btn-active-bg: #e0b000;
-  --bs-btn-active-border-color: #e0b000;
-}
+  --text-display-sm: clamp(1.25rem, 2vw, 1.75rem);
+  --text-display-sm--line-height: 1.15;
+  --text-display-sm--letter-spacing: -0.01em;
+  --text-display-sm--font-weight: 600;
 
-.form-check-input:checked {
-  background-color: #2a75bb;
-  border-color: #2a75bb;
+  --text-label: 0.75rem;
+  --text-label--line-height: 1;
+  --text-label--letter-spacing: 0.12em;
+  --text-label--font-weight: 500;
+
+  /* Shape, depth, rhythm */
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+  --shadow-float: 0 24px 60px -24px rgb(23 21 26 / 0.28);
+  --shadow-float-lg: 0 40px 90px -30px rgb(23 21 26 / 0.4);
+  --spacing-section: clamp(4rem, 9vw, 8rem);
+  --spacing-gutter: clamp(1rem, 4vw, 2.5rem);
+  --spacing-header: 5rem;
+
+  /* Motion */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.3, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 450ms;
+  --duration-hero: 900ms;
+
+  --animate-marquee: marquee 48s linear infinite;
+  --animate-spin-slow: spin 60s linear infinite;
+  --animate-float: float 5s ease-in-out infinite;
+  --animate-pulse-badge: pulse-badge 360ms var(--ease-spring);
+  --animate-toast-in: toast-in 300ms var(--ease-out);
+  --animate-menu-link-in: menu-link-in 500ms var(--ease-out) both;
+
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  @keyframes menu-link-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-8px);
+    }
+  }
+  @keyframes pulse-badge {
+    0% {
+      transform: scale(1);
+    }
+    40% {
+      transform: scale(1.3);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
 }
 
 /* ---------- Base ---------- */
 
-html {
-  scroll-behavior: smooth;
-  /* Keeps anchored sections below the sticky header */
-  scroll-padding-top: 88px;
+@layer base {
+  html {
+    scroll-padding-top: calc(var(--spacing-header) + 1rem);
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-porcelain);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-feature-settings: 'kern';
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: clip;
+  }
+
+  ::selection {
+    background-color: var(--color-lacquer);
+    color: #fff;
+  }
+
+  /* One focus style for everything: visible, brand-coloured, never removed */
+  :focus-visible {
+    outline: 3px solid color-mix(in oklab, var(--color-lacquer) 55%, transparent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  button,
+  [role='button'] {
+    cursor: pointer;
+    touch-action: manipulation;
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Prices, counters and labels never jitter */
+  .font-mono {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Native dialogs: top layer, no default chrome */
+  dialog {
+    margin: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    max-width: none;
+    max-height: none;
+  }
+
+  dialog::backdrop {
+    background: rgb(23 21 26 / 0.55);
+  }
+
+  /* Page scroll is frozen behind an open modal */
+  :root:has(dialog:modal) {
+    overflow: hidden;
+  }
 }
 
-h1,
-h2,
-h3,
-.navbar-brand {
-  font-family: var(--font-display);
+/* ---------- Components ---------- */
+
+@layer components {
+  .container-pb {
+    width: 100%;
+    max-width: 80rem;
+    margin-inline: auto;
+    padding-inline: var(--spacing-gutter);
+  }
+
+  /*
+   * The belt: signature line of the site (2px ink rule with the Poké Ball button in the middle).
+   * `.belt-light` inverts it for dark surfaces.
+   */
+  .belt {
+    position: relative;
+    height: 2px;
+    background-color: var(--color-ink);
+  }
+
+  .belt::before,
+  .belt::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    border-radius: 9999px;
+  }
+
+  .belt::before {
+    width: 28px;
+    height: 28px;
+    background: var(--color-porcelain);
+    border: 2px solid var(--color-ink);
+  }
+
+  .belt::after {
+    width: 10px;
+    height: 10px;
+    background: var(--color-ink);
+  }
+
+  .belt-light {
+    background-color: var(--color-porcelain);
+  }
+
+  .belt-light::before {
+    background: var(--color-ink);
+    border-color: var(--color-porcelain);
+  }
+
+  .belt-light::after {
+    background: var(--color-porcelain);
+  }
+
+  /* Product visuals: the cream edges of the image dissolve into whatever surface is behind */
+  .dish-image {
+    mask-image: radial-gradient(ellipse 62% 62% at 50% 52%, #000 58%, transparent 82%);
+    -webkit-mask-image: radial-gradient(ellipse 62% 62% at 50% 52%, #000 58%, transparent 82%);
+  }
+
+  /* Text on lacquer / ink */
+  .on-dark {
+    color: var(--color-porcelain);
+  }
+
+  /* Thin scrollbars inside drawers */
+  .scroll-panel {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line) transparent;
+    overscroll-behavior: contain;
+  }
 }
 
-/* Visible keyboard focus on our custom buttons (chips, filter options, quantity buttons) */
-.chip:focus-visible,
-.filter-option:focus-visible,
-.qty-btn:focus-visible {
-  outline: 3px solid rgba(42, 117, 187, 0.45);
-  outline-offset: 2px;
+/* ---------- Utilities ---------- */
+
+@utility text-balance {
+  text-wrap: balance;
 }
 
-/* ---------- Header ---------- */
+@utility text-pretty {
+  text-wrap: pretty;
+}
 
-.navbar .nav-link {
-  padding: 0.45rem 1rem;
-  border-radius: 999px;
+/* ---------- Native dialog transitions (entry via @starting-style, exit via allow-discrete) ---------- */
+
+dialog[data-variant] {
   transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
+    opacity var(--duration-base) var(--ease-out),
+    translate var(--duration-slow) var(--ease-out),
+    scale var(--duration-slow) var(--ease-out),
+    overlay var(--duration-slow) allow-discrete,
+    display var(--duration-slow) allow-discrete;
 }
 
-.navbar .nav-link:hover,
-.navbar .nav-link:focus-visible {
-  background-color: rgba(255, 255, 255, 0.14);
-  color: #fff;
+dialog[data-variant]::backdrop {
+  transition:
+    opacity var(--duration-base) var(--ease-out),
+    overlay var(--duration-slow) allow-discrete,
+    display var(--duration-slow) allow-discrete;
+  opacity: 0;
 }
 
-/* Feedback when the cart changes: the counter "pops" */
-@keyframes pop {
-  0% {
-    transform: translate(-50%, -50%) scale(1);
-  }
-  50% {
-    transform: translate(-50%, -50%) scale(1.4);
-  }
-  100% {
-    transform: translate(-50%, -50%) scale(1);
-  }
+dialog[data-variant][open]::backdrop {
+  opacity: 1;
 }
 
-.badge-pop {
-  animation: pop 0.3s ease;
-}
-
-/* ---------- Product cards ---------- */
-
-@keyframes fade-up {
-  from {
+@starting-style {
+  dialog[data-variant][open]::backdrop {
     opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
   }
 }
 
-.product-card {
-  animation: fade-up 0.35s ease both;
-  transition:
-    transform 0.25s ease,
-    box-shadow 0.25s ease;
+dialog[data-variant='center'] {
+  opacity: 0;
+  scale: 0.96;
+}
+dialog[data-variant='center'][open] {
+  opacity: 1;
+  scale: 1;
+}
+@starting-style {
+  dialog[data-variant='center'][open] {
+    opacity: 0;
+    scale: 0.96;
+  }
 }
 
-.product-card:hover {
-  transform: translateY(-6px);
-  box-shadow: 0 1rem 2rem rgba(27, 42, 74, 0.16);
+dialog[data-variant='right'] {
+  margin: 0 0 0 auto;
+  height: 100dvh;
+  translate: 100% 0;
+}
+dialog[data-variant='right'][open] {
+  translate: 0 0;
+}
+@starting-style {
+  dialog[data-variant='right'][open] {
+    translate: 100% 0;
+  }
 }
 
-/* Product images are 198 x 168 px: the box keeps the same ratio, so nothing is cropped or stretched */
-.ratio-product {
-  --bs-aspect-ratio: calc(168 / 198 * 100%);
-  background-color: #f7efdb;
-}
-
-.product-card-image {
-  transition: transform 0.35s ease;
-}
-
-.product-card:hover .product-card-image {
-  transform: scale(1.05);
-}
-
-/* Small tag chips (sidebar + cards). Clicking a chip filters the products. */
-.chip {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.3rem 0.8rem;
-  border: 1px solid transparent;
-  border-radius: 999px;
-  background-color: #f1f5f9;
-  color: #475569;
-  font-size: 0.8rem;
-  font-weight: 700;
-  text-transform: capitalize;
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease,
-    transform 0.2s ease;
-}
-
-.chip:hover {
-  background-color: #fff3b0;
-  color: #1b2a4a;
-  transform: translateY(-1px);
-}
-
-.chip.is-active {
-  background-color: #ffcb05;
-  border-color: #e0b000;
-  color: #1b2a4a;
-}
-
-/* ---------- Sidebar ---------- */
-
-.filter-block + .filter-block {
-  margin-top: 1.25rem;
-  padding-top: 1.25rem;
-  border-top: 1px solid #eef1f5;
-}
-
-/* One line of the category list */
-.filter-option {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+dialog[data-variant='bottom'] {
+  margin: auto 0 0 0;
   width: 100%;
-  padding: 0.55rem 0.9rem;
-  border: 0;
-  border-radius: 0.75rem;
-  background-color: transparent;
-  color: #1f2937;
-  font-weight: 600;
-  text-align: left;
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
+  translate: 0 100%;
+}
+dialog[data-variant='bottom'][open] {
+  translate: 0 0;
+}
+@starting-style {
+  dialog[data-variant='bottom'][open] {
+    translate: 0 100%;
+  }
 }
 
-.filter-option:hover {
-  background-color: #f1f5f9;
+dialog[data-variant='full'] {
+  width: 100%;
+  height: 100dvh;
+  opacity: 0;
+  translate: 0 -12px;
 }
-
-.filter-option.is-active {
-  background-color: #2a75bb;
-  color: #fff;
+dialog[data-variant='full'][open] {
+  opacity: 1;
+  translate: 0 0;
 }
-
-.filter-count {
-  padding: 0.1rem 0.55rem;
-  border-radius: 999px;
-  background-color: #eef2f7;
-  color: #475569;
-  font-size: 0.75rem;
-  font-weight: 700;
-}
-
-.filter-option.is-active .filter-count {
-  background-color: rgba(255, 255, 255, 0.22);
-  color: #fff;
-}
-
-/* ---------- Cart ---------- */
-
-.cart-item + .cart-item {
-  border-top: 1px solid #eef1f5;
-}
-
-/* Round − / + buttons */
-.qty-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2rem;
-  height: 2rem;
-  border: 0;
-  border-radius: 999px;
-  background-color: #fff;
-  color: #1b2a4a;
-  font-size: 1.1rem;
-  font-weight: 700;
-  line-height: 1;
-  box-shadow: 0 1px 3px rgba(27, 42, 74, 0.15);
-  transition:
-    background-color 0.2s ease,
-    color 0.2s ease;
-}
-
-.qty-btn:hover {
-  background-color: #2a75bb;
-  color: #fff;
-}
-
-/* ---------- Modal ---------- */
-
-@keyframes modal-in {
-  from {
+@starting-style {
+  dialog[data-variant='full'][open] {
     opacity: 0;
-    transform: translateY(-16px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+    translate: 0 -12px;
   }
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 0.5;
-  }
-}
+/* ---------- Reduced motion ---------- */
 
-.modal.d-block .modal-dialog {
-  animation: modal-in 0.25s ease-out;
-}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.15s !important;
+    scroll-behavior: auto !important;
+  }
 
-.modal-backdrop.show {
-  animation: fade-in 0.2s ease-out;
+  dialog[data-variant] {
+    translate: 0 0 !important;
+    scale: 1 !important;
+  }
 }
