@@ -1,14 +1,23 @@
 {
-  "name": "poke-bistro",
+  "name": "pokebistro",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "lint": "oxlint",
+    "build:pages": "vite build --mode pages",
     "preview": "vite preview",
-    "predeploy": "vite build --base=./",
+    "lint": "oxlint",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "playwright test",
+    "predeploy": "npm run build:pages",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
