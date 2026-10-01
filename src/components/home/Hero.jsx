@@ -66,36 +66,36 @@ export default function Hero() {
             </p>
             <h1
               id="hero-title"
-              className="mt-5 max-w-[14ch] font-display text-[clamp(1.85rem,5.6vw,4.25rem)] leading-[1.02] font-bold tracking-[-0.02em] text-balance md:max-w-[16ch] md:text-[clamp(2.25rem,4.9vw,3.75rem)]"
+              className="mt-5 max-w-[14ch] font-display text-[clamp(1.85rem,5.6vw,4.25rem)] leading-[1.02] font-bold tracking-[-0.02em] text-balance md:max-w-none md:text-[clamp(2.25rem,4.6vw,3.5rem)] lg:text-[clamp(2.5rem,4vw,3.5rem)] xl:text-[clamp(3rem,2.75vw,3.25rem)]"
             >
               {hero.title}
             </h1>
           </div>
 
           <figure className="hero-dish relative z-10 -mb-14 justify-self-end md:col-span-5 md:-mb-20 lg:col-span-6 lg:-mb-24">
+            {/* A washi card, like a menu card standing on the belt: the cream of the photo melts into it */}
             <Link
               to={`/menu/${dish.slug}`}
-              className="group block w-[min(70vw,330px)] no-underline md:w-[clamp(300px,36vw,500px)]"
+              className="group block w-[min(70vw,330px)] overflow-hidden rounded-(--radius-lg) bg-washi p-2 shadow-float-lg no-underline md:w-[clamp(300px,36vw,500px)] md:p-3"
               aria-label={`${dish.name}, voir le plat`}
             >
               <DishImage
                 product={dish}
                 priority
-                sizes="(min-width: 768px) 36vw, 76vw"
-                className="w-full drop-shadow-[0_30px_40px_rgb(23_21_26_/_0.35)] transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-[1.02]"
+                sizes="(min-width: 768px) 36vw, 70vw"
+                className="w-full rounded-[calc(var(--radius-lg)-0.75rem)] transition-transform duration-(--duration-slow) ease-(--ease-out) group-hover:scale-[1.03]"
               />
             </Link>
+            {/* The Poké Ball is the button of the belt, tucked against the card: it never meets the title */}
+            <div className="hero-ball pointer-events-none absolute bottom-14 -left-9 z-20 w-[clamp(72px,10vw,150px)] translate-y-1/2 md:bottom-20 md:-left-14 lg:bottom-24 lg:-left-20">
+              <HeroBall />
+            </div>
           </figure>
         </div>
       </div>
 
-      {/* The belt, with the ball as its button */}
-      <div className="relative">
-        <div aria-hidden="true" className="hero-belt h-[3px] origin-center bg-ink" />
-        <div className="hero-ball pointer-events-none absolute top-1/2 left-[5%] z-20 w-[clamp(72px,10vw,150px)] -translate-y-1/2 md:left-[42%] md:-translate-x-1/2 lg:left-[45%]">
-          <HeroBall />
-        </div>
-      </div>
+      {/* The belt: the card and its ball stand on it */}
+      <div aria-hidden="true" className="hero-belt h-[3px] origin-center bg-ink" />
 
       {/* Bottom half: porcelain */}
       <div className="bg-porcelain">

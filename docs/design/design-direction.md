@@ -17,8 +17,8 @@ Le site est construit sur cette correspondance. Il ne cite pas Pokémon par des 
 ## Le hero (v3, « food-first »)
 
 - **Structure** : la Poké Ball ouverte. Haut laque (`#C9211B`), ceinture encre de 3 px, bas porcelaine. La **Poké Ball 3D** est le bouton de la ceinture, à petite échelle (72 → 150 px) : un sceau, plus un décor.
-- **Sujet** : un plat haute définition (Marill Aqua Bowl, `data/content.js › hero.dishSlug`) qui déborde de la laque et se pose sur la ceinture. Il est peint immédiatement (`fetchpriority="high"`, préchargé, jamais en `opacity: 0`).
-- **Titre** : `clamp(1.85rem, 5.6vw, 4.25rem)`, `max-width: 14ch`, trois lignes maximum à 390 px. Visible dès la première peinture : l'intro GSAP n'anime que la ceinture, le plat, la balle, le chapeau et les boutons.
+- **Sujet** : un plat haute définition (Marill Aqua Bowl, `data/content.js › hero.dishSlug`) posé sur une **carte washi** arrondie (ombre portée) qui déborde de la laque et s'appuie sur la ceinture : la photo, prise sur un fond crème, fond dans la carte au lieu de former un rectangle sur le rouge. La Poké Ball est accrochée au coin bas-gauche de la carte, à hauteur de ceinture, donc jamais sur le titre. Le plat est peint immédiatement (`fetchpriority="high"`, préchargé, jamais en `opacity: 0`).
+- **Titre** : trois lignes à toutes les largeurs (390, 768, 1024, 1366, 1920) : `clamp(1.85rem, 5.6vw, 4.25rem)` et `max-width: 14ch` sur mobile, puis la colonne de grille fait la mesure avec une échelle par palier (`md` 4,6vw, `lg` 4vw, `xl` 2,75vw plafonné à 3,25rem). Visible dès la première peinture : l'intro GSAP n'anime que la ceinture, le plat, la balle, le chapeau et les boutons.
 - **Sous la ceinture** : le chapeau, deux boutons (carte, réservation) et la **légende du plat** (nom, type, prix) qui mène à sa fiche. Les quatre médaillons de la v2 ont disparu : ils gênaient à 768 px et diluaient le sujet.
 - **Hauteurs plafonnées** : `min-height: min(50svh, 560px)` pour la laque, aucune section n'excède un écran.
 
